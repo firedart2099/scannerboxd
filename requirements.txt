@@ -2,5 +2,5 @@ Flask
 pandas
 requests
 python-dotenv
-git+https://www.google.com/url?sa=E&source=gmail&q=https://github.com/dawoudt/SimpleJustWatchAPI.git
+git+https://www.google.com/search?q=https://github.com/dawoudt/SimpleJustWatchAPI.git
 gunicorn
