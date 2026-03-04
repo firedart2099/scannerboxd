@@ -2,5 +2,4 @@ Flask
 pandas
 requests
 python-dotenv
-justwatch
 gunicorn
