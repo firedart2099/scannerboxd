@@ -28,6 +28,20 @@ ARQUIVO_PROGRESSO = "progresso.json" # Monitor de progresso compartilhado
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 TMDB_API_KEY = os.getenv("TMDB_API_KEY")
 
+# === SISTEMA DE PROGRESSO COMPARTILHADO ===
+def set_progresso(atual, total, finalizado, filme_atual):
+    try:
+        with open(ARQUIVO_PROGRESSO, 'w', encoding='utf-8') as f:
+            json.dump({"atual": atual, "total": total, "finalizado": finalizado, "filme_atual": filme_atual}, f)
+    except: pass
+
+def get_progresso():
+    try:
+        with open(ARQUIVO_PROGRESSO, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except:
+        return {"atual": 0, "total": 0, "finalizado": False, "filme_atual": "Aguardando..."}
+
 def garantir_arquivos_externos():
     if not os.path.exists(ARQUIVO_FRASES):
         with open(ARQUIVO_FRASES, 'w', encoding='utf-8') as f:
@@ -42,20 +56,6 @@ def garantir_arquivos_externos():
         set_progresso(0, 0, False, "Aguardando...")
 
 garantir_arquivos_externos()
-
-# === SISTEMA DE PROGRESSO COMPARTILHADO ===
-def set_progresso(atual, total, finalizado, filme_atual):
-    try:
-        with open(ARQUIVO_PROGRESSO, 'w', encoding='utf-8') as f:
-            json.dump({"atual": atual, "total": total, "finalizado": finalizado, "filme_atual": filme_atual}, f)
-    except: pass
-
-def get_progresso():
-    try:
-        with open(ARQUIVO_PROGRESSO, 'r', encoding='utf-8') as f:
-            return json.load(f)
-    except:
-        return {"atual": 0, "total": 0, "finalizado": False, "filme_atual": "Aguardando..."}
 
 # === SISTEMA DE SEGURANÇA E CRÉDITOS POR IP ===
 def get_ip():
