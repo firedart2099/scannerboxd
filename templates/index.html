@@ -485,6 +485,7 @@
                 </div>
                 
                 <h3 class="text-xl md:text-3xl font-black text-white uppercase tracking-tighter mb-2">Buscando Plataformas</h3>
+                <p id="current-movie-name" class="text-[#8c9bab] text-xs md:text-sm max-w-lg mx-auto truncate">A processar...</p>
                 
                 <div class="flex flex-row justify-center gap-2 mt-4">
                     <div class="bg-[#14181c] p-3 rounded-xl border border-[#2c3440] flex-1">
@@ -492,7 +493,7 @@
                         <span id="loading-count" class="text-lg font-black text-[#40bcf4]">0/0</span>
                     </div>
                     <div class="bg-[#14181c] p-3 rounded-xl border border-[#2c3440] flex-1">
-                        <span class="block text-[8px] text-[#00e054] font-black uppercase mb-1">Tempo</span>
+                        <span class="block text-[8px] text-[#00e054] font-black uppercase mb-1">Tempo Est.</span>
                         <span id="eta-timer" class="text-lg font-black text-white">--:--</span>
                     </div>
                 </div>
@@ -565,6 +566,13 @@
 </div>
 
 <script>
+    // SISTEMA DE SESSÕES (Cria uma "impressão digital" para este navegador)
+    let sessionId = localStorage.getItem('oraculo_session_id');
+    if (!sessionId) {
+        sessionId = crypto.randomUUID();
+        localStorage.setItem('oraculo_session_id', sessionId);
+    }
+
     let statsData = {};
     let rawDatabase = {};
     let frasesAleatorias = [];
@@ -701,7 +709,10 @@
         const fnd = document.getElementById('file-name-display');
         if(fnd) { fnd.innerText = file.name; fnd.classList.remove('hidden'); }
         
-        const fd = new FormData(); fd.append("file", file);
+        const fd = new FormData(); 
+        fd.append("file", file);
+        fd.append("session_id", sessionId); // Envia o ID para o Backend
+        
         try {
             const res = await fetch('/upload_profile', { method: 'POST', body: fd });
             statsData = (await res.json()).stats;
@@ -760,7 +771,7 @@
         while(f.length < 4 && t < 4) {
             if(t===1) document.getElementById('ps-trophy')?.classList.add('show');
             try {
-                const r = await (await fetch('/oraculo')).json();
+                const r = await (await fetch(`/oraculo?session_id=${sessionId}`)).json();
                 if(r.recomendacoes) f.push(...r.recomendacoes.filter(x => !f.some(y=>y.rec===x.rec)));
             } catch(e) { break; }
             t++;
@@ -794,10 +805,22 @@
         recs.forEach((r,i) => {
             const idx = start+i, id=`oracle-card-${idx}`;
             g.insertAdjacentHTML('beforeend', `
-                <div id="${id}" class="movie-card opacity-0 translate-y-4 transition-all duration-700 cursor-pointer border-[#40bcf4] aspect-[2/3]" onclick="toggleSelecao(${idx})">
-                    <div id="check-${idx}" class="absolute top-2 right-2 z-40 bg-[#40bcf4] text-[#14181c] rounded-full p-1 transition-all"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg></div>
+                <div id="${id}" class="movie-card group opacity-0 translate-y-4 transition-all duration-700 cursor-pointer border-[#40bcf4] aspect-[2/3]" onclick="toggleSelecao(${idx})">
+                    <div id="check-${idx}" class="absolute top-2 right-2 z-40 bg-[#40bcf4] text-[#14181c] rounded-full p-1 transition-all"><svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg></div>
                     <img class="fav-poster absolute inset-0 w-full h-full object-cover z-10" src="" loading="lazy">
-                    <div class="card-info z-20"><span class="text-[#40bcf4] text-[8px] font-black uppercase bg-[#14181c]/80 px-1 rounded block truncate">${r.base}</span><h5 class="text-white font-bold text-xs line-clamp-2">${r.rec}</h5></div>
+                    
+                    <div class="card-info z-20 pb-2 px-2 sm:pb-3 sm:px-3">
+                        <span class="text-[#40bcf4] text-[7px] sm:text-[8px] font-black uppercase bg-[#14181c]/90 px-1 py-0.5 rounded inline-block truncate max-w-full mb-1 border border-[#40bcf4]/30">${r.base}</span>
+                        <h5 class="text-white font-bold text-[10px] sm:text-xs line-clamp-2 leading-tight drop-shadow-md">${r.rec}</h5>
+                    </div>
+
+                    <div class="absolute inset-0 bg-[#14181c]/95 z-30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col p-3 sm:p-4 text-center justify-center items-center"> 
+                        <svg class="w-6 h-6 sm:w-8 sm:h-8 mb-1.5 sm:mb-2 text-[#40bcf4] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                        <div class="w-full flex-1 overflow-y-auto no-scrollbar flex flex-col justify-center items-center mb-1">
+                            <p class="text-[9px] sm:text-[11px] text-gray-300 leading-snug sm:leading-relaxed line-clamp-6">"${r.desc}"</p>
+                        </div>
+                        <span class="text-[7px] sm:text-[9px] text-[#40bcf4] font-black uppercase tracking-widest mt-auto shrink-0">CLIQUE P/ SELECIONAR</span> 
+                    </div>
                 </div>
             `);
             fetch(`/api/tmdb/search?query=${encodeURIComponent(r.rec)}&year=${r.ano}`).then(r=>r.json()).then(d=>{
@@ -817,19 +840,43 @@
 
     async function iniciarFluxoWatchlist() {
         document.getElementById('loading-container').classList.remove('hidden');
-        iniciarCicloDeFrases(); fetch('/process_watchlist', { method: 'POST' });
+        iniciarCicloDeFrases(); 
+        
+        fetch('/process_watchlist', { 
+            method: 'POST', 
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({session_id: sessionId}) 
+        });
         
         const m = setInterval(async () => {
-            const p = await (await fetch('/progress')).json();
+            const p = await (await fetch(`/progress?session_id=${sessionId}`)).json();
             if(p.total > 0) {
                 const pct = (p.atual/p.total)*100;
                 document.getElementById('progress-bar-fill').style.width = pct+'%';
                 document.getElementById('load-percent').innerText = Math.floor(pct)+'%';
                 document.getElementById('loading-count').innerText = `${p.atual}/${p.total}`;
                 
+                const currentMovie = document.getElementById('current-movie-name');
+                if (currentMovie) currentMovie.innerText = p.filme_atual || "Processando...";
+                
+                // CÁLCULO DE ETA (TEMPO ESTIMADO) RECUPERADO
+                const itemsRemaining = p.total - p.atual;
+                const etaSeconds = itemsRemaining * 0.3; // 0.3s estimado por filme
+                const min = Math.floor(etaSeconds / 60);
+                const sec = Math.floor(etaSeconds % 60);
+                
+                const etaTimer = document.getElementById('eta-timer');
+                if (etaTimer) {
+                    if (etaSeconds > 0) {
+                        etaTimer.innerText = `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+                    } else {
+                        etaTimer.innerText = "Quase lá...";
+                    }
+                }
+                
                 if(p.finalizado) {
                     clearInterval(m); pararCicloDeFrases(); document.getElementById('loading-container').classList.add('hidden');
-                    rawDatabase = normalizeDatabase((await(await fetch('/dados')).json()).watchlist);
+                    rawDatabase = normalizeDatabase((await(await fetch(`/dados?session_id=${sessionId}`)).json()).watchlist);
                     mostrarVeredito();
                 }
             }
