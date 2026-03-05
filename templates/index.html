@@ -192,7 +192,6 @@
         }
     </style>
 </head>
-<!-- Padding Body Reduzido para Mobile -->
 <body class="p-2 sm:p-4 md:p-8 min-h-screen relative">
 
 <div id="ps-trophy" class="ps-trophy">
@@ -294,7 +293,6 @@
 
 <div class="max-w-5xl mx-auto relative z-10">
     <header class="flex justify-between items-start md:items-center mb-8 md:mb-16">
-        <!-- Logo Responsiva: Analyzer em baixo no mobile e igualado no desktop -->
         <div class="flex items-start sm:items-center gap-2 sm:gap-4 group cursor-pointer shrink-0" onclick="location.reload()">
             <div class="flex items-center gap-1.5 group-hover:scale-110 transition-transform mt-1.5 sm:mt-0">
                 <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[#00e054]"></div>
@@ -451,14 +449,20 @@
                 </p>
             </div>
 
-            <!-- GRID OTMIZADA MOBILE (1 COLUNA) E DESKTOP (4 COLUNAS) -->
-            <div id="oracle-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 px-1 md:px-2 mb-6">
+            <!-- GRID OTIMIZADA MOBILE (2 COLUNAS) E DESKTOP (4 COLUNAS) -->
+            <div id="oracle-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6 px-1 md:px-2 mb-6">
                 <!-- Esqueletos -->
-                <div class="movie-card border-[#2c3440] border-2 aspect-[16/9] sm:aspect-[2/3]">
+                <div class="movie-card border-[#2c3440] border-2 aspect-[2/3]">
                    <div class="h-full w-full bg-[#1c2228] flex items-center justify-center animate-pulse"><span class="text-[#8c9bab] text-[10px] font-bold uppercase tracking-widest text-center">Analisando...</span></div>
                 </div>
-                <div class="movie-card border-[#2c3440] border-2 aspect-[16/9] sm:aspect-[2/3] hidden sm:block">
+                <div class="movie-card border-[#2c3440] border-2 aspect-[2/3]">
                    <div class="h-full w-full bg-[#1c2228] flex items-center justify-center animate-pulse"><span class="text-[#8c9bab] text-[10px] font-bold uppercase tracking-widest text-center">Buscando...</span></div>
+                </div>
+                <div class="movie-card border-[#2c3440] border-2 aspect-[2/3] hidden sm:block">
+                   <div class="h-full w-full bg-[#1c2228] flex items-center justify-center animate-pulse"><span class="text-[#8c9bab] text-[10px] font-bold uppercase tracking-widest text-center">Filtrando...</span></div>
+                </div>
+                <div class="movie-card border-[#2c3440] border-2 aspect-[2/3] hidden sm:block">
+                   <div class="h-full w-full bg-[#1c2228] flex items-center justify-center animate-pulse"><span class="text-[#8c9bab] text-[10px] font-bold uppercase tracking-widest text-center">Gerando...</span></div>
                 </div>
             </div>
 
@@ -711,7 +715,7 @@
         
         const fd = new FormData(); 
         fd.append("file", file);
-        fd.append("session_id", sessionId); // Envia o ID para o Backend
+        fd.append("session_id", sessionId); 
         
         try {
             const res = await fetch('/upload_profile', { method: 'POST', body: fd });
