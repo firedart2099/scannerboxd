@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Oráculo de Streaming | Letterboxd Analyzer</title>
+    
+    <!-- VOLTAMOS AO CDN MÁGICO: Não precisas do Node.js! -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&family=Space+Grotesk:wght@300;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -107,14 +110,11 @@
             border-radius: 12px;
             padding: 20px;
             display: flex;
-            align-items: center;
+            flex-direction: column;
             gap: 20px;
         }
         @media (min-width: 768px) {
-            .profile-card-ref { padding: 30px; gap: 30px; }
-        }
-        @media (max-width: 768px) {
-            .profile-card-ref { flex-direction: column; text-align: center; }
+            .profile-card-ref { padding: 30px; gap: 24px; }
         }
 
         .animate-fade-in-fast { animation: fadeInFast 0.2s ease-out forwards; }
@@ -203,12 +203,11 @@
     </div>
 </div>
 
-<!-- Altura do Hero Otimizada -->
 <div class="absolute top-0 left-0 w-full h-[50vh] md:h-[80vh] -z-10 pointer-events-none">
     <img id="hero-backdrop-img" 
-         src="https://image.tmdb.org/t/p/original/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg" 
+         src="" 
          alt="Cinema Backdrop" 
-         class="w-full h-full object-cover opacity-30 transition-opacity duration-500 grayscale-[20%]" 
+         class="w-full h-full object-cover opacity-0 transition-opacity duration-500 grayscale-[20%]" 
          style="-webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.5) 40%, rgba(0,0,0,0) 100%); mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.5) 40%, rgba(0,0,0,0) 100%);">
 </div>
 
@@ -216,7 +215,6 @@
     <div id="countdown-text" class="countdown-number">3</div>
 </div>
 
-<!-- MODAL DE TUTORIAL - Altura Limitada (max-h-[90vh]) -->
 <div id="tutorial-modal" class="fixed inset-0 bg-[#14181c]/90 z-[10000] hidden items-center justify-center backdrop-blur-sm p-4">
     <div class="bg-[#1c2228] border border-[#40bcf4]/30 rounded-2xl p-6 md:p-8 max-w-lg w-full shadow-2xl relative animate-fade-in-fast max-h-[90vh] flex flex-col">
         <button onclick="fecharTutorial()" class="absolute top-4 right-5 text-[#8c9bab] hover:text-white text-3xl font-light z-10">&times;</button>
@@ -265,7 +263,6 @@
     </div>
 </div>
 
-<!-- MODAL DE DOAÇÃO - Altura Limitada & UI Ajustada -->
 <div id="donation-modal" class="fixed inset-0 bg-[#14181c]/95 z-[10000] hidden items-center justify-center backdrop-blur-sm p-4">
     <div class="bg-[#1c2228] border border-[#ff8000]/50 rounded-2xl p-6 md:p-8 max-w-md w-full shadow-2xl relative text-center animate-fade-in-fast max-h-[90vh] overflow-y-auto no-scrollbar flex flex-col">
         <button onclick="fecharDoacao()" class="absolute top-4 right-5 text-[#8c9bab] hover:text-white text-3xl font-light">&times;</button>
@@ -276,7 +273,6 @@
         
         <h3 class="text-xl md:text-2xl font-black text-white uppercase tracking-tighter mb-2">Apoie o Projeto</h3>
         
-        <!-- Texto Refinado e Natural -->
         <p class="text-[#8c9bab] text-[11px] sm:text-xs md:text-sm mb-6 leading-relaxed flex-1">
             As consultas à IA e os bancos de dados de streaming têm um custo.<br><br>
             Se você está curtindo a experiência, considere dar um apoio de apenas <strong>R$ 1,90</strong>. E já aviso: se os servidores caírem e o site sair do ar, a culpa é sua! 💀
@@ -286,7 +282,6 @@
             <button onclick="abrirMercadoPago()" class="w-full bg-gradient-to-r from-[#ff8000] to-[#e67300] text-[#14181c] font-black py-3 sm:py-3.5 px-4 rounded-xl uppercase tracking-widest transition-all shadow-md flex items-center justify-center gap-2 text-[10px] sm:text-xs">
                 Apoiar com Mercado Pago
             </button>
-            <!-- Botão de 'continuar de graça' removido conforme solicitado -->
         </div>
     </div>
 </div>
@@ -311,11 +306,12 @@
                 <span class="hidden md:inline">Apoiar</span>
             </button>
 
-            <div id="slideshow-info" class="transition-opacity duration-500 opacity-100 flex flex-col items-end justify-center hidden sm:flex">
-                <h2 id="slide-title" class="text-sm md:text-lg font-black text-white tracking-tighter drop-shadow-md leading-tight mb-0.5 max-w-[150px] md:max-w-[200px] break-words line-clamp-2">Interstellar</h2>
+            <div id="slideshow-info" class="transition-opacity duration-500 opacity-0 flex flex-col items-end justify-center hidden sm:flex">
+                <h2 id="slide-title" class="text-sm md:text-lg font-black text-white tracking-tighter drop-shadow-md leading-tight mb-0.5 max-w-[150px] md:max-w-[200px] break-words line-clamp-2">...</h2>
                 <div class="flex items-center justify-end gap-2">
-                    <span id="slide-year" class="text-gray-300 font-bold text-[9px] md:text-[10px]">2014</span>
-                    <span id="slide-rating" class="text-[#40bcf4] text-[9px] md:text-[10px] tracking-widest"></span>
+                    <span id="slide-year" class="text-gray-300 font-bold text-[9px] md:text-[10px]"></span>
+                    <!-- ESTRELAS VERDES ESTILO LETTERBOXD -->
+                    <span id="slide-rating" class="text-[#00e054] text-[9px] md:text-[10px] tracking-widest drop-shadow-md"></span>
                 </div>
             </div>
         </div>
@@ -390,9 +386,11 @@
     <div id="analyzer-panel" class="hidden space-y-8 animate-fade-in mt-40 md:mt-80 relative z-20">
         <div class="text-center flex justify-center items-center gap-2">
             <svg class="w-5 h-5 text-[#40bcf4]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-            <h2 class="text-xl md:text-2xl font-bold text-[#40bcf4] tracking-tighter drop-shadow-md">O Seu Perfil de Crítico</h2>
+            <!-- ID ADICIONADO AQUI PARA INJETAR O NOME DE USUÁRIO -->
+            <h2 id="profile-greeting" class="text-xl md:text-2xl font-bold text-[#40bcf4] tracking-tighter drop-shadow-md">O Seu Perfil de Crítico</h2>
         </div>
 
+        <!-- CARTA DE ROAST PRINCIPAL -->
         <div class="profile-card-ref relative overflow-hidden shadow-xl p-5 md:p-8">
             <div class="w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 shrink-0 relative rounded-full border-4 border-[#40bcf4] overflow-hidden bg-[#14181c] flex items-center justify-center mx-auto md:mx-0">
                 <div id="profile-pulse-loader" class="w-full h-full bg-[#1c2228] animate-pulse absolute inset-0"></div>
@@ -409,7 +407,7 @@
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                     </button>
                 </div>
-                <p id="roast-desc" class="text-gray-300 text-xs md:text-sm leading-relaxed font-light">Processando avaliações...</p>
+                <p id="roast-desc" class="text-gray-300 text-xs md:text-sm leading-relaxed font-light whitespace-pre-line">Processando avaliações...</p>
                 <div class="pt-1">
                     <span id="roast-vibe" class="text-[9px] md:text-xs text-[#14181c] font-black uppercase tracking-widest bg-[#40bcf4] px-2 py-1 rounded-sm truncate max-w-full inline-block">CALCULANDO...</span>
                 </div>
@@ -447,9 +445,7 @@
                 </p>
             </div>
 
-            <!-- GRID OTIMIZADA MOBILE (2 COLUNAS) E DESKTOP (4 COLUNAS) -->
             <div id="oracle-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6 px-1 md:px-2 mb-6">
-                <!-- Esqueletos -->
                 <div class="movie-card border-[#2c3440] border-2 aspect-[2/3]">
                    <div class="h-full w-full bg-[#1c2228] flex items-center justify-center animate-pulse"><span class="text-[#8c9bab] text-[10px] font-bold uppercase tracking-widest text-center">Analisando...</span></div>
                 </div>
@@ -477,7 +473,6 @@
             </div>
         </div>
 
-        <!-- LOADING DA WATCHLIST: TEXTO EXPLICATIVO ADICIONADO -->
         <div id="loading-container" class="hidden mt-10 max-w-2xl mx-auto bg-[#1c2228] md:bg-[#1c2228]/95 p-5 md:p-10 rounded-2xl md:rounded-3xl border border-[#2c3440] relative overflow-hidden z-20">
             <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#40bcf4] via-[#00e054] to-[#40bcf4] bg-[length:200%_200%] animate-gradient-x"></div>
             
@@ -489,8 +484,8 @@
                 <h3 class="text-xl md:text-3xl font-black text-white uppercase tracking-tighter mb-2">Buscando Plataformas</h3>
                 
                 <p class="text-[#8c9bab] text-[10px] sm:text-xs max-w-lg mx-auto leading-relaxed mb-4 px-2">
-                    O sistema está cruzando a sua <strong>Watchlist</strong>, filme por filme, com os catálogos mundiais de streaming. <br><br>
-                    <span class="text-[#40bcf4] font-bold block bg-[#40bcf4]/10 p-2 rounded-lg border border-[#40bcf4]/20 mt-1">Aviso: Este processo completo só ocorre na sua primeira visita. Nas próximas, usaremos o cache local e será 100% instantâneo!</span>
+                    O sistema está cruzando a sua <strong>Watchlist</strong>, filme por filme, com os catálogos mundiais de streaming. <br>
+                    <span class="text-[9px] sm:text-[10px] italic opacity-60 mt-1 block">*O carregamento será instantâneo nas suas próximas visitas.</span>
                 </p>
                 
                 <p id="current-movie-name" class="text-white font-medium text-xs md:text-sm max-w-sm mx-auto truncate bg-[#14181c] py-2 px-4 rounded-lg border border-[#2c3440] inline-block shadow-inner mt-2">A processar...</p>
@@ -518,7 +513,6 @@
         </div>
     </div>
 
-    <!-- ETAPA 3: STREAMING VEREDITO -->
     <div id="streaming-panel" class="hidden space-y-6 md:space-y-10 animate-fade-in pb-10 md:pb-20 mt-10 relative z-20">
         <div class="text-center">
             <h2 class="text-3xl md:text-5xl font-black text-white tracking-tighter uppercase mb-1 drop-shadow-lg">A Sua <span class="text-[#40bcf4]">Watchlist</span></h2>
@@ -528,7 +522,6 @@
         <div id="dynamic-podium" class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8"></div>
         <p id="price-disclaimer" class="text-center text-[#8c9bab]/60 text-[8px] uppercase tracking-widest mt-2 hidden">* Valores mensais estimados.</p>
 
-        <!-- EXPLORAÇÃO E FILTROS -->
         <div class="glass-panel p-4 md:p-8 space-y-4 md:space-y-6 mt-4">
             <div class="flex flex-col md:flex-row items-center justify-between gap-4">
                 <div class="flex items-center gap-3 w-full md:w-auto">
@@ -549,9 +542,7 @@
                 <p class="text-[#8c9bab] text-[9px] font-black uppercase tracking-widest mb-3 flex items-center gap-1.5">
                     Filtros de Plataforma
                 </p>
-                <!-- LISTA DE FILTROS OTIMIZADA PARA MOBILE (SCROLL HORIZONTAL) -->
                 <div id="stats-container" class="flex flex-row overflow-x-auto no-scrollbar snap-x gap-2 pb-2 md:flex-wrap">
-                    <!-- Gerado pelo JS -->
                 </div>
             </div>
         </div>
@@ -574,7 +565,6 @@
 </div>
 
 <script>
-    // SISTEMA DE SESSÕES (Cria uma "impressão digital" para este navegador)
     let sessionId = localStorage.getItem('oraculo_session_id');
     if (!sessionId) {
         sessionId = crypto.randomUUID();
@@ -595,10 +585,17 @@
     const iconicMovies = [
         { Name: "Interstellar", Year: 2014, backdrop: "https://image.tmdb.org/t/p/original/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg" },
         { Name: "Parasite", Year: 2019, backdrop: "https://image.tmdb.org/t/p/original/tuJG5x22K2p06ZEM4sNfW6Z78wI.jpg" },
-        { Name: "The Dark Knight", Year: 2008, backdrop: "https://image.tmdb.org/t/p/original/nMKdUUepR0i5zn0y1T4CsSB5chy.jpg" }
+        { Name: "The Dark Knight", Year: 2008, backdrop: "https://image.tmdb.org/t/p/original/nMKdUUepR0i5zn0y1T4CsSB5chy.jpg" },
+        { Name: "Spirited Away", Year: 2001, backdrop: "https://image.tmdb.org/t/p/original/2w11gS27aB60hZ1yDk8nO8J1O1O.jpg" },
+        { Name: "Pulp Fiction", Year: 1994, backdrop: "https://image.tmdb.org/t/p/original/suaEOtk1N1sgg2MTM7oZd2cfVp3.jpg" },
+        { Name: "Everything Everywhere All at Once", Year: 2022, backdrop: "https://image.tmdb.org/t/p/original/wPU78OPN4BYEgWYdXy7wMqwqFDb.jpg" },
+        { Name: "The Matrix", Year: 1999, backdrop: "https://image.tmdb.org/t/p/original/ncEsesgOJDNrTUED89hYbA117wo.jpg" },
+        { Name: "Blade Runner 2049", Year: 2017, backdrop: "https://image.tmdb.org/t/p/original/ilRyazdndIGMqWhH2tYdK0mHihM.jpg" },
+        { Name: "Goodfellas", Year: 1990, backdrop: "https://image.tmdb.org/t/p/original/sw7mordbZxgITU877yTpZCud90M.jpg" },
+        { Name: "Inception", Year: 2010, backdrop: "https://image.tmdb.org/t/p/original/8ZTVqvKDQ8emSGUEMjsS4yHAwrp.jpg" }
     ];
 
-    let currentIconicIdx = 0;
+    let currentIconicIdx = Math.floor(Math.random() * iconicMovies.length);
 
     function copyExportLink() {
         const input = document.getElementById('export-link-input');
@@ -609,24 +606,44 @@
         setTimeout(() => { btn.innerText = 'Copiar'; }, 2000);
     }
 
+    const updateSlideInfo = (movie) => {
+        const st = document.getElementById('slide-title');
+        const sy = document.getElementById('slide-year');
+        const sr = document.getElementById('slide-rating');
+        if(st) st.innerText = movie.Name;
+        if(sy) sy.innerText = movie.Year;
+        
+        let starsHTML = '';
+        if(movie.Rating) {
+            for(let i=0; i<Math.floor(movie.Rating); i++) starsHTML += '★';
+            if(movie.Rating % 1 !== 0) starsHTML += '½';
+        }
+        if(sr) sr.innerText = starsHTML;
+    };
+
     function startInitialSlideshow() {
         const heroImg = document.getElementById('hero-backdrop-img');
         const slideInfo = document.getElementById('slideshow-info');
         if (!heroImg) return;
 
+        const startMovie = iconicMovies[currentIconicIdx];
+        heroImg.src = startMovie.backdrop;
+        updateSlideInfo(startMovie);
+        heroImg.onload = () => {
+            heroImg.style.opacity = '0.3';
+            if(slideInfo) slideInfo.style.opacity = '1';
+        };
+
         initialBackdropInterval = setInterval(() => {
-            const nextMovie = iconicMovies[(currentIconicIdx + 1) % iconicMovies.length];
+            currentIconicIdx = (currentIconicIdx + 1) % iconicMovies.length;
+            const nextMovie = iconicMovies[currentIconicIdx];
             const tempImg = new Image();
             tempImg.onload = () => {
                 heroImg.style.opacity = '0';
                 if(slideInfo) slideInfo.style.opacity = '0';
                 setTimeout(() => {
                     heroImg.src = nextMovie.backdrop;
-                    const st = document.getElementById('slide-title');
-                    const sy = document.getElementById('slide-year');
-                    if(st) st.innerText = nextMovie.Name;
-                    if(sy) sy.innerText = nextMovie.Year;
-                    currentIconicIdx = (currentIconicIdx + 1) % iconicMovies.length;
+                    updateSlideInfo(nextMovie);
                     heroImg.style.opacity = '0.3';
                     if(slideInfo) slideInfo.style.opacity = '1';
                 }, 500);
@@ -736,8 +753,77 @@
         document.getElementById('analyzer-panel')?.classList.remove('hidden');
         document.getElementById('stat-total').innerText = statsData?.total_avaliados || 0;
         document.getElementById('stat-avg').innerText = (statsData?.media_notas || 0).toFixed(2);
+        
+        const greeting = document.getElementById('profile-greeting');
+        if (greeting && statsData.username) {
+            greeting.innerHTML = `E aí, <span class="text-white">${statsData.username}</span>! O Seu Perfil de Crítico:`;
+        }
+        
         gerarPerfilIA();
+
+        // --- CARROSSEL DOS FAVORITOS NO BACKGROUND ---
         if (initialBackdropInterval) clearInterval(initialBackdropInterval);
+        if (backdropInterval) clearInterval(backdropInterval);
+
+        const favs = statsData?.favoritos || [];
+        if (favs.length > 0) {
+            const heroImg = document.getElementById('hero-backdrop-img');
+            const slideInfo = document.getElementById('slideshow-info');
+            
+            const backdropPromises = favs.map(f => 
+                fetch(`/api/tmdb/search?query=${encodeURIComponent(f.Name)}`)
+                .then(res => res.json())
+                .then(data => {
+                    if(data.results && data.results.length > 0 && data.results[0].backdrop_path) {
+                        return { url: `https://image.tmdb.org/t/p/original${data.results[0].backdrop_path}`, movie: f };
+                    }
+                    return null;
+                }).catch(() => null)
+            );
+
+            Promise.all(backdropPromises).then(results => {
+                let validSlides = results.filter(r => r !== null).sort(() => Math.random() - 0.5);
+                if (validSlides.length > 0) {
+                    let currentIdx = 0;
+                    if(heroImg) {
+                        heroImg.style.opacity = '0';
+                        heroImg.classList.remove('grayscale-[20%]'); 
+                    }
+                    if (slideInfo) slideInfo.style.opacity = '0';
+                    
+                    setTimeout(() => {
+                        if(heroImg) heroImg.src = validSlides[0].url;
+                        if (slideInfo) updateSlideInfo(validSlides[0].movie);
+                        
+                        if(heroImg) heroImg.onload = () => { 
+                            heroImg.style.opacity = '0.4'; 
+                            if (slideInfo) slideInfo.style.opacity = '1';
+                        };
+                    }, 500);
+
+                    if (validSlides.length > 1) {
+                        backdropInterval = setInterval(() => {
+                            const nextIdx = (currentIdx + 1) % validSlides.length;
+                            const nextSlide = validSlides[nextIdx];
+                            const tempImg = new Image();
+                            tempImg.onload = () => {
+                                if(heroImg) heroImg.style.opacity = '0';
+                                if (slideInfo) slideInfo.style.opacity = '0';
+                                setTimeout(() => {
+                                    if(heroImg) heroImg.src = nextSlide.url;
+                                    if (slideInfo) updateSlideInfo(nextSlide.movie);
+                                    currentIdx = nextIdx;
+                                    if(heroImg) heroImg.style.opacity = '0.4';
+                                    if (slideInfo) slideInfo.style.opacity = '1';
+                                }, 500);
+                            };
+                            tempImg.onerror = () => { currentIdx = nextIdx; };
+                            tempImg.src = nextSlide.url;
+                        }, 5000); 
+                    }
+                }
+            });
+        }
     }
 
     async function tentarRegerarPerfil() { if(await verificarCredito()){ await consumirCredito(); gerarPerfilIA(); } }
@@ -745,6 +831,7 @@
     async function gerarPerfilIA() {
         const tt=document.getElementById('roast-title'), td=document.getElementById('roast-desc'), tv=document.getElementById('roast-vibe'),
               ti=document.getElementById('profile-img-element'), pl=document.getElementById('profile-pulse-loader'), br=document.getElementById('btn-regenerate-profile');
+              
         br?.classList.add('hidden'); ti?.classList.add('hidden'); pl?.classList.remove('hidden');
         if(tt) tt.innerHTML = `Analisando gosto... <svg class="animate-spin w-4 h-4 ml-1 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>`;
         
@@ -753,7 +840,10 @@
             if(res.ok) {
                 const data = await res.json();
                 if(!data.erro) {
-                    if(tt) tt.innerHTML = data.titulo; if(td) td.innerText = data.descricao; if(tv) tv.innerText = data.personagem_referencia;
+                    if(tt) tt.innerHTML = data.titulo; 
+                    if(td) td.innerText = data.descricao; 
+                    if(tv) tv.innerText = data.personagem_referencia;
+                    
                     br?.classList.remove('hidden');
                     fetch(`/api/tmdb/search?query=${encodeURIComponent(data.filme_referencia)}`).then(r=>r.json()).then(d=>{
                         if(d.results?.[0]?.poster_path){ ti.src=`https://image.tmdb.org/t/p/w500${d.results[0].poster_path}`; ti.classList.remove('hidden'); pl.classList.add('hidden'); }
@@ -779,12 +869,23 @@
         while(f.length < 4 && t < 4) {
             if(t===1) document.getElementById('ps-trophy')?.classList.add('show');
             try {
-                const r = await (await fetch(`/oraculo?session_id=${sessionId}`)).json();
-                if(r.recomendacoes) f.push(...r.recomendacoes.filter(x => !f.some(y=>y.rec===x.rec)));
+                const excl = [...oraculoRecomendacoesGlobais.map(x => x.rec), ...f.map(x => x.rec)];
+                const reqBody = JSON.stringify({ favorites: statsData.profile_favorites || [], exclude: excl });
+                const res = await fetch(`/oraculo?session_id=${sessionId}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: reqBody });
+                const r = await res.json();
+                
+                if(r.recomendacoes) {
+                    r.recomendacoes.forEach(x => {
+                        const tituloLimpo = x.rec.toLowerCase().trim();
+                        const jaExisteGlob = oraculoRecomendacoesGlobais.some(y => y.rec.toLowerCase().trim() === tituloLimpo);
+                        const jaExisteLocal = f.some(y => y.rec.toLowerCase().trim() === tituloLimpo);
+                        if(!jaExisteGlob && !jaExisteLocal && f.length < 4) { f.push(x); }
+                    });
+                }
             } catch(e) { break; }
             t++;
         }
-        return f.slice(0,4);
+        return f.slice(0,4); 
     }
 
     async function carregarMaisSugestoes() {
@@ -856,6 +957,8 @@
             body: JSON.stringify({session_id: sessionId}) 
         });
         
+        let startTime = Date.now();
+        
         const m = setInterval(async () => {
             const p = await (await fetch(`/progress?session_id=${sessionId}`)).json();
             if(p.total > 0) {
@@ -867,9 +970,17 @@
                 const currentMovie = document.getElementById('current-movie-name');
                 if (currentMovie) currentMovie.innerText = p.filme_atual || "Processando...";
                 
-                // CÁLCULO DE ETA (TEMPO ESTIMADO) RECUPERADO
                 const itemsRemaining = p.total - p.atual;
-                const etaSeconds = itemsRemaining * 0.3; // 0.3s estimado por filme
+                const elapsedSeconds = (Date.now() - startTime) / 1000;
+                let etaSeconds = 0;
+                
+                if (p.atual > 0) {
+                    const timePerItem = elapsedSeconds / p.atual;
+                    etaSeconds = itemsRemaining * timePerItem;
+                } else {
+                    etaSeconds = itemsRemaining * 0.1;
+                }
+                
                 const min = Math.floor(etaSeconds / 60);
                 const sec = Math.floor(etaSeconds % 60);
                 
