@@ -211,7 +211,7 @@ def gerar_perfil():
 
     favoritos_nomes = [f['Name'] for f in stats.get('favoritos', [])]
     
-    # PROMPT ORIGINAL RESTAURADO (O SARCASMO VOLTOU!)
+    # PROMPT 1: PERFIL SARCÁSTICO, DEBOCHADO E COM EMOJIS (EXATAMENTE COMO VOCÊ PEDIU)
     prompt = f"""Atue como aquele seu amigo cinéfilo cronicamente online do Letterboxd, que é extremamente irônico, debochado, mas no fundo fala umas verdades que doem na alma. Você vai analisar e destruir o ego deste usuário com base nestes dados:
     - Total de filmes vistos: {stats.get('total_avaliados', 0)}
     - Média de notas (de 0 a 5): {stats.get('media_notas', 0)}
@@ -286,25 +286,25 @@ def oraculo():
             ]
             tema_escolhido = random.choice(temas_aleatorios)
 
-            # ORÁCULO TAMBÉM GANHOU SARCASMO E EMOJIS AGORA!
-            prompt = f"""Atue como um curador de cinema SNOB, DEBOCHADO e cronicamente online do Letterboxd. O usuário amou: {amados_amostra}. Odiou: {odiados_amostra}.
+            # PROMPT 2: ORÁCULO SÉRIO, PROFISSIONAL E ANTI-BLOCKBUSTERS (ÓBVIOS)
+            prompt = f"""Atue como um curador de cinema focado em OBRAS-PRIMAS. O usuário amou: {amados_amostra}. Odiou: {odiados_amostra}.
             Recomende EXATAMENTE 15 filmes EXCEPCIONAIS (Nota média > 4.0) que ele provavelmente ainda não viu.
             DIRETRIZ DE CURADORIA: {tema_escolhido}
             
-            REGRA CRÍTICA 1: O usuário é um suposto "cinéfilo". Ele JÁ VIU todos os filmes óbvios! 
+            REGRA CRÍTICA (NÃO IGNORE): O usuário é um CINÉFILO HARDCORE. Ele JÁ VIU todos os filmes óbvios! 
             É ABSOLUTAMENTE PROIBIDO recomendar megaproduções, franquias famosas ou escolhas óbvias do Top 250 do IMDb (EXEMPLOS PROIBIDOS: O Senhor dos Anéis, Star Wars, Harry Potter, Matrix, Clube da Luta, O Poderoso Chefão, Interestelar, Batman, Marvel).
             Esforce-se para trazer filmes aclamados (nota > 4.0), mas que sejam ligeiramente menos populares ou filmes internacionais maravilhosos.
 
             REGRAS DE FORMATO (OBRIGATÓRIO):
             1. "rec_original": Título original do filme em INGLÊS.
             2. "rec": MESMO TÍTULO EM INGLÊS.
-            3. "base": Uma definição de gênero/vibe sarcástica (ex: "Filme de gente triste 🚬"). (Máximo 5 palavras).
-            4. "desc": Uma sinopse que venda o filme, mas que tenha o SEU TOM DEBOCHADO E IRÔNICO. Use gírias do Letterboxd ("mano", "literalmente cinema", "saca") e tempere com emojis (🙄💀💅🤌🔥🤓). (Aproximadamente 15 a 25 palavras). PT-BR.
+            3. "base": Uma definição de gênero objetiva e elegante (ex: "Thriller Psicológico", "Ficção Científica Épica"). (Máximo 4 palavras).
+            4. "desc": Uma sinopse profissional, culta e muito bem escrita que venda o filme, SEM usar gírias ou emojis. Foque na narrativa e no clima da obra. (Aproximadamente 15 a 25 palavras). PT-BR.
 
             É OBRIGATÓRIO responder APENAS em JSON estruturado:
             {{
               "recomendacoes": [
-                {{"rec_original": "Prisoners", "rec": "Prisoners", "ano": 2013, "base": "Suspense pra traumatizar 💀", "desc": "Mano, um pai coringando pra achar a filha sequestrada. É literalmente cinema puro e asfixiante, vai te deixar em choque 🤌💅."}}
+                {{"rec_original": "Prisoners", "rec": "Prisoners", "ano": 2013, "base": "Suspense Policial Intenso", "desc": "Um pai desesperado cruza todos os limites éticos e morais para encontrar sua filha desaparecida em um thriller angustiante e magistralmente dirigido."}}
               ]
             }}"""
             
