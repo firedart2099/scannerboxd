@@ -8,7 +8,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&family=Space+Grotesk:wght@300;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* Paleta Oficial do Letterboxd */
             --bg-base: #14181c; 
             --bg-panel: #1c2228; 
             --text-main: #8c9bab; 
@@ -29,19 +28,24 @@
 
         h1, h2, h3, .stat-value { font-family: 'Space Grotesk', sans-serif; }
 
+        /* OPTIMIZAÇÃO MOBILE: Blur apenas no Desktop para salvar bateria/FPS */
         .glass-panel {
-            background: rgba(28, 34, 40, 0.85);
-            backdrop-filter: blur(10px);
+            background: rgba(28, 34, 40, 0.95);
             border: 1px solid var(--border-color);
             border-radius: 12px;
             transition: all 0.3s ease;
         }
-
-        .glass-panel:hover {
-            border-color: rgba(64, 188, 244, 0.4); /* Hover com azul */
+        @media (min-width: 768px) {
+            .glass-panel {
+                background: rgba(28, 34, 40, 0.85);
+                backdrop-filter: blur(10px);
+            }
         }
 
-        /* Countdown Overlay Cinematográfico */
+        .glass-panel:hover {
+            border-color: rgba(64, 188, 244, 0.4); 
+        }
+
         #countdown-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: radial-gradient(circle, #1c2228 0%, #14181c 100%);
@@ -55,7 +59,7 @@
             background: linear-gradient(135deg, var(--lb-blue), var(--lb-green));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 30px rgba(64, 188, 244, 0.4)); /* Sombra azul */
+            filter: drop-shadow(0 0 20px rgba(64, 188, 244, 0.3)); 
             animation: bounceIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
@@ -65,7 +69,6 @@
             100% { transform: scale(1); opacity: 1; }
         }
 
-        /* Cartazes de Filmes (Oráculo) */
         .movie-card {
             position: relative;
             aspect-ratio: 2/3;
@@ -73,12 +76,16 @@
             border-radius: 12px;
             overflow: hidden;
             border: 2px solid var(--border-color);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
             transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
         }
-        .movie-card:hover {
-            transform: scale(1.05) translateY(-5px);
-            z-index: 10;
+        @media (min-width: 768px) {
+            .movie-card {
+                box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            }
+            .movie-card:hover {
+                transform: scale(1.05) translateY(-5px);
+                z-index: 10;
+            }
         }
         
         .fav-poster {
@@ -94,23 +101,22 @@
             background: linear-gradient(to top, rgba(20,24,28,1) 0%, rgba(20,24,28,0.8) 50%, transparent 100%);
         }
 
-        .progress-bar-bg { width: 100%; background: #111417; height: 12px; border-radius: 6px; overflow: hidden; border: 1px solid var(--border-color); }
-        .progress-bar-fill { background: linear-gradient(90deg, var(--lb-blue), var(--lb-green)); height: 100%; width: 0%; transition: width 0.4s ease; box-shadow: 0 0 15px rgba(64, 188, 244, 0.5); }
-
         .profile-card-ref {
             background: var(--bg-panel);
-            border: 1px solid var(--lb-blue); /* Borda azul */
+            border: 1px solid var(--lb-blue); 
             border-radius: 12px;
-            padding: 30px;
+            padding: 20px;
             display: flex;
             align-items: center;
-            gap: 30px;
+            gap: 20px;
+        }
+        @media (min-width: 768px) {
+            .profile-card-ref { padding: 30px; gap: 30px; }
         }
         @media (max-width: 768px) {
             .profile-card-ref { flex-direction: column; text-align: center; }
         }
 
-        /* Animação para o Modal */
         .animate-fade-in-fast { animation: fadeInFast 0.2s ease-out forwards; }
         @keyframes fadeInFast {
             from { opacity: 0; transform: scale(0.95); }
@@ -127,20 +133,18 @@
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
         .filter-btn-active {
-            border-color: var(--lb-blue) !important; /* Destaque azul */
+            border-color: var(--lb-blue) !important; 
             background-color: rgba(64, 188, 244, 0.1) !important;
         }
         
-        /* Efeito visual para a foto de perfil da IA */
         .profile-img-effect {
             animation: profileGlow 3s infinite alternate;
         }
         @keyframes profileGlow {
-            0% { box-shadow: 0 0 15px rgba(64, 188, 244, 0.2); border-color: rgba(64, 188, 244, 0.5); }
-            100% { box-shadow: 0 0 30px rgba(64, 188, 244, 0.6); border-color: rgba(64, 188, 244, 1); }
+            0% { box-shadow: 0 0 10px rgba(64, 188, 244, 0.2); border-color: rgba(64, 188, 244, 0.5); }
+            100% { box-shadow: 0 0 20px rgba(64, 188, 244, 0.6); border-color: rgba(64, 188, 244, 1); }
         }
 
-        /* CONQUISTA PLAYSTATION (TROFÉU) */
         .ps-trophy {
             position: fixed;
             top: 24px;
@@ -156,7 +160,9 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.8), inset 0 0 15px rgba(64,188,244,0.1);
             z-index: 100000;
             transition: right 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            backdrop-filter: blur(10px);
+        }
+        @media (min-width: 768px) {
+            .ps-trophy { backdrop-filter: blur(10px); }
         }
         .ps-trophy.show {
             right: 24px;
@@ -186,9 +192,9 @@
         }
     </style>
 </head>
-<body class="p-4 md:p-8 min-h-screen relative">
+<!-- Padding Body Reduzido para Mobile -->
+<body class="p-2 sm:p-4 md:p-8 min-h-screen relative">
 
-<!-- ELEMENTO DO TROFÉU -->
 <div id="ps-trophy" class="ps-trophy">
     <div class="trophy-icon">🏆</div>
     <div>
@@ -198,7 +204,8 @@
     </div>
 </div>
 
-<div class="absolute top-0 left-0 w-full h-[80vh] -z-10 pointer-events-none">
+<!-- Altura do Hero Otimizada -->
+<div class="absolute top-0 left-0 w-full h-[50vh] md:h-[80vh] -z-10 pointer-events-none">
     <img id="hero-backdrop-img" 
          src="https://image.tmdb.org/t/p/original/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg" 
          alt="Cinema Backdrop" 
@@ -210,25 +217,23 @@
     <div id="countdown-text" class="countdown-number">3</div>
 </div>
 
-<div id="particles-container"></div>
-
-<!-- MODAL DE TUTORIAL PARA EXPORTAR WATCHLIST -->
-<div id="tutorial-modal" class="fixed inset-0 bg-[#14181c]/90 z-[10000] hidden items-center justify-center backdrop-blur-sm">
-    <div class="bg-[#1c2228] border border-[#40bcf4]/30 rounded-2xl p-8 max-w-lg w-full mx-4 shadow-[0_0_50px_rgba(64,188,244,0.15)] relative animate-fade-in-fast">
-        <button onclick="fecharTutorial()" class="absolute top-4 right-5 text-[#8c9bab] hover:text-white text-3xl font-light">&times;</button>
+<!-- MODAL DE TUTORIAL - Altura Limitada (max-h-[90vh]) -->
+<div id="tutorial-modal" class="fixed inset-0 bg-[#14181c]/90 z-[10000] hidden items-center justify-center backdrop-blur-sm p-4">
+    <div class="bg-[#1c2228] border border-[#40bcf4]/30 rounded-2xl p-6 md:p-8 max-w-lg w-full shadow-2xl relative animate-fade-in-fast max-h-[90vh] flex flex-col">
+        <button onclick="fecharTutorial()" class="absolute top-4 right-5 text-[#8c9bab] hover:text-white text-3xl font-light z-10">&times;</button>
         
-        <div class="text-center mb-6">
-            <div class="w-16 h-16 bg-[#40bcf4]/10 rounded-full flex items-center justify-center text-[#40bcf4] mx-auto mb-4 border border-[#40bcf4]/30 shadow-[0_0_15px_rgba(64,188,244,0.2)]">
-                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+        <div class="text-center mb-6 shrink-0">
+            <div class="w-12 h-12 md:w-16 md:h-16 bg-[#40bcf4]/10 rounded-full flex items-center justify-center text-[#40bcf4] mx-auto mb-4 border border-[#40bcf4]/30">
+                <svg class="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
             </div>
-            <h3 class="text-2xl font-black text-white uppercase tracking-tighter">Atualizar sua Watchlist</h3>
-            <p class="text-[#8c9bab] text-sm mt-2">Vamos adicionar as suas obras-primas escolhidas à sua lista oficial do Letterboxd.</p>
+            <h3 class="text-xl md:text-2xl font-black text-white uppercase tracking-tighter">Atualizar sua Watchlist</h3>
+            <p class="text-[#8c9bab] text-xs md:text-sm mt-2">Vamos adicionar as suas obras-primas escolhidas à sua lista oficial.</p>
         </div>
 
-        <div class="space-y-3 mb-6 overflow-y-auto max-h-[50vh] pr-2 no-scrollbar">
+        <div class="space-y-3 mb-6 overflow-y-auto pr-2 no-scrollbar flex-1">
             <div class="flex gap-4 items-start bg-white/5 p-4 rounded-xl border border-white/5">
                 <span class="bg-[#40bcf4] text-[#14181c] font-black w-6 h-6 rounded-full flex items-center justify-center shrink-0 text-xs">1</span>
-                <p class="text-sm text-gray-300 leading-snug">Baixe o arquivo CSV abaixo. (Ele contém <strong>apenas os <span id="tut-count" class="text-[#40bcf4] font-bold">4</span> filmes selecionados</strong>).</p>
+                <p class="text-sm text-gray-300 leading-snug">Baixe o arquivo CSV. (Ele contém <strong>apenas os <span id="tut-count" class="text-[#40bcf4] font-bold">4</span> filmes</strong>).</p>
             </div>
 
             <div class="bg-white/5 p-4 rounded-xl border border-white/5 space-y-3">
@@ -238,8 +243,7 @@
                 </div>
                 <ol class="list-decimal list-inside marker:text-[#40bcf4] text-xs text-gray-300 space-y-1 ml-9">
                     <li>Vá até a sua aba <span class="text-white font-bold">Watchlist</span> no Letterboxd.</li>
-                    <li>Na barra lateral direita, clique em <span class="text-white font-bold">Import films to watchlist</span>.</li>
-                    <li>Selecione o arquivo CSV baixado.</li>
+                    <li>Clique em <span class="text-white font-bold">Import films to watchlist</span> na direita.</li>
                 </ol>
             </div>
 
@@ -249,378 +253,322 @@
                     <h5 class="text-white font-bold text-xs uppercase tracking-widest">Pelo Celular (App ou Site):</h5>
                 </div>
                 <ol class="list-decimal list-inside marker:text-[#40bcf4] text-xs text-gray-300 space-y-2 ml-9">
-                    <li><strong>No App:</strong> Vá em <em>Settings</em> (engrenagem) > <em>Advanced Settings</em> > <em>Import & Export</em> > <em>Import Your Data</em>. Na janela que abrir, clique no texto azul <span class="text-white font-bold">"import to your watchlist"</span>.</li>
-                    <li><strong>No Navegador (Site):</strong> Acesse a sua <em>Watchlist</em> e clique no botão <span class="text-white font-bold">Import Watchlist</span>.</li>
+                    <li><strong>No App:</strong> Settings > Advanced Settings > Import & Export > Import Your Data > <span class="text-white font-bold">"import to your watchlist"</span>.</li>
+                    <li><strong>No Site:</strong> Acesse a Watchlist e clique em <span class="text-white font-bold">Import Watchlist</span>.</li>
                 </ol>
             </div>
         </div>
 
-        <button onclick="baixarWatchlistCompleta()" class="w-full bg-gradient-to-r from-[#40bcf4] to-[#2ba8e0] hover:from-[#5cd0ff] hover:to-[#40bcf4] text-[#14181c] font-black py-4 rounded-xl uppercase tracking-widest transition-all shadow-[0_0_20px_rgba(64,188,244,0.3)] hover:shadow-[0_0_30px_rgba(64,188,244,0.5)] hover:-translate-y-1 flex items-center justify-center gap-2">
+        <button onclick="baixarWatchlistCompleta()" class="w-full bg-gradient-to-r from-[#40bcf4] to-[#2ba8e0] text-[#14181c] font-black py-4 rounded-xl uppercase tracking-widest transition-all shadow-lg flex items-center justify-center gap-2 shrink-0">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
             Baixar CSV
         </button>
     </div>
 </div>
 
-<!-- MODAL DE DOAÇÃO / APOIO -->
-<div id="donation-modal" class="fixed inset-0 bg-[#14181c]/95 z-[10000] hidden items-center justify-center backdrop-blur-sm">
-    <div class="bg-[#1c2228] border border-[#ff8000]/50 rounded-2xl p-8 max-w-md w-full mx-4 shadow-[0_0_50px_rgba(255,128,0,0.15)] relative text-center animate-fade-in-fast">
+<!-- MODAL DE DOAÇÃO - Altura Limitada -->
+<div id="donation-modal" class="fixed inset-0 bg-[#14181c]/95 z-[10000] hidden items-center justify-center backdrop-blur-sm p-4">
+    <div class="bg-[#1c2228] border border-[#ff8000]/50 rounded-2xl p-6 md:p-8 max-w-md w-full shadow-2xl relative text-center animate-fade-in-fast max-h-[90vh] overflow-y-auto no-scrollbar flex flex-col">
         <button onclick="fecharDoacao()" class="absolute top-4 right-5 text-[#8c9bab] hover:text-white text-3xl font-light">&times;</button>
         
-        <div class="w-16 h-16 bg-[#ff8000]/10 rounded-full flex items-center justify-center text-[#ff8000] mx-auto mb-4 border border-[#ff8000]/30 shadow-[0_0_15px_rgba(255,128,0,0.2)]">
+        <div class="w-16 h-16 bg-[#ff8000]/10 rounded-full flex items-center justify-center text-[#ff8000] mx-auto mb-4 border border-[#ff8000]/30 shrink-0">
             <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z"></path></svg>
         </div>
         
-        <h3 class="text-2xl font-black text-white uppercase tracking-tighter mb-2">Apoie o Projeto</h3>
-        <p class="text-[#8c9bab] text-sm mb-6 leading-relaxed">
-            As consultas do nosso Oráculo à Inteligência Artificial têm um pequeno custo por cada filme sugerido.<br><br>
-            Se o site te está a ajudar a encontrar boas sessões de cinema, considera apoiar o projeto com um <strong>valor simbólico de R$ 1,90</strong> para ajudar a manter os servidores online! 
+        <h3 class="text-xl md:text-2xl font-black text-white uppercase tracking-tighter mb-2">Apoie o Projeto</h3>
+        <p class="text-[#8c9bab] text-xs md:text-sm mb-6 leading-relaxed flex-1">
+            As consultas à Inteligência Artificial têm um pequeno custo.<br><br>
+            Se o site te está a ajudar, considera apoiar o projeto com <strong>R$ 1,90</strong> para manter os servidores!
         </p>
         
-        <div class="space-y-3">
-            <button onclick="abrirMercadoPago()" class="w-full bg-gradient-to-r from-[#ff8000] to-[#e67300] hover:from-[#ff9933] hover:to-[#ff8000] text-[#14181c] font-black py-4 rounded-xl uppercase tracking-widest transition-all shadow-[0_0_20px_rgba(255,128,0,0.3)] hover:shadow-[0_0_30px_rgba(255,128,0,0.5)] hover:-translate-y-1 flex items-center justify-center gap-2">
+        <div class="space-y-3 shrink-0 mt-auto">
+            <button onclick="abrirMercadoPago()" class="w-full bg-gradient-to-r from-[#ff8000] to-[#e67300] text-[#14181c] font-black py-4 rounded-xl uppercase tracking-widest transition-all shadow-md flex items-center justify-center gap-2">
                 Apoiar com Mercado Pago
             </button>
-            
-            <button onclick="recarregarGratis()" class="w-full bg-transparent hover:bg-white/5 border border-[#2c3440] text-[#8c9bab] hover:text-white font-bold py-3 rounded-xl uppercase tracking-widest text-[10px] transition-all">
-                Não posso agora, continuar de graça
+            <button onclick="recarregarGratis()" class="w-full bg-transparent border border-[#2c3440] text-[#8c9bab] font-bold py-3 rounded-xl uppercase tracking-widest text-[10px]">
+                Continuar de graça
             </button>
         </div>
     </div>
 </div>
 
 <div class="max-w-5xl mx-auto relative z-10">
-    <header class="flex justify-between items-start md:items-center mb-10 md:mb-16">
-        <!-- Logo -->
-        <div class="flex items-center gap-3 sm:gap-4 group cursor-pointer shrink-0" onclick="location.reload()">
-            <div class="flex items-center gap-1.5 group-hover:scale-110 transition-transform mt-1 md:mt-0">
-                <div class="w-3 h-3 rounded-full bg-[#00e054] shadow-[0_0_10px_rgba(0,224,84,0.5)]"></div>
-                <div class="w-3 h-3 rounded-full bg-[#40bcf4] shadow-[0_0_10px_rgba(64,188,244,0.5)]"></div>
-                <div class="w-3 h-3 rounded-full bg-[#ff8000] shadow-[0_0_10px_rgba(255,128,0,0.5)]"></div>
+    <header class="flex justify-between items-start md:items-center mb-8 md:mb-16">
+        <!-- Logo Responsiva: Analyzer em baixo no mobile -->
+        <div class="flex items-start sm:items-center gap-2 sm:gap-4 group cursor-pointer shrink-0" onclick="location.reload()">
+            <div class="flex items-center gap-1.5 group-hover:scale-110 transition-transform mt-1.5 sm:mt-0">
+                <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[#00e054]"></div>
+                <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[#40bcf4]"></div>
+                <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[#ff8000]"></div>
             </div>
-            <div>
-                <!-- TÍTULO CORRIGIDO PARA MOBILE -->
-                <h1 class="text-sm sm:text-xl font-bold tracking-widest text-white uppercase drop-shadow-md">Letterboxd <span class="text-[#40bcf4]">Analyzer</span></h1>
-                <p class="text-[8px] sm:text-[10px] text-[#8c9bab] font-bold tracking-[0.3em] uppercase drop-shadow-md">v1.0.0 Oficial</p>
+            <div class="flex flex-col justify-center">
+                <h1 class="text-sm sm:text-xl font-bold tracking-widest text-white uppercase drop-shadow-md leading-none">Letterboxd <span class="text-[#40bcf4] block sm:inline text-[10px] sm:text-[inherit] mt-0.5 sm:mt-0">Analyzer</span></h1>
+                <p class="text-[8px] sm:text-[10px] text-[#8c9bab] font-bold tracking-[0.3em] uppercase drop-shadow-md mt-1 sm:mt-0.5">v1.0.0 Oficial</p>
             </div>
         </div>
 
-        <!-- Grupo Direito: Apoiar + Info do Filme -->
         <div class="flex items-center gap-3 sm:gap-5 text-right">
-            <!-- Botão de Apoio -->
-            <button onclick="abrirDoacao()" class="flex items-center gap-1.5 bg-[#ff8000]/10 hover:bg-[#ff8000]/20 text-[#ff8000] border border-[#ff8000]/30 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-widest transition-all hover:scale-105 shrink-0">
+            <button onclick="abrirDoacao()" class="flex items-center gap-1.5 bg-[#ff8000]/10 text-[#ff8000] border border-[#ff8000]/30 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-[9px] sm:text-xs font-black uppercase tracking-widest transition-all hover:scale-105 shrink-0 mt-1 sm:mt-0">
                 <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z"></path></svg>
                 <span class="hidden md:inline">Apoiar</span>
             </button>
 
-            <!-- Título do Filme -->
-            <div id="slideshow-info" class="transition-opacity duration-500 opacity-100 flex flex-col items-end min-h-[32px] justify-center">
-                <h2 id="slide-title" class="text-xs sm:text-sm md:text-lg font-black text-white tracking-tighter drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)] leading-tight mb-0.5 max-w-[100px] sm:max-w-[150px] md:max-w-[200px] break-words line-clamp-2">Interstellar</h2>
-                <div class="flex items-center justify-end gap-1.5 sm:gap-2">
-                    <span id="slide-year" class="text-gray-300 font-bold text-[8px] sm:text-[9px] md:text-[10px] drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">2014</span>
-                    <span id="slide-rating" class="text-[#40bcf4] text-[8px] sm:text-[9px] md:text-[10px] drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] tracking-widest"></span>
+            <div id="slideshow-info" class="transition-opacity duration-500 opacity-100 flex flex-col items-end justify-center hidden sm:flex">
+                <h2 id="slide-title" class="text-sm md:text-lg font-black text-white tracking-tighter drop-shadow-md leading-tight mb-0.5 max-w-[150px] md:max-w-[200px] break-words line-clamp-2">Interstellar</h2>
+                <div class="flex items-center justify-end gap-2">
+                    <span id="slide-year" class="text-gray-300 font-bold text-[9px] md:text-[10px]">2014</span>
+                    <span id="slide-rating" class="text-[#40bcf4] text-[9px] md:text-[10px] tracking-widest"></span>
                 </div>
             </div>
         </div>
     </header>
 
-    <div id="main-content" class="space-y-10">
-        <div class="text-center space-y-4 pt-6 md:pt-10">
-            <h2 class="text-4xl sm:text-5xl md:text-6xl font-black text-white leading-tight tracking-tighter drop-shadow-[0_5px_15px_rgba(0,0,0,0.8)]">QUAL É O SEU PERFIL <br><span class="text-[#40bcf4] italic drop-shadow-[0_5px_15px_rgba(0,0,0,0.8)]">CINEMATOGRÁFICO?</span></h2>
-            <p class="text-[#8c9bab] max-w-xl mx-auto text-base md:text-lg font-medium drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] px-2">Envie o seu arquivo de exportação do Letterboxd (.zip) para iniciarmos a análise dos seus dados e descobrirmos os seus padrões de avaliação.</p>
+    <div id="main-content" class="space-y-6 sm:space-y-10">
+        <!-- Títulos Otimizados -->
+        <div class="text-center space-y-3 sm:space-y-4 pt-4 sm:pt-10">
+            <h2 class="text-3xl sm:text-4xl md:text-6xl font-black text-white leading-tight tracking-tighter drop-shadow-lg">QUAL É O SEU PERFIL <br><span class="text-[#40bcf4] italic">CINEMATOGRÁFICO?</span></h2>
+            <p class="text-[#8c9bab] max-w-xl mx-auto text-sm sm:text-base md:text-lg font-medium px-2">Envie o seu arquivo de exportação do Letterboxd (.zip) para iniciarmos a análise dos seus dados.</p>
         </div>
 
-        <div class="glass-panel p-6 md:p-12 text-center border-dashed border-2 border-[#2c3440] hover:border-[#40bcf4]/50 transition-all group mt-10">
-            <div class="mb-6 md:mb-10">
+        <div class="glass-panel p-6 md:p-12 text-center border-dashed border-2 border-[#2c3440] hover:border-[#40bcf4]/50 transition-all group mt-6 sm:mt-10">
+            <div class="mb-4 sm:mb-10">
                 <label for="csv-file" class="cursor-pointer group block">
-                    <div class="w-20 h-20 bg-[#40bcf4]/10 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform border border-[#40bcf4]/20">
-                        <svg class="w-10 h-10 text-[#40bcf4]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v16m8-8H4"></path></svg>
+                    <div class="w-16 h-16 sm:w-20 sm:h-20 bg-[#40bcf4]/10 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6 group-hover:scale-110 transition-transform border border-[#40bcf4]/20">
+                        <svg class="w-8 h-8 sm:w-10 sm:h-10 text-[#40bcf4]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v16m8-8H4"></path></svg>
                     </div>
-                    <!-- TEXTOS CORRIGIDOS PARA PC/MOBILE -->
-                    <p class="text-xl sm:text-2xl font-bold text-white mb-2">
+                    <p class="text-lg sm:text-2xl font-bold text-white mb-2">
                         <span class="hidden sm:inline">Arraste seu arquivo <span class="text-[#40bcf4]">.zip</span> aqui</span>
                         <span class="sm:hidden">Envie seu arquivo <span class="text-[#40bcf4]">.zip</span></span>
                     </p>
-                    <p class="text-xs sm:text-sm text-[#8c9bab] uppercase tracking-widest font-bold">
+                    <p class="text-[10px] sm:text-sm text-[#8c9bab] uppercase tracking-widest font-bold">
                         <span class="hidden sm:inline">ou clique para procurar no computador</span>
                         <span class="sm:hidden">ou toque para procurar nos arquivos</span>
                     </p>
                 </label>
                 <input type="file" id="csv-file" class="hidden" accept=".zip" onchange="handleFileUpload()">
-                <p id="file-name-display" class="mt-6 text-[#40bcf4] font-mono text-xs hidden"></p>
+                <p id="file-name-display" class="mt-4 text-[#40bcf4] font-mono text-xs hidden"></p>
             </div>
         </div>
 
         <div class="text-center mt-6 space-y-4">
-            <!-- BOTÃO DIRETO DE DOWNLOAD SUPER VISÍVEL -->
-            <a href="https://letterboxd.com/data/export/" target="_blank" class="inline-flex items-center justify-center gap-2 bg-[#40bcf4]/10 hover:bg-[#40bcf4]/20 text-[#40bcf4] border border-[#40bcf4]/30 px-5 py-3 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-widest transition-all hover:scale-105 shadow-[0_0_15px_rgba(64,188,244,0.15)] w-[90%] sm:w-auto mx-auto">
+            <a href="https://letterboxd.com/data/export/" target="_blank" class="inline-flex items-center justify-center gap-2 bg-[#40bcf4]/10 text-[#40bcf4] border border-[#40bcf4]/30 px-5 py-3.5 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-widest transition-all w-[95%] sm:w-auto mx-auto shadow-sm">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                 Baixar meu .zip do Letterboxd
             </a>
             
-            <button onclick="toggleImportTutorial()" class="block w-full text-[10px] text-[#8c9bab] hover:text-white font-bold tracking-widest uppercase transition-colors underline decoration-dashed underline-offset-4 mx-auto">
-                Ver outras formas de importar
+            <button onclick="toggleImportTutorial()" class="block w-full text-[10px] text-[#8c9bab] hover:text-white font-bold tracking-widest uppercase transition-colors underline decoration-dashed underline-offset-4 mx-auto pt-2">
+                Ver passo a passo detalhado
             </button>
             
-            <div id="import-tutorial" class="hidden mt-6 p-6 bg-[#1c2228]/95 border border-[#2c3440] rounded-xl text-left text-sm text-gray-300 max-w-lg mx-auto shadow-xl animate-fade-in-fast">
+            <div id="import-tutorial" class="hidden mt-4 p-5 bg-[#1c2228]/95 border border-[#2c3440] rounded-xl text-left text-sm text-gray-300 max-w-lg mx-auto">
                 <h4 class="text-white font-black mb-4 uppercase tracking-widest text-xs flex items-center gap-2">
-                    <svg class="w-5 h-5 text-[#40bcf4]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
-                    Passo a passo no Letterboxd
+                    <svg class="w-4 h-4 text-[#40bcf4]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                    Passo a passo
                 </h4>
-                
-                <div class="space-y-4">
-                    <div class="bg-[#00e054]/10 border border-[#00e054]/30 p-4 rounded-xl text-xs">
-                        <h5 class="text-[#00e054] font-black uppercase mb-2 text-[13px] flex items-center gap-1.5"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg> O Jeito Mais Rápido (PC ou Celular)</h5>
-                        <ol class="space-y-2 list-decimal list-inside marker:text-[#00e054]">
-                            <li>Acesse o link direto: <a href="https://letterboxd.com/data/export/" target="_blank" class="text-white font-bold underline decoration-dashed hover:text-[#00e054] transition-colors break-all">letterboxd.com/data/export/</a></li>
-                            <li>Faça login na sua conta (se pedir).</li>
-                            <li>O download do seu <span class="text-white font-mono">.zip</span> vai começar na hora!</li>
+                <div class="space-y-3">
+                    <div class="bg-[#00e054]/10 border border-[#00e054]/30 p-3 rounded-xl text-xs">
+                        <h5 class="text-[#00e054] font-black uppercase mb-1.5 flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg> O Jeito Rápido</h5>
+                        <ol class="space-y-1 list-decimal list-inside marker:text-[#00e054]">
+                            <li>Acesse o botão azul acima ou <a href="https://letterboxd.com/data/export/" target="_blank" class="text-white font-bold underline">aqui</a>.</li>
+                            <li>Faça login na sua conta.</li>
+                            <li>O download do <span class="font-mono">.zip</span> começa na hora!</li>
                         </ol>
                     </div>
-
-                    <div class="opacity-60 hover:opacity-100 transition-opacity p-2">
-                        <h5 class="text-[#8c9bab] font-bold text-[10px] uppercase mb-1">Método Antigo (Menus do App/Site):</h5>
-                        <ol class="space-y-1 list-decimal list-inside marker:text-[#8c9bab] text-[10px]">
-                            <li>Vá em <strong>Settings</strong> > <strong>Import & Export</strong>.</li>
-                            <li>Clique em <strong>Export Your Data</strong>.</li>
-                            <li class="text-[#ff8000] mt-1"><em>Aviso: O app do celular às vezes entra num loop infinito nessa tela. Recomendamos usar o link direto acima!</em></li>
-                        </ol>
-                    </div>
-
-                    <p class="text-xs font-bold text-center mt-2 border-t border-[#2c3440] pt-3">Por fim, envie o arquivo <span class="text-[#40bcf4] font-mono">.zip</span> baixado para a área tracejada acima!</p>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- ETAPA 2: RAIO-X E ORÁCULO AUTOMÁTICO -->
-    <div id="analyzer-panel" class="hidden space-y-12 animate-fade-in mt-64 md:mt-80 relative z-20">
-        <div class="text-center flex justify-center items-center gap-2 mt-4">
-            <svg class="w-6 h-6 text-[#40bcf4]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-            <h2 class="text-2xl font-bold text-[#40bcf4] tracking-tighter drop-shadow-lg">O Seu Perfil de Crítico</h2>
+    <div id="analyzer-panel" class="hidden space-y-8 animate-fade-in mt-40 md:mt-80 relative z-20">
+        <div class="text-center flex justify-center items-center gap-2">
+            <svg class="w-5 h-5 text-[#40bcf4]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+            <h2 class="text-xl md:text-2xl font-bold text-[#40bcf4] tracking-tighter drop-shadow-md">O Seu Perfil de Crítico</h2>
         </div>
 
-        <div class="profile-card-ref relative overflow-hidden shadow-2xl flex-col md:flex-row text-center md:text-left p-6 md:p-8">
-            <div class="w-28 h-28 sm:w-32 sm:h-32 md:w-40 md:h-40 shrink-0 relative rounded-full border-4 border-[#40bcf4] overflow-hidden shadow-[0_0_30px_rgba(64,188,244,0.2)] bg-[#14181c] flex items-center justify-center mx-auto md:mx-0">
+        <div class="profile-card-ref relative overflow-hidden shadow-xl p-5 md:p-8">
+            <div class="w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 shrink-0 relative rounded-full border-4 border-[#40bcf4] overflow-hidden bg-[#14181c] flex items-center justify-center mx-auto md:mx-0">
                 <div id="profile-pulse-loader" class="w-full h-full bg-[#1c2228] animate-pulse absolute inset-0"></div>
-                <img id="profile-img-element" src="" class="w-full h-full object-cover hidden profile-img-effect transition-all duration-500 relative z-10">
+                <img id="profile-img-element" src="" loading="lazy" class="w-full h-full object-cover hidden transition-opacity duration-500 relative z-10">
             </div>
             
-            <div class="flex-1 space-y-3 min-w-0 mt-4 md:mt-0">
-                <div class="flex items-center gap-3 flex-wrap justify-center md:justify-start">
-                    <h3 id="roast-title" class="text-xl sm:text-2xl md:text-3xl font-black text-white tracking-tighter flex items-center gap-2">
-                        Analisando o seu gosto... 
-                        <svg class="animate-spin w-5 h-5 text-[#40bcf4] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+            <div class="flex-1 space-y-2 md:space-y-3 min-w-0 mt-4 md:mt-0">
+                <div class="flex items-center gap-2 flex-wrap justify-center md:justify-start">
+                    <h3 id="roast-title" class="text-lg sm:text-2xl md:text-3xl font-black text-white tracking-tighter flex items-center gap-2 text-center md:text-left leading-tight">
+                        Analisando o gosto... 
+                        <svg class="animate-spin w-4 h-4 text-[#40bcf4] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                     </h3>
-                    <button id="btn-regenerate-profile" onclick="tentarRegerarPerfil()" class="hidden text-[#8c9bab] hover:text-[#40bcf4] transition-colors bg-white/5 hover:bg-[#40bcf4]/20 p-2 rounded-full border border-transparent hover:border-[#40bcf4]/50" title="Gerar novo perfil">
+                    <button id="btn-regenerate-profile" onclick="tentarRegerarPerfil()" class="hidden text-[#8c9bab] hover:text-white bg-white/5 p-1.5 rounded-full" title="Gerar novo perfil">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                     </button>
                 </div>
-                <p id="roast-desc" class="text-gray-300 text-sm leading-relaxed font-light">O nosso sistema está processando as suas avaliações para traçar um perfil detalhado do seu comportamento como crítico...</p>
-                <div class="pt-2">
-                    <span id="roast-vibe" class="text-xs text-[#14181c] font-black uppercase tracking-widest bg-[#40bcf4] px-3 py-1 rounded-full border border-[#40bcf4] truncate max-w-full inline-block">PERFIL: CALCULANDO...</span>
+                <p id="roast-desc" class="text-gray-300 text-xs md:text-sm leading-relaxed font-light">Processando avaliações...</p>
+                <div class="pt-1">
+                    <span id="roast-vibe" class="text-[9px] md:text-xs text-[#14181c] font-black uppercase tracking-widest bg-[#40bcf4] px-2 py-1 rounded-sm truncate max-w-full inline-block">CALCULANDO...</span>
                 </div>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="glass-panel p-8 text-center">
-                <span id="stat-total" class="text-5xl font-black text-[#40bcf4] drop-shadow-md block mb-2">0</span>
-                <p class="text-[#8c9bab] text-xs font-black uppercase tracking-widest">Filmes Avaliados</p>
+        <div class="grid grid-cols-2 gap-3 sm:gap-6">
+            <div class="glass-panel p-4 md:p-8 text-center">
+                <span id="stat-total" class="text-3xl sm:text-5xl font-black text-[#40bcf4] block mb-1 md:mb-2">0</span>
+                <p class="text-[#8c9bab] text-[8px] sm:text-xs font-black uppercase tracking-widest">Avaliados</p>
             </div>
-            <div class="glass-panel p-8 text-center">
-                <span id="stat-avg" class="text-5xl font-black text-[#00e054] drop-shadow-md block mb-2">0.00</span>
-                <p class="text-[#8c9bab] text-xs font-black uppercase tracking-widest">Média de Notas</p>
+            <div class="glass-panel p-4 md:p-8 text-center">
+                <span id="stat-avg" class="text-3xl sm:text-5xl font-black text-[#00e054] block mb-1 md:mb-2">0.00</span>
+                <p class="text-[#8c9bab] text-[8px] sm:text-xs font-black uppercase tracking-widest">Média</p>
             </div>
         </div>
 
-        <div class="space-y-6 pt-8 border-t border-[#2c3440]" id="oracle-section">
-            <div class="flex flex-col md:flex-row items-center justify-between px-2 mb-6 gap-4 text-center md:text-left">
+        <div class="space-y-6 pt-6 border-t border-[#2c3440]" id="oracle-section">
+            <div class="flex flex-col md:flex-row items-center justify-between px-1 mb-4 gap-4 text-center md:text-left">
                 <div>
-                    <div class="flex items-center justify-center md:justify-start gap-3">
-                        <svg class="w-6 h-6 text-[#40bcf4] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"></path></svg>
-                        <h4 class="text-white font-bold text-xl sm:text-2xl drop-shadow-md">Oráculo de Recomendações</h4>
+                    <div class="flex items-center justify-center md:justify-start gap-2">
+                        <svg class="w-5 h-5 text-[#40bcf4] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"></path></svg>
+                        <h4 class="text-white font-bold text-lg sm:text-2xl drop-shadow-md">Oráculo de Recomendações</h4>
                     </div>
-                    <p class="text-[#8c9bab] text-xs mt-1">O sistema cruzou o seu histórico completo para sugerir filmes excecionais que você ainda não viu. <br><strong class="text-[#40bcf4]">Clique nos cartazes abaixo para selecionar quais você deseja exportar.</strong></p>
+                    <p class="text-[#8c9bab] text-[10px] md:text-xs mt-1 px-2 md:px-0">A IA cruzou o seu histórico. <br class="sm:hidden"><strong class="text-[#40bcf4]">Toque nos cartazes para exportar.</strong></p>
                 </div>
-                <button id="btn-export-desktop" onclick="abrirTutorial()" class="hidden md:flex items-center gap-1.5 px-6 py-3 bg-[#40bcf4]/20 text-[#40bcf4] border border-[#40bcf4]/50 rounded-lg font-black text-[10px] uppercase tracking-widest hover:bg-[#40bcf4] hover:text-[#14181c] transition-all shadow-[0_0_15px_rgba(64,188,244,0.3)] disabled:opacity-50 disabled:cursor-not-allowed">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                <button id="btn-export-desktop" onclick="abrirTutorial()" class="hidden md:flex items-center gap-1.5 px-6 py-3 bg-[#40bcf4]/20 text-[#40bcf4] border border-[#40bcf4]/50 rounded-lg font-black text-[10px] uppercase tracking-widest hover:bg-[#40bcf4] hover:text-[#14181c] transition-all disabled:opacity-50 disabled:cursor-not-allowed">
                     EXPORTAR SELECIONADOS (4)
                 </button>
             </div>
             
-            <!-- AVISO DE WATCHLIST GIGANTE -->
-            <div id="oracle-warning" class="hidden mb-6 bg-[#ff8000]/10 border border-[#ff8000]/30 p-4 rounded-xl text-center shadow-[0_0_15px_rgba(255,128,0,0.15)] animate-fade-in-fast mx-2">
-                <p class="text-[#ff8000] text-[11px] sm:text-xs font-bold leading-relaxed">
-                    <span class="text-xl block mb-1">🚨</span>
-                    Mano, a sua lista de filmes assistidos é GIGANTESCA 💀! Meu estoque de obras-primas obscuras tá esgotando e a IA tá pedindo arrego. Tive que improvisar e puxar uns clássicos de emergência aqui pra não deixar buraco, então finge demência se repetir algo ou der erro, beleza? Vai assistir isso aí e depois vai tocar numa grama 🙄💅.
+            <div id="oracle-warning" class="hidden mb-4 bg-[#ff8000]/10 border border-[#ff8000]/30 p-3 rounded-xl text-center mx-1">
+                <p class="text-[#ff8000] text-[10px] sm:text-xs font-bold leading-relaxed">
+                    🚨 Sua lista é GIGANTE! IA improvisando clássicos obscuros.
                 </p>
             </div>
 
-            <div id="oracle-grid" class="grid grid-cols-2 md:grid-cols-4 gap-6 px-2 mb-6">
-                <!-- Cartões de loading ajustados para Letterboxd -->
-                <div class="movie-card animate-pulse border-[#2c3440] border-2">
-                   <div class="h-full w-full bg-[#1c2228] flex items-center justify-center"><span class="text-[#8c9bab] text-xs font-bold uppercase tracking-widest text-center px-4">Verificando<br>o histórico...</span></div>
+            <!-- GRID OTMIZADA MOBILE (1 COLUNA) E DESKTOP (4 COLUNAS) -->
+            <div id="oracle-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 px-1 md:px-2 mb-6">
+                <!-- Esqueletos -->
+                <div class="movie-card border-[#2c3440] border-2 aspect-[16/9] sm:aspect-[2/3]">
+                   <div class="h-full w-full bg-[#1c2228] flex items-center justify-center animate-pulse"><span class="text-[#8c9bab] text-[10px] font-bold uppercase tracking-widest text-center">Analisando...</span></div>
                 </div>
-                <div class="movie-card animate-pulse border-[#2c3440] border-2" style="animation-delay: 200ms;">
-                   <div class="h-full w-full bg-[#1c2228] flex items-center justify-center"><span class="text-[#8c9bab] text-xs font-bold uppercase tracking-widest text-center px-4">Procurando<br>obras similares...</span></div>
-                </div>
-                <div class="movie-card animate-pulse border-[#2c3440] border-2" style="animation-delay: 400ms;">
-                   <div class="h-full w-full bg-[#1c2228] flex items-center justify-center"><span class="text-[#8c9bab] text-xs font-bold uppercase tracking-widest text-center px-4">Filtrando<br>resultados...</span></div>
-                </div>
-                <div class="movie-card animate-pulse border-[#2c3440] border-2" style="animation-delay: 600ms;">
-                   <div class="h-full w-full bg-[#1c2228] flex items-center justify-center"><span class="text-[#8c9bab] text-xs font-bold uppercase tracking-widest text-center px-4">Gerando<br>sugestões...</span></div>
+                <div class="movie-card border-[#2c3440] border-2 aspect-[16/9] sm:aspect-[2/3] hidden sm:block">
+                   <div class="h-full w-full bg-[#1c2228] flex items-center justify-center animate-pulse"><span class="text-[#8c9bab] text-[10px] font-bold uppercase tracking-widest text-center">Buscando...</span></div>
                 </div>
             </div>
 
-            <!-- Novos Botões (Carregar Mais & Exportar Mobile) -->
-            <div class="flex flex-col items-center gap-4 px-2">
-                <button id="btn-load-more" onclick="carregarMaisSugestoes()" class="w-full md:w-auto px-8 py-3 bg-[#1c2228] text-[#40bcf4] border border-[#2c3440] hover:border-[#40bcf4] rounded-xl font-black text-[11px] sm:text-xs uppercase tracking-widest transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-wait">
+            <div class="flex flex-col items-center gap-3 px-1">
+                <button id="btn-load-more" onclick="carregarMaisSugestoes()" class="w-full md:w-auto px-6 py-3.5 md:py-3 bg-[#1c2228] text-[#40bcf4] border border-[#2c3440] rounded-xl font-black text-[10px] sm:text-xs uppercase tracking-widest transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50">
                     <svg id="load-more-spinner" class="w-4 h-4 animate-spin hidden shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                     <svg id="load-more-icon" class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                    <span>Descobrir Mais Filmes</span>
+                    <span>Descobrir Mais</span>
                 </button>
 
-                <button id="btn-export-mobile" onclick="abrirTutorial()" class="md:hidden w-full flex items-center justify-center gap-1.5 px-6 py-4 bg-[#40bcf4]/20 text-[#40bcf4] border border-[#40bcf4]/50 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-[#40bcf4] hover:text-[#14181c] transition-all disabled:opacity-50 disabled:cursor-not-allowed">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                <button id="btn-export-mobile" onclick="abrirTutorial()" class="md:hidden w-full flex items-center justify-center gap-1.5 px-6 py-3.5 bg-[#40bcf4]/20 text-[#40bcf4] border border-[#40bcf4]/50 rounded-xl font-black text-[10px] uppercase tracking-widest disabled:opacity-50 disabled:cursor-not-allowed">
                     EXPORTAR SELECIONADOS (4)
                 </button>
             </div>
         </div>
 
-        <!-- NOVO LOADING STREAMING AVANÇADO -->
-        <div id="loading-container" class="hidden mt-20 max-w-2xl mx-auto bg-[#1c2228]/95 backdrop-blur-xl p-6 md:p-10 rounded-3xl border border-[#2c3440] shadow-[0_0_50px_rgba(0,0,0,0.5)] relative overflow-hidden z-20">
-            <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[#40bcf4] via-[#00e054] to-[#40bcf4] bg-[length:200%_200%] animate-gradient-x"></div>
+        <!-- LOADING DA WATCHLIST -->
+        <div id="loading-container" class="hidden mt-10 max-w-2xl mx-auto bg-[#1c2228] md:bg-[#1c2228]/95 p-5 md:p-10 rounded-2xl md:rounded-3xl border border-[#2c3440] relative overflow-hidden z-20">
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#40bcf4] via-[#00e054] to-[#40bcf4] bg-[length:200%_200%] animate-gradient-x"></div>
             
-            <div class="text-center mb-8">
-                <!-- Frase Engraçada Isolada no Topo -->
-                <div class="mb-6 h-8 flex items-center justify-center">
-                    <p id="funny-text" class="text-[#40bcf4] font-bold uppercase text-[11px] md:text-xs tracking-widest text-center drop-shadow-md transition-opacity duration-500">Iniciando processos...</p>
+            <div class="text-center mb-6">
+                <div class="mb-4 h-6 flex items-center justify-center">
+                    <p id="funny-text" class="text-[#40bcf4] font-bold uppercase text-[9px] md:text-xs tracking-widest text-center transition-opacity duration-500">Iniciando...</p>
                 </div>
                 
-                <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-[#40bcf4]/10 text-[#40bcf4] mb-4 border border-[#40bcf4]/20 shadow-[0_0_30px_rgba(64,188,244,0.2)]">
-                    <svg class="w-10 h-10 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 2v20m10-10H2m15.364 7.364l-14.14-14.14M6.636 21.364l14.14-14.14"></path></svg>
-                </div>
-                <h3 class="text-3xl font-black text-white uppercase tracking-tighter mb-2">Mapeamento de Plataformas</h3>
-                <p class="text-[#8c9bab] text-sm max-w-lg mx-auto">O sistema está consultando os bancos de dados de streaming globais para encontrar onde os filmes da sua <span class="text-white font-bold">Watchlist</span> estão disponíveis hoje.</p>
+                <h3 class="text-xl md:text-3xl font-black text-white uppercase tracking-tighter mb-2">Buscando Plataformas</h3>
                 
-                <div class="flex flex-col sm:flex-row justify-center gap-4 mt-6">
-                    <div class="bg-[#14181c] px-6 py-4 rounded-2xl border border-[#2c3440] shadow-inner flex-1 w-full sm:max-w-[200px] mx-auto">
-                        <span class="block text-[10px] text-[#8c9bab] font-black uppercase tracking-widest mb-1">Filmes Verificados</span>
-                        <span id="loading-count" class="text-2xl font-black text-[#40bcf4]">0 / 0</span>
+                <div class="flex flex-row justify-center gap-2 mt-4">
+                    <div class="bg-[#14181c] p-3 rounded-xl border border-[#2c3440] flex-1">
+                        <span class="block text-[8px] text-[#8c9bab] font-black uppercase mb-1">Verificados</span>
+                        <span id="loading-count" class="text-lg font-black text-[#40bcf4]">0/0</span>
                     </div>
-                    <div class="bg-[#14181c] px-6 py-4 rounded-2xl border border-[#2c3440] flex-1 w-full sm:max-w-[200px] mx-auto">
-                        <span class="block text-[10px] text-[#00e054] font-black uppercase tracking-widest mb-1 flex items-center justify-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-[#00e054] animate-pulse"></span> Tempo Estimado</span>
-                        <span id="eta-timer" class="text-2xl font-black text-white">--:--</span>
+                    <div class="bg-[#14181c] p-3 rounded-xl border border-[#2c3440] flex-1">
+                        <span class="block text-[8px] text-[#00e054] font-black uppercase mb-1">Tempo</span>
+                        <span id="eta-timer" class="text-lg font-black text-white">--:--</span>
                     </div>
                 </div>
             </div>
 
-            <div class="space-y-4 relative z-10">
-                <div class="flex justify-end items-end px-2">
-                    <span id="load-percent" class="text-4xl font-black text-white drop-shadow-md tracking-tighter">0%</span>
+            <div class="space-y-2 relative z-10">
+                <div class="flex justify-end px-1">
+                    <span id="load-percent" class="text-2xl md:text-4xl font-black text-white tracking-tighter">0%</span>
                 </div>
-                <div class="w-full bg-[#14181c] h-4 rounded-full overflow-hidden border border-[#2c3440] shadow-inner relative">
-                    <div id="progress-bar-fill" class="bg-gradient-to-r from-[#40bcf4] to-[#00e054] h-full w-0 transition-all duration-300 shadow-[0_0_20px_rgba(64,188,244,0.5)] relative">
-                        <div class="absolute top-0 right-0 bottom-0 left-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9InAiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTTAgNDBMMDAgMEw0MCAweiIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjEpIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI3ApIi8+PC9zdmc+')] opacity-30 animate-stripes"></div>
-                    </div>
+                <div class="w-full bg-[#14181c] h-3 md:h-4 rounded-full overflow-hidden border border-[#2c3440]">
+                    <div id="progress-bar-fill" class="bg-gradient-to-r from-[#40bcf4] to-[#00e054] h-full w-0 transition-all duration-300"></div>
                 </div>
-            </div>
-            
-            <div class="mt-6 bg-[#14181c] p-5 rounded-2xl border border-[#2c3440] text-center">
-                <p class="text-[#8c9bab] text-[10px] uppercase font-bold mb-1 tracking-widest">Buscando disponibilidade para:</p>
-                <p id="current-movie-name" class="text-white font-medium text-lg truncate">...</p>
             </div>
         </div>
     </div>
 
     <!-- ETAPA 3: STREAMING VEREDITO -->
-    <div id="streaming-panel" class="hidden space-y-10 animate-fade-in pb-20 mt-10 relative z-20">
+    <div id="streaming-panel" class="hidden space-y-6 md:space-y-10 animate-fade-in pb-10 md:pb-20 mt-10 relative z-20">
         <div class="text-center">
-            <h2 class="text-5xl font-black text-white tracking-tighter uppercase mb-2 drop-shadow-lg">A Sua <span class="text-[#40bcf4]">Watchlist</span></h2>
-            <p class="text-[#8c9bab] font-bold uppercase tracking-widest text-xs drop-shadow-md">Filtrada por disponibilidade de streaming e pronta a dar play</p>
+            <h2 class="text-3xl md:text-5xl font-black text-white tracking-tighter uppercase mb-1 drop-shadow-lg">A Sua <span class="text-[#40bcf4]">Watchlist</span></h2>
+            <p class="text-[#8c9bab] font-bold uppercase tracking-widest text-[9px] md:text-xs">Pronta a dar play</p>
         </div>
 
-        <div id="dynamic-podium" class="grid md:grid-cols-2 gap-8"></div>
-        
-        <p id="price-disclaimer" class="text-center text-[#8c9bab]/60 text-[9px] uppercase tracking-widest mt-2 hidden">* Valores mensais estimados com base no plano padrão. O catálogo e os preços (planos anuais, familiares ou com anúncios) variam; confirme sempre no site oficial.</p>
+        <div id="dynamic-podium" class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8"></div>
+        <p id="price-disclaimer" class="text-center text-[#8c9bab]/60 text-[8px] uppercase tracking-widest mt-2 hidden">* Valores mensais estimados.</p>
 
-        <!-- PAINEL DE EXPLORAÇÃO / Busca / FILTROS -->
-        <div class="glass-panel p-8 space-y-6 mt-6">
-            <div class="flex flex-col md:flex-row items-center justify-between gap-6">
-                <div class="flex items-center gap-4 w-full md:w-auto min-w-0">
-                    <span class="text-[#40bcf4] bg-[#40bcf4]/10 p-3 rounded-xl border border-[#40bcf4]/20 shadow-[0_0_15px_rgba(64,188,244,0.15)] shrink-0">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        <!-- EXPLORAÇÃO E FILTROS -->
+        <div class="glass-panel p-4 md:p-8 space-y-4 md:space-y-6 mt-4">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-3 w-full md:w-auto">
+                    <span class="text-[#40bcf4] bg-[#40bcf4]/10 p-2.5 rounded-xl border border-[#40bcf4]/20 shrink-0">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                     </span>
                     <div class="min-w-0">
-                        <h3 class="text-white font-bold text-xl tracking-tighter uppercase truncate">Explorar o Catálogo</h3>
-                        <p class="text-[#8c9bab] text-xs truncate">Use a busca de texto ou selecione os streamings que você assina.</p>
+                        <h3 class="text-white font-bold text-base md:text-xl tracking-tighter uppercase truncate">O Catálogo</h3>
                     </div>
                 </div>
                 <div class="w-full md:w-1/3 relative shrink-0">
-                    <input type="text" id="search-input" oninput="handleSearch()" placeholder="Procurar filme..." class="w-full bg-[#14181c] border border-[#2c3440] text-white pl-4 pr-10 py-3 rounded-xl focus:outline-none focus:border-[#40bcf4] transition-colors placeholder-[#8c9bab] text-sm shadow-inner">
-                    <svg class="w-5 h-5 absolute right-3 top-3.5 text-[#8c9bab]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    <input type="text" id="search-input" oninput="handleSearch()" placeholder="Procurar filme..." class="w-full bg-[#14181c] border border-[#2c3440] text-white pl-4 pr-10 py-2.5 rounded-xl focus:outline-none focus:border-[#40bcf4] text-xs sm:text-sm">
+                    <svg class="w-4 h-4 absolute right-3 top-3 text-[#8c9bab]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                 </div>
             </div>
 
-            <div class="border-t border-[#2c3440] pt-6">
-                <p class="text-[#8c9bab] text-[10px] font-black uppercase tracking-widest mb-4 flex items-center gap-2">
-                    <svg class="w-4 h-4 text-[#40bcf4]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
-                    Filtros de Plataforma (Você pode selecionar várias)
+            <div class="border-t border-[#2c3440] pt-4">
+                <p class="text-[#8c9bab] text-[9px] font-black uppercase tracking-widest mb-3 flex items-center gap-1.5">
+                    Filtros de Plataforma
                 </p>
-                <div id="stats-container" class="flex flex-wrap gap-2 md:gap-3">
-                    <!-- Pills compactas geradas pelo JS -->
+                <!-- LISTA DE FILTROS OTIMIZADA PARA MOBILE (SCROLL HORIZONTAL) -->
+                <div id="stats-container" class="flex flex-row overflow-x-auto no-scrollbar snap-x gap-2 pb-2 md:flex-wrap">
+                    <!-- Gerado pelo JS -->
                 </div>
             </div>
         </div>
 
-        <div id="movies-panel" class="space-y-6 hidden animate-fade-in-fast">
-            <div class="flex justify-between items-center bg-gradient-to-r from-[#1c2228] to-[#14181c] p-4 sm:p-6 rounded-xl border border-[#2c3440] gap-4 flex-col sm:flex-row">
-                <div class="flex items-center gap-2 sm:gap-4 min-w-0 w-full sm:w-auto justify-between sm:justify-start">
-                    <h3 id="current-filter-title" class="text-white font-bold text-lg sm:text-xl tracking-tighter uppercase drop-shadow-md truncate">Resultados</h3>
-                    <span id="movie-counter" class="bg-[#14181c] px-3 py-1 rounded text-[10px] font-black text-[#40bcf4] border border-[#40bcf4]/20 whitespace-nowrap shrink-0">0 RESULTADOS</span>
+        <div id="movies-panel" class="space-y-4 hidden animate-fade-in-fast">
+            <div class="flex justify-between items-center bg-[#1c2228] p-3 sm:p-6 rounded-xl border border-[#2c3440] gap-3 flex-col sm:flex-row">
+                <div class="flex items-center gap-2 min-w-0 w-full justify-between sm:justify-start">
+                    <h3 id="current-filter-title" class="text-white font-bold text-sm sm:text-xl tracking-tighter uppercase truncate">Resultados</h3>
+                    <span id="movie-counter" class="bg-[#14181c] px-2 py-1 rounded text-[9px] font-black text-[#40bcf4] border border-[#40bcf4]/20 shrink-0">0 FILMES</span>
                 </div>
-                <button onclick="tentarForcarAnalise()" class="w-full sm:w-auto justify-center bg-[#14181c] hover:bg-[#40bcf4] text-[#8c9bab] hover:text-[#14181c] px-3 py-2 sm:py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all border border-[#2c3440] hover:border-[#40bcf4] shadow-md flex items-center gap-2 shrink-0">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                    <span>Forçar Nova Análise</span>
-                </button>
             </div>
-            <ul id="results" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></ul>
+            <ul id="results" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></ul>
         </div>
     </div>
     
-    <!-- FOOTER DE DIREITOS AUTORAIS E AVISOS LEGAIS -->
-    <footer class="mt-20 border-t border-[#2c3440] pt-8 pb-12 text-center text-[#8c9bab] text-[10px] uppercase tracking-widest leading-relaxed relative z-20">
-        <p class="mb-2">O Oráculo de Streaming é um projeto independente e não é afiliado, associado, endossado ou patrocinado pelo Letterboxd.</p>
-        <p>Este produto utiliza a API do TMDB para dados e imagens de filmes, mas não é endossado ou certificado pelo <a href="https://www.themoviedb.org/" target="_blank" class="hover:text-[#40bcf4] transition-colors font-bold underline decoration-dashed">The Movie Database (TMDB)</a>.</p>
+    <footer class="mt-12 border-t border-[#2c3440] pt-6 pb-10 text-center text-[#8c9bab] text-[8px] sm:text-[10px] uppercase tracking-widest leading-relaxed relative z-20">
+        <p class="mb-1">Oráculo de Streaming é independente e não afiliado ao Letterboxd.</p>
+        <p>Dados de TMDB API.</p>
     </footer>
 </div>
 
 <script>
     let statsData = {};
     let rawDatabase = {};
-    let frasesAleatorias = ["Analisando catálogos...", "Verificando base de dados JustWatch...", "Procurando direitos de transmissão...", "Lendo arquivos de catálogos locais...", "Aguardando resposta dos servidores da Netflix e Amazon..."];
+    let frasesAleatorias = [];
     let oraculoRecomendacoesGlobais = []; 
     let filmesSelecionados = new Set(); 
     const posterCache = {}; 
-    
     let activePlatformFilters = new Set();
     let backdropInterval;
     let initialBackdropInterval;
     let fraseTimerInterval;
 
-    // ======= FILMES ICÔNICOS INICIAIS (CARROSSEL) =======
     const iconicMovies = [
         { Name: "Interstellar", Year: 2014, backdrop: "https://image.tmdb.org/t/p/original/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg" },
         { Name: "Parasite", Year: 2019, backdrop: "https://image.tmdb.org/t/p/original/tuJG5x22K2p06ZEM4sNfW6Z78wI.jpg" },
-        { Name: "The Dark Knight", Year: 2008, backdrop: "https://image.tmdb.org/t/p/original/nMKdUUepR0i5zn0y1T4CsSB5chy.jpg" },
-        { Name: "Spirited Away", Year: 2001, backdrop: "https://image.tmdb.org/t/p/original/2w11gS27aB60hZ1yDk8nO8J1O1O.jpg" },
-        { Name: "Pulp Fiction", Year: 1994, backdrop: "https://image.tmdb.org/t/p/original/suaEOtk1N1sgg2MTM7oZd2cfVp3.jpg" },
-        { Name: "Everything Everywhere All at Once", Year: 2022, backdrop: "https://image.tmdb.org/t/p/original/wPU78OPN4BYEgWYdXy7wMqwqFDb.jpg" },
-        { Name: "The Matrix", Year: 1999, backdrop: "https://image.tmdb.org/t/p/original/ncEsesgOJDNrTUED89hYbA117wo.jpg" },
-        { Name: "Blade Runner 2049", Year: 2017, backdrop: "https://image.tmdb.org/t/p/original/ilRyazdndIGMqWhH2tYdK0mHihM.jpg" },
-        { Name: "Goodfellas", Year: 1990, backdrop: "https://image.tmdb.org/t/p/original/sw7mordbZxgITU877yTpZCud90M.jpg" },
-        { Name: "Inception", Year: 2010, backdrop: "https://image.tmdb.org/t/p/original/8ZTVqvKDQ8emSGUEMjsS4yHAwrp.jpg" }
+        { Name: "The Dark Knight", Year: 2008, backdrop: "https://image.tmdb.org/t/p/original/nMKdUUepR0i5zn0y1T4CsSB5chy.jpg" }
     ];
 
     let currentIconicIdx = 0;
@@ -628,1074 +576,313 @@
     function startInitialSlideshow() {
         const heroImg = document.getElementById('hero-backdrop-img');
         const slideInfo = document.getElementById('slideshow-info');
-        const slideTitle = document.getElementById('slide-title');
-        const slideYear = document.getElementById('slide-year');
-
-        if (!heroImg || !slideInfo) return;
+        if (!heroImg) return;
 
         initialBackdropInterval = setInterval(() => {
-            const nextIdx = (currentIconicIdx + 1) % iconicMovies.length;
-            const nextMovie = iconicMovies[nextIdx];
-
+            const nextMovie = iconicMovies[(currentIconicIdx + 1) % iconicMovies.length];
             const tempImg = new Image();
-            
             tempImg.onload = () => {
                 heroImg.style.opacity = '0';
-                slideInfo.style.opacity = '0';
-                
+                if(slideInfo) slideInfo.style.opacity = '0';
                 setTimeout(() => {
                     heroImg.src = nextMovie.backdrop;
-                    if(slideTitle) slideTitle.innerText = nextMovie.Name;
-                    if(slideYear) slideYear.innerText = nextMovie.Year;
-                    
-                    const slideRating = document.getElementById('slide-rating');
-                    if(slideRating) slideRating.innerText = '';
-                    
-                    currentIconicIdx = nextIdx;
-                    
+                    const st = document.getElementById('slide-title');
+                    const sy = document.getElementById('slide-year');
+                    if(st) st.innerText = nextMovie.Name;
+                    if(sy) sy.innerText = nextMovie.Year;
+                    currentIconicIdx = (currentIconicIdx + 1) % iconicMovies.length;
                     heroImg.style.opacity = '0.3';
-                    slideInfo.style.opacity = '1';
+                    if(slideInfo) slideInfo.style.opacity = '1';
                 }, 500);
             };
-            
-            tempImg.onerror = () => {
-                currentIconicIdx = nextIdx;
-            };
-            
             tempImg.src = nextMovie.backdrop;
-            
         }, 5000);
     }
-
     document.addEventListener('DOMContentLoaded', startInitialSlideshow);
 
-
-    // ======= SISTEMA DE CRÉDITOS E DOAÇÕES =======
     async function verificarCredito() {
         try {
             const res = await fetch('/api/creditos');
             const data = await res.json();
-            if (data.creditos <= 0) {
-                abrirDoacao();
-                return false;
-            }
+            if (data.creditos <= 0) { abrirDoacao(); return false; }
             return true;
-        } catch (e) {
-            console.error("Falha ao checar créditos", e);
-            return true; 
-        }
+        } catch (e) { return true; }
     }
+    async function consumirCredito() { try { await fetch('/api/consumir_credito', { method: 'POST' }); } catch (e) {} }
+    function abrirDoacao() { document.getElementById('donation-modal')?.classList.remove('hidden'); document.getElementById('donation-modal')?.classList.add('flex'); }
+    function fecharDoacao() { document.getElementById('donation-modal')?.classList.add('hidden'); document.getElementById('donation-modal')?.classList.remove('flex'); }
+    function abrirMercadoPago() { window.open("https://mpago.la/15FPHv4", '_blank'); recarregarGratis(); }
+    async function recarregarGratis() { try { for(let i=0;i<5;i++) await fetch('/api/adicionar_credito', { method: 'POST' }); } catch (e) {} fecharDoacao(); }
 
-    async function consumirCredito() {
-        try {
-            await fetch('/api/consumir_credito', { method: 'POST' });
-        } catch (e) {}
-    }
-
-    function abrirDoacao() {
-        document.getElementById('donation-modal')?.classList.remove('hidden');
-        document.getElementById('donation-modal')?.classList.add('flex');
-    }
-
-    function fecharDoacao() {
-        document.getElementById('donation-modal')?.classList.add('hidden');
-        document.getElementById('donation-modal')?.classList.remove('flex');
-    }
-
-    function abrirMercadoPago() {
-        const linkMercadoPago = "https://mpago.la/15FPHv4"; 
-        window.open(linkMercadoPago, '_blank');
-        recarregarGratis();
-    }
-
-    async function recarregarGratis() {
-        try {
-            for(let i=0; i<5; i++) {
-                await fetch('/api/adicionar_credito', { method: 'POST' });
-            }
-        } catch (e) {}
-        fecharDoacao();
-    }
-
-    const platformPrices = {
-        "Netflix": 39.90,
-        "Prime Video": 19.90,
-        "Max": 39.90,
-        "MUBI": 34.90,
-        "Disney+": 43.90,
-        "Globoplay": 24.90,
-        "Apple TV+": 21.90,
-        "Telecine": 29.90,
-        "Paramount+": 19.90,
-        "Claro TV+": 34.90, 
-        "MGM+": 14.90,
-        "Looke": 16.90,
-        "Pluto TV": 0.00, 
-        "Crunchyroll": 14.90,
-        "Star+": 43.90,
-        "Belas Artes": 14.90,
-        "Oldflix": 16.90,
-        "Mercado Play": 0.00,
-        "Plex": 0.00,
-        "NetMovies": 0.00,
-        "Libreflix": 0.00,
-        "JustWatch": 0.00
-    };
+    const platformPrices = { "Netflix": 39.90, "Prime Video": 19.90, "Max": 39.90, "MUBI": 34.90, "Disney+": 43.90, "Globoplay": 24.90, "Apple TV+": 21.90, "Telecine": 29.90, "Paramount+": 19.90, "Claro TV+": 34.90, "MGM+": 14.90, "Looke": 16.90, "Pluto TV": 0.00, "Crunchyroll": 14.90, "Star+": 43.90, "Belas Artes": 14.90, "Oldflix": 16.90, "Mercado Play": 0.00, "Plex": 0.00, "NetMovies": 0.00, "Libreflix": 0.00 };
 
     function normalizePlatformName(name) {
-        let cleanName = name.replace(/ Amazon Channel/gi, '')
-                   .replace(/ Amazon Channels/gi, '')
-                   .replace(/ Apple TV Channel/gi, '')
-                   .replace(/ Channels/gi, '')
-                   .replace(/ with Ads/gi, '')
-                   .replace(/ Premium/gi, '')
-                   .replace(/ Plus/gi, '+')
-                   .trim();
-                   
-        const c = cleanName.toLowerCase();
-        
-        if (c.includes('netflix')) return 'Netflix';
-        if (c.includes('max') || c.includes('hbo')) return 'Max';
-        if (c.includes('mubi')) return 'MUBI';
-        if (c.includes('disney')) return 'Disney+';
-        if (c.includes('globoplay')) return 'Globoplay';
-        if (c.includes('apple')) return 'Apple TV+';
-        if (c.includes('telecine')) return 'Telecine';
-        if (c.includes('paramount')) return 'Paramount+';
-        if (c.includes('claro')) return 'Claro TV+';
-        if (c.includes('mgm')) return 'MGM+';
-        if (c.includes('looke')) return 'Looke';
-        if (c.includes('pluto')) return 'Pluto TV';
-        if (c.includes('crunchyroll')) return 'Crunchyroll';
-        if (c.includes('star')) return 'Star+';
-        if (c.includes('plex')) return 'Plex';
-        if (c.includes('belas artes')) return 'Belas Artes';
-        if (c.includes('oldflix')) return 'Oldflix';
-        if (c.includes('netmovies')) return 'NetMovies';
-        if (c.includes('mercado play')) return 'Mercado Play';
-        if (c.includes('justwatch')) return 'JustWatch';
-        if (c.includes('lionsgate')) return 'Lionsgate+';
-        if (c.includes('universal')) return 'Universal+';
-        if (c.includes('sony')) return 'Sony One';
-        if (c.includes('reserva imovision')) return 'Reserva Imovision';
-        if (c.includes('arte ')) return 'Arte';
-        if (c.includes('filmelier')) return 'Filmelier';
-        if (c.includes('booh')) return 'Booh';
-        if (c.includes('artiflix')) return 'Artiflix';
-        if (c.includes('filmbox')) return 'FilmBox+';
-        if (c.includes('libreflix')) return 'Libreflix';
-        if (c.includes('cultpix')) return 'Cultpix';
-        if (c.includes('filmicca')) return 'Filmicca';
-        if (c.includes('runtime')) return 'Runtime';
-        if (c.includes('kocowa')) return 'Kocowa';
-        if (c.includes('diamond films')) return 'Diamond Films';
-        if (c.includes('prime') || c.includes('amazon')) return 'Prime Video';
-        
-        return cleanName; 
+        let c = name.replace(/ Amazon Channel/gi, '').replace(/ Channels/gi, '').replace(/ Plus/gi, '+').trim().toLowerCase();
+        if (c.includes('netflix')) return 'Netflix'; if (c.includes('max') || c.includes('hbo')) return 'Max';
+        if (c.includes('disney')) return 'Disney+'; if (c.includes('prime') || c.includes('amazon')) return 'Prime Video';
+        if (c.includes('apple')) return 'Apple TV+'; if (c.includes('paramount')) return 'Paramount+';
+        if (c.includes('globoplay')) return 'Globoplay'; if (c.includes('telecine')) return 'Telecine';
+        return name; 
     }
 
     function normalizeDatabase(db) {
-        let normalized = {};
-        for(let key in db) {
-            let uniquePlats = new Set();
-            db[key].forEach(p => {
-                if(p !== "Não disponível") uniquePlats.add(normalizePlatformName(p));
-            });
-            normalized[key] = uniquePlats.size > 0 ? Array.from(uniquePlats) : ["Não disponível"];
+        let norm = {};
+        for(let k in db) {
+            let p = new Set();
+            db[k].forEach(x => { if(x !== "Não disponível") p.add(normalizePlatformName(x)); });
+            norm[k] = p.size > 0 ? Array.from(p) : ["Não disponível"];
         }
-        return normalized;
+        return norm;
     }
 
     function getPlatformLogo(name) {
         const n = name.toLowerCase();
         if (n.includes('netflix')) return "https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg";
-        if (n.includes('prime') || n.includes('amazon')) return "https://upload.wikimedia.org/wikipedia/commons/f/f1/Prime_Video.png";
-        if (n.includes('max') || n.includes('hbo')) return "https://upload.wikimedia.org/wikipedia/commons/c/ce/Max_logo.svg";
-        if (n.includes('mubi')) return "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dc/MUBI_Logo_Standard_Black.png/250px-MUBI_Logo_Standard_Black.png";
+        if (n.includes('prime')) return "https://upload.wikimedia.org/wikipedia/commons/f/f1/Prime_Video.png";
+        if (n.includes('max')) return "https://upload.wikimedia.org/wikipedia/commons/c/ce/Max_logo.svg";
         if (n.includes('disney')) return "https://upload.wikimedia.org/wikipedia/commons/3/3e/Disney%2B_logo.svg";
-        if (n.includes('globoplay')) return "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Globoplay2020_red.svg/250px-Globoplay2020_red.svg.png";
         if (n.includes('apple')) return "https://upload.wikimedia.org/wikipedia/commons/2/28/Apple_TV_Plus_Logo.svg";
-        if (n.includes('telecine')) return "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Rede_Telecine_vertical_logo.svg/250px-Rede_Telecine_vertical_logo.svg.png";
-        if (n.includes('paramount')) return "https://upload.wikimedia.org/wikipedia/commons/a/a5/Paramount_Plus.svg";
-        if (n.includes('claro')) return "https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Claro_TV_wordmark.svg/250px-Claro_TV_wordmark.svg.png";
-        if (n.includes('mgm')) return "https://upload.wikimedia.org/wikipedia/commons/0/06/MGM%2B_logo.svg";
-        if (n.includes('looke')) return "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Looke_logo.svg/250px-Looke_logo.svg.png";
-        if (n.includes('pluto')) return "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Pluto_TV_logo_2024.svg/250px-Pluto_TV_logo_2024.svg.png";
-        if (n.includes('crunchyroll')) return "https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Crunchyroll_Logo.png/250px-Crunchyroll_Logo.png";
-        if (n.includes('star')) return "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Star%2B_logo.svg/250px-Star%2B_logo.svg.png";
-        
         return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=14181c&color=fff&bold=true`;
     }
 
-    fetch('/frases').then(res => res.json()).then(data => { if(data.length > 0) frasesAleatorias = data; }).catch(e => {});
+    fetch('/frases').then(res => res.json()).then(data => { if(data.length>0) frasesAleatorias = data; }).catch(e => {});
 
     function iniciarCicloDeFrases() {
-        const fnTxt = document.getElementById('funny-text');
-        if (!fnTxt) return;
-        
-        if (frasesAleatorias.length > 0) {
-            fnTxt.innerText = frasesAleatorias[Math.floor(Math.random() * frasesAleatorias.length)];
-        }
-        
-        if (fraseTimerInterval) clearInterval(fraseTimerInterval);
-        
+        const t = document.getElementById('funny-text');
+        if(!t) return;
+        if(frasesAleatorias.length > 0) t.innerText = frasesAleatorias[0];
+        if(fraseTimerInterval) clearInterval(fraseTimerInterval);
         fraseTimerInterval = setInterval(() => {
-            if (frasesAleatorias.length > 0) {
-                fnTxt.style.opacity = '0';
-                setTimeout(() => {
-                    fnTxt.innerText = frasesAleatorias[Math.floor(Math.random() * frasesAleatorias.length)];
-                    fnTxt.style.opacity = '1';
-                }, 500); 
+            if(frasesAleatorias.length > 0) {
+                t.style.opacity = '0';
+                setTimeout(() => { t.innerText = frasesAleatorias[Math.floor(Math.random() * frasesAleatorias.length)]; t.style.opacity = '1'; }, 500);
             }
-        }, 6000); 
+        }, 6000);
     }
+    function pararCicloDeFrases() { if(fraseTimerInterval) clearInterval(fraseTimerInterval); }
 
-    function pararCicloDeFrases() {
-        if (fraseTimerInterval) clearInterval(fraseTimerInterval);
-    }
-
-    function countdown(msg, callback) {
-        const overlay = document.getElementById('countdown-overlay');
-        const text = document.getElementById('countdown-text');
-        if(overlay) overlay.style.display = 'flex';
-        let count = 3;
-        if(text) text.innerText = count;
-        if(text) text.className = 'countdown-number';
-        
-        const interval = setInterval(() => {
-            count--;
-            if (count > 0) {
-                if(text) text.innerText = count;
-            } else if (count === 0) {
-                if(text) {
-                    text.style.fontSize = '3rem';
-                    text.classList.remove('countdown-number');
-                    text.className = 'text-white font-black uppercase tracking-widest animate-pulse';
-                    text.innerText = msg;
-                }
-            } else {
-                clearInterval(interval);
-                if(overlay) overlay.style.display = 'none';
-                callback();
-            }
+    function countdown(msg, cb) {
+        const o = document.getElementById('countdown-overlay'); const t = document.getElementById('countdown-text');
+        if(o) o.style.display = 'flex'; let c = 3;
+        if(t) { t.innerText = c; t.className = 'countdown-number'; }
+        const iv = setInterval(() => {
+            c--;
+            if(c>0) { if(t) t.innerText=c; }
+            else if(c===0) { if(t){ t.style.fontSize='3rem'; t.className='text-white font-black uppercase tracking-widest'; t.innerText=msg; } }
+            else { clearInterval(iv); if(o) o.style.display='none'; cb(); }
         }, 800);
     }
 
     async function handleFileUpload() {
         const file = document.getElementById('csv-file')?.files[0];
         if(!file) return;
+        if (!(await verificarCredito())) { document.getElementById('csv-file').value = ''; return; }
         
-        const temCredito = await verificarCredito();
-        if (!temCredito) {
-            const fileInput = document.getElementById('csv-file');
-            if(fileInput) fileInput.value = ''; 
-            return;
-        }
-
-        const fileNameDisplay = document.getElementById('file-name-display');
-        if(fileNameDisplay) {
-            fileNameDisplay.innerText = file.name;
-            fileNameDisplay.classList.remove('hidden');
-        }
-
-        const formData = new FormData();
-        formData.append("file", file);
+        const fnd = document.getElementById('file-name-display');
+        if(fnd) { fnd.innerText = file.name; fnd.classList.remove('hidden'); }
         
+        const fd = new FormData(); fd.append("file", file);
         try {
-            const res = await fetch('/upload_profile', { method: 'POST', body: formData });
-            const data = await res.json();
-            statsData = data.stats;
-            
+            const res = await fetch('/upload_profile', { method: 'POST', body: fd });
+            statsData = (await res.json()).stats;
             await consumirCredito();
-            
-            countdown("INICIANDO ANÁLISE COMPLETA...", () => {
+            countdown("INICIANDO ANÁLISE...", () => {
                 document.getElementById('main-content')?.classList.add('hidden');
-                exibirRaioX();
-                carregarOraculo();
-                iniciarFluxoWatchlist();
+                exibirRaioX(); carregarOraculo(); iniciarFluxoWatchlist();
             });
-        } catch(e) {
-            alert("Houve um erro ao ler o seu arquivo. Tente enviar o .zip original do Letterboxd sem o extrair!");
-        }
-    }
-
-    async function tentarRegerarPerfil() {
-        if (!(await verificarCredito())) return;
-        await consumirCredito();
-        gerarPerfilIA();
-    }
-
-    function mostrarTrofeuConquista() {
-        const trophy = document.getElementById('ps-trophy');
-        if(trophy && !trophy.classList.contains('show')) {
-            trophy.classList.add('show');
-            setTimeout(() => {
-                trophy.classList.remove('show');
-            }, 6000);
-        }
-    }
-
-    async function buscarAteQuatroIneditos() {
-        let filmesEncontrados = [];
-        let tentativasAPI = 0;
-        let limiteTentativas = 4;
-
-        while (filmesEncontrados.length < 4 && tentativasAPI < limiteTentativas) {
-            if (tentativasAPI === 1) {
-                mostrarTrofeuConquista();
-            }
-
-            try {
-                const res = await fetch('/oraculo');
-                const data = await res.json();
-                
-                if(data.recomendacoes && data.recomendacoes.length > 0) {
-                    const ineditosNaTela = data.recomendacoes.filter(r => 
-                        !oraculoRecomendacoesGlobais.some(og => og.rec.toLowerCase() === r.rec.toLowerCase()) &&
-                        !filmesEncontrados.some(nf => nf.rec.toLowerCase() === r.rec.toLowerCase())
-                    );
-                    filmesEncontrados.push(...ineditosNaTela);
-                }
-            } catch (e) {
-                console.error("Erro no loop do Oráculo:", e);
-                break; 
-            }
-            tentativasAPI++;
-        }
-        
-        return filmesEncontrados.slice(0, 4); 
-    }
-
-    async function carregarMaisSugestoes() {
-        if (!(await verificarCredito())) return;
-        
-        const btn = document.getElementById('btn-load-more');
-        const spinner = document.getElementById('load-more-spinner');
-        const icon = document.getElementById('load-more-icon');
-        const grid = document.getElementById('oracle-grid');
-
-        if(btn) btn.disabled = true;
-        if(icon) icon.classList.add('hidden');
-        if(spinner) spinner.classList.remove('hidden');
-
-        await consumirCredito();
-
-        const startSkeletonIdx = oraculoRecomendacoesGlobais.length;
-        let skeletonHTML = '';
-        for(let i=0; i<4; i++) {
-            skeletonHTML += `
-            <div id="skeleton-${startSkeletonIdx+i}" class="movie-card animate-pulse border-[#2c3440] border-2">
-               <div class="h-full w-full bg-[#1c2228] flex items-center justify-center"><span class="text-[#8c9bab] text-xs font-bold uppercase tracking-widest text-center px-4">Minerando<br>dados...</span></div>
-            </div>`;
-        }
-        if(grid) grid.insertAdjacentHTML('beforeend', skeletonHTML);
-
-        const novosFilmes = await buscarAteQuatroIneditos();
-
-        for(let i=0; i<4; i++) {
-            const skel = document.getElementById(`skeleton-${startSkeletonIdx+i}`);
-            if(skel) skel.remove();
-        }
-
-        if(novosFilmes.length > 0) {
-            const startIndex = oraculoRecomendacoesGlobais.length;
-            oraculoRecomendacoesGlobais = [...oraculoRecomendacoesGlobais, ...novosFilmes];
-            
-            novosFilmes.forEach((_, i) => filmesSelecionados.add(startIndex + i));
-            renderizarOraculoCards(novosFilmes, startIndex);
-        } else {
-            alert("VOCÊ ZEROU O CINEMA! A IA varreu a base de dados múltiplas vezes e tudo o que ela pensou, você já assistiu. Parabéns, você é o Mestre Supremo do Letterboxd.");
-        }
-
-        if(btn) btn.disabled = false;
-        if(icon) icon.classList.remove('hidden');
-        if(spinner) spinner.classList.add('hidden');
-    }
-
-    async function tentarForcarAnalise() {
-        if (!(await verificarCredito())) return;
-        await consumirCredito();
-        iniciarFluxoWatchlist(true);
+        } catch(e) { alert("Erro ao ler arquivo .zip"); }
     }
 
     function exibirRaioX() {
         document.getElementById('analyzer-panel')?.classList.remove('hidden');
-        const statTotal = document.getElementById('stat-total');
-        if(statTotal) statTotal.innerText = statsData?.total_avaliados || 0;
-        const statAvg = document.getElementById('stat-avg');
-        if(statAvg) statAvg.innerText = (statsData?.media_notas || 0).toFixed(2);
-        
+        document.getElementById('stat-total').innerText = statsData?.total_avaliados || 0;
+        document.getElementById('stat-avg').innerText = (statsData?.media_notas || 0).toFixed(2);
         gerarPerfilIA();
-
         if (initialBackdropInterval) clearInterval(initialBackdropInterval);
-        if (backdropInterval) clearInterval(backdropInterval);
-
-        const favs = statsData?.favoritos || [];
-        if (favs.length > 0) {
-            const heroImg = document.getElementById('hero-backdrop-img');
-            const slideInfo = document.getElementById('slideshow-info');
-            const slideTitle = document.getElementById('slide-title');
-            const slideYear = document.getElementById('slide-year');
-            const slideRating = document.getElementById('slide-rating');
-
-            const updateSlideInfo = (movie) => {
-                if(slideTitle) slideTitle.innerText = movie.Name;
-                if(slideYear) slideYear.innerText = movie.Year;
-                
-                let starsHTML = '';
-                if(movie.Rating) {
-                    for(let i=0; i<Math.floor(movie.Rating); i++) starsHTML += '★';
-                    if(movie.Rating % 1 !== 0) starsHTML += '½';
-                }
-                if(slideRating) slideRating.innerText = starsHTML;
-            };
-            
-            const backdropPromises = favs.map(f => 
-                fetch(`/api/tmdb/search?query=${encodeURIComponent(f.Name)}`)
-                .then(res => res.json())
-                .then(data => {
-                    if(data.results && data.results.length > 0 && data.results[0].backdrop_path) {
-                        return {
-                            url: `https://image.tmdb.org/t/p/original${data.results[0].backdrop_path}`,
-                            movie: f
-                        };
-                    }
-                    return null;
-                }).catch(() => null)
-            );
-
-            Promise.all(backdropPromises).then(results => {
-                const validSlides = results.filter(r => r !== null);
-                
-                if (validSlides.length > 0) {
-                    let currentIdx = 0;
-                    
-                    if(heroImg) {
-                        heroImg.style.opacity = '0';
-                        heroImg.classList.remove('grayscale-[20%]');
-                    }
-                    if (slideInfo) slideInfo.style.opacity = '0';
-                    
-                    setTimeout(() => {
-                        if(heroImg) heroImg.src = validSlides[0].url;
-                        if (slideInfo) updateSlideInfo(validSlides[0].movie);
-                        
-                        if(heroImg) heroImg.onload = () => { 
-                            heroImg.style.opacity = '0.3'; 
-                            if (slideInfo) slideInfo.style.opacity = '1';
-                        };
-                    }, 500);
-
-                    if (validSlides.length > 1) {
-                        backdropInterval = setInterval(() => {
-                            const nextIdx = (currentIdx + 1) % validSlides.length;
-                            const nextSlide = validSlides[nextIdx];
-                            
-                            const tempImg = new Image();
-                            
-                            tempImg.onload = () => {
-                                if(heroImg) heroImg.style.opacity = '0';
-                                if (slideInfo) slideInfo.style.opacity = '0';
-                                
-                                setTimeout(() => {
-                                    if(heroImg) heroImg.src = nextSlide.url;
-                                    if (slideInfo) updateSlideInfo(nextSlide.movie);
-                                    currentIdx = nextIdx;
-                                    
-                                    if(heroImg) heroImg.style.opacity = '0.3';
-                                    if (slideInfo) slideInfo.style.opacity = '1';
-                                }, 500);
-                            };
-
-                            tempImg.onerror = () => {
-                                currentIdx = nextIdx; 
-                            };
-
-                            tempImg.src = nextSlide.url;
-                        }, 5000); 
-                    }
-                }
-            });
-        }
     }
 
+    async function tentarRegerarPerfil() { if(await verificarCredito()){ await consumirCredito(); gerarPerfilIA(); } }
+
     async function gerarPerfilIA() {
-        const titleEl = document.getElementById('roast-title');
-        const descEl = document.getElementById('roast-desc');
-        const vibeEl = document.getElementById('roast-vibe');
-        const imgEl = document.getElementById('profile-img-element');
-        const pulseLoader = document.getElementById('profile-pulse-loader');
-        const regenBtn = document.getElementById('btn-regenerate-profile');
-
-        regenBtn?.classList.add('hidden');
-        if(titleEl) titleEl.innerHTML = `Analisando o seu gosto... <svg class="animate-spin w-5 h-5 inline-block text-[#40bcf4] ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>`;
-        if(descEl) descEl.innerText = "O nosso sistema está processando as suas avaliações para traçar um perfil detalhado do seu comportamento como crítico...";
-        if(vibeEl) vibeEl.innerText = `PERFIL: CALCULANDO...`;
+        const tt=document.getElementById('roast-title'), td=document.getElementById('roast-desc'), tv=document.getElementById('roast-vibe'),
+              ti=document.getElementById('profile-img-element'), pl=document.getElementById('profile-pulse-loader'), br=document.getElementById('btn-regenerate-profile');
+        br?.classList.add('hidden'); ti?.classList.add('hidden'); pl?.classList.remove('hidden');
+        if(tt) tt.innerHTML = `Analisando gosto... <svg class="animate-spin w-4 h-4 ml-1 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>`;
         
-        imgEl?.classList.add('hidden');
-        pulseLoader?.classList.remove('hidden');
-
         try {
-            const res = await fetch('/gerar_perfil', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ stats: statsData })
-            });
-
-            if (res.ok) {
-                const perfil = await res.json();
-                
-                if (!perfil.erro) {
-                    if(titleEl) titleEl.innerHTML = `${perfil.titulo}`;
-                    if(descEl) descEl.innerText = perfil.descricao;
-                    if(vibeEl) vibeEl.innerText = `PERFIL: ${perfil.personagem_referencia}`;
-                    regenBtn?.classList.remove('hidden');
-
-                    fetch(`/api/tmdb/search?query=${encodeURIComponent(perfil.filme_referencia)}`)
-                    .then(r => r.json())
-                    .then(data => {
-                        if(data.results && data.results.length > 0 && data.results[0].poster_path) {
-                            if(imgEl) {
-                                imgEl.src = `https://image.tmdb.org/t/p/w500${data.results[0].poster_path}`;
-                                imgEl.classList.remove('hidden');
-                            }
-                            pulseLoader?.classList.add('hidden');
-                        }
-                    }).catch(err => console.log("Sem poster para perfil:", err));
-                    
-                    return; 
+            const res = await fetch('/gerar_perfil', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({stats: statsData}) });
+            if(res.ok) {
+                const data = await res.json();
+                if(!data.erro) {
+                    if(tt) tt.innerHTML = data.titulo; if(td) td.innerText = data.descricao; if(tv) tv.innerText = data.personagem_referencia;
+                    br?.classList.remove('hidden');
+                    fetch(`/api/tmdb/search?query=${encodeURIComponent(data.filme_referencia)}`).then(r=>r.json()).then(d=>{
+                        if(d.results?.[0]?.poster_path){ ti.src=`https://image.tmdb.org/t/p/w500${d.results[0].poster_path}`; ti.classList.remove('hidden'); pl.classList.add('hidden'); }
+                    });
+                    return;
                 }
-            }
-            throw new Error("Falha na Comunicação (API)");
-
-        } catch (e) {
-            console.error("Erro ao gerar perfil de crítico:", e);
-            if(titleEl) titleEl.innerHTML = `O Avaliador Silencioso`;
-            if(descEl) descEl.innerText = "A quantidade de filmes avaliados sobrecarregou nossos servidores e o algoritmo não conseguiu encontrar uma definição exata para o seu gosto. Considere o seu perfil inclassificável.";
-            if(vibeEl) vibeEl.innerText = `PERFIL: MAX ROCKATANSKY`;
-            pulseLoader?.classList.remove('hidden');
-            regenBtn?.classList.remove('hidden');
+            } throw new Error();
+        } catch(e) {
+            if(tt) tt.innerHTML = "O Inclassificável"; pl?.classList.remove('hidden'); br?.classList.remove('hidden');
         }
     }
 
     async function carregarOraculo() {
-        try {
-            const recomendacoesSeguras = await buscarAteQuatroIneditos();
-            
-            if(recomendacoesSeguras && recomendacoesSeguras.length > 0) {
-                oraculoRecomendacoesGlobais = recomendacoesSeguras;
-                filmesSelecionados = new Set(oraculoRecomendacoesGlobais.map((_, i) => i));
-                
-                const grid = document.getElementById('oracle-grid');
-                if(grid) grid.innerHTML = ''; 
-                
-                renderizarOraculoCards(oraculoRecomendacoesGlobais, 0);
-            } else {
-                const grid = document.getElementById('oracle-grid');
-                if(grid) grid.innerHTML = `<div class="col-span-4 text-center p-8 bg-[#1c2228] border border-[#40bcf4] rounded-xl shadow-[0_0_15px_rgba(64,188,244,0.2)]"><h4 class="text-white font-black text-xl uppercase mb-2">🏆 CINÉFILO SUPREMO</h4><p class="text-[#8c9bab] text-sm">Você zerou o banco de dados. A IA foi incapaz de encontrar sequer 1 filme que você ainda não tenha visto ou adicionado à watchlist. Recomendamos que você comece a dirigir os seus próprios filmes.</p></div>`;
-            }
-
-        } catch (e) {
-            console.error(e);
-            const oracleGrid = document.getElementById('oracle-grid');
-            if(oracleGrid) oracleGrid.innerHTML = `<div class="col-span-4 text-center p-8 bg-[#1c2228] border border-[#2c3440] rounded-xl"><p class="text-[#40bcf4] text-sm font-bold uppercase">A conexão com o servidor de curadoria foi perdida.</p></div>`;
+        const f = await buscarAteQuatroIneditos();
+        if(f.length > 0) {
+            oraculoRecomendacoesGlobais = f; f.forEach((_,i)=>filmesSelecionados.add(i));
+            document.getElementById('oracle-grid').innerHTML = ''; renderizarOraculoCards(f, 0);
         }
     }
 
-    function atualizarBotoesExportar() {
-        const count = filmesSelecionados.size;
-        const text = count > 0 ? `EXPORTAR SELECIONADOS (${count})` : `SELECIONE UM FILME`;
-        
-        const btnD = document.getElementById('btn-export-desktop');
-        const btnM = document.getElementById('btn-export-mobile');
-        
-        if(btnD) { 
-            btnD.innerHTML = count > 0 
-                ? `<svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg> ${text}`
-                : `<svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg> ${text}`;
-            btnD.disabled = count === 0; 
+    async function buscarAteQuatroIneditos() {
+        let f = [], t = 0;
+        while(f.length < 4 && t < 4) {
+            if(t===1) document.getElementById('ps-trophy')?.classList.add('show');
+            try {
+                const r = await (await fetch('/oraculo')).json();
+                if(r.recomendacoes) f.push(...r.recomendacoes.filter(x => !f.some(y=>y.rec===x.rec)));
+            } catch(e) { break; }
+            t++;
         }
-        if(btnM) { 
-            btnM.innerHTML = count > 0 
-                ? `<svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg> ${text}`
-                : `<svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg> ${text}`;
-            btnM.disabled = count === 0; 
+        return f.slice(0,4);
+    }
+
+    async function carregarMaisSugestoes() {
+        if(!(await verificarCredito())) return; await consumirCredito();
+        document.getElementById('load-more-spinner').classList.remove('hidden');
+        document.getElementById('load-more-icon').classList.add('hidden');
+        const nov = await buscarAteQuatroIneditos();
+        if(nov.length>0) {
+            const s = oraculoRecomendacoesGlobais.length; oraculoRecomendacoesGlobais.push(...nov);
+            nov.forEach((_,i)=>filmesSelecionados.add(s+i)); renderizarOraculoCards(nov, s);
         }
-        
-        const tutCount = document.getElementById('tut-count');
-        if(tutCount) tutCount.innerText = count;
+        document.getElementById('load-more-spinner').classList.add('hidden');
+        document.getElementById('load-more-icon').classList.remove('hidden');
     }
 
     function toggleSelecao(idx) {
-        const card = document.getElementById(`oracle-card-${idx}`);
-        const check = document.getElementById(`check-${idx}`);
-        
-        if(filmesSelecionados.has(idx)) {
-            filmesSelecionados.delete(idx);
-            card.classList.remove('border-[#40bcf4]', 'shadow-[0_0_15px_rgba(64,188,244,0.3)]'); 
-            card.classList.add('border-[#2c3440]', 'brightness-50');
-            check.classList.add('scale-0', 'opacity-0');
-        } else {
-            filmesSelecionados.add(idx);
-            card.classList.add('border-[#40bcf4]', 'shadow-[0_0_15px_rgba(64,188,244,0.3)]'); 
-            card.classList.remove('border-[#2c3440]', 'brightness-50');
-            check.classList.remove('scale-0', 'opacity-0');
-        }
-        atualizarBotoesExportar();
+        const c = document.getElementById(`oracle-card-${idx}`), ch = document.getElementById(`check-${idx}`);
+        if(filmesSelecionados.has(idx)) { filmesSelecionados.delete(idx); c.classList.remove('border-[#40bcf4]'); c.classList.add('border-[#2c3440]'); ch.classList.add('scale-0'); }
+        else { filmesSelecionados.add(idx); c.classList.add('border-[#40bcf4]'); c.classList.remove('border-[#2c3440]'); ch.classList.remove('scale-0'); }
+        const txt = filmesSelecionados.size>0 ? `EXPORTAR (${filmesSelecionados.size})` : "SELECIONE";
+        document.getElementById('btn-export-desktop').innerText = txt; document.getElementById('btn-export-mobile').innerText = txt;
     }
 
-    function renderizarOraculoCards(recs, startIndex = 0) {
-        const grid = document.getElementById('oracle-grid');
-        if(!grid) return;
-        
-        atualizarBotoesExportar();
-        
-        recs.forEach((r, i) => {
-            const idx = startIndex + i; 
-            const cardId = `oracle-card-${idx}`;
-            const hue = (r.rec.length * 25) % 360; 
-            
-            const cardHTML = `
-                <div id="${cardId}" class="movie-card group opacity-0 translate-y-10 transition-all duration-[800ms] ease-out cursor-pointer border-[#40bcf4] shadow-[0_0_15px_rgba(64,188,244,0.3)]" onclick="toggleSelecao(${idx})"> 
-                    
-                    <div id="check-${idx}" class="absolute top-3 right-3 z-40 bg-[#40bcf4] text-[#14181c] rounded-full p-1.5 shadow-[0_0_10px_rgba(64,188,244,0.8)] transition-all duration-300"> 
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
-                    </div>
-
-                    <div class="poster-placeholder z-0 absolute inset-0 flex flex-col items-center justify-center p-4 text-center rounded-xl" style="background: linear-gradient(135deg, #1c2228, #14181c);">
-                        <span class="text-white/5 font-black text-6xl absolute italic select-none">${r.ano}</span>
-                        <span class="text-[#8c9bab]/80 font-bold text-lg z-10 leading-tight px-2">${r.rec.toUpperCase()}</span>
-                    </div>
-
-                    <img class="fav-poster absolute inset-0 w-full h-full object-cover z-10" src="" alt="${r.rec}">
-
-                    <div class="card-info z-20 group-hover:opacity-0 transition-opacity duration-300">
-                        <span class="text-[#40bcf4] text-[8px] font-black uppercase tracking-widest bg-[#14181c]/80 px-2 py-0.5 rounded-sm mb-1.5 inline-block truncate max-w-full">${r.base}</span>
-                        <h5 class="text-white font-bold text-sm leading-tight mb-1 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] line-clamp-2">${r.rec}</h5>
-                        <span class="text-[11px] text-[#8c9bab] font-bold tracking-widest drop-shadow-md">${r.ano}</span>
-                    </div>
-
-                    <div class="absolute inset-0 bg-[#14181c]/95 z-30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col p-4 text-center border border-[#40bcf4]/50 rounded-xl"> 
-                        <svg class="w-10 h-10 mb-2 text-white/80 shrink-0 mt-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                        <div class="w-full flex-1 overflow-y-auto no-scrollbar my-2 flex flex-col justify-center items-center">
-                            <p class="text-[11px] text-gray-300 leading-relaxed line-clamp-4">"${r.desc}"</p>
-                        </div>
-                        <span class="text-[9px] text-[#40bcf4] font-black uppercase tracking-widest mt-auto">CLIQUE PARA SELECIONAR</span> 
-                    </div>
+    function renderizarOraculoCards(recs, start) {
+        const g = document.getElementById('oracle-grid');
+        recs.forEach((r,i) => {
+            const idx = start+i, id=`oracle-card-${idx}`;
+            g.insertAdjacentHTML('beforeend', `
+                <div id="${id}" class="movie-card opacity-0 translate-y-4 transition-all duration-700 cursor-pointer border-[#40bcf4] aspect-[2/3]" onclick="toggleSelecao(${idx})">
+                    <div id="check-${idx}" class="absolute top-2 right-2 z-40 bg-[#40bcf4] text-[#14181c] rounded-full p-1 transition-all"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg></div>
+                    <img class="fav-poster absolute inset-0 w-full h-full object-cover z-10" src="" loading="lazy">
+                    <div class="card-info z-20"><span class="text-[#40bcf4] text-[8px] font-black uppercase bg-[#14181c]/80 px-1 rounded block truncate">${r.base}</span><h5 class="text-white font-bold text-xs line-clamp-2">${r.rec}</h5></div>
                 </div>
-            `;
-            
-            grid.insertAdjacentHTML('beforeend', cardHTML);
-
-            fetch(`/api/tmdb/search?query=${encodeURIComponent(r.rec)}&year=${r.ano}`)
-            .then(res => res.json())
-            .then(data => {
-                if(data.results && data.results.length > 0 && data.results[0].poster_path) {
-                    const imgUrl = `https://image.tmdb.org/t/p/w500${data.results[0].poster_path}`;
-                    const card = document.getElementById(cardId);
-                    if(card) {
-                        const posterImg = card.querySelector('.fav-poster');
-                        if(posterImg) {
-                            posterImg.src = imgUrl;
-                            posterImg.onload = () => posterImg.style.opacity = '1';
-                        }
-                    }
-                }
-            }).catch(err => console.log("Sem poster na API:", r.rec));
-
-            setTimeout(() => {
-                const theCard = document.getElementById(cardId);
-                if(theCard) {
-                    theCard.classList.remove('opacity-0', 'translate-y-10');
-                    theCard.classList.add('opacity-100', 'translate-y-0');
-                }
-            }, 300 + (i * 400));
-        });
-    }
-
-    function abrirTutorial() {
-        if(filmesSelecionados.size === 0) return;
-        document.getElementById('tutorial-modal')?.classList.remove('hidden');
-        document.getElementById('tutorial-modal')?.classList.add('flex');
-    }
-
-    function fecharTutorial() {
-        document.getElementById('tutorial-modal')?.classList.add('hidden');
-        document.getElementById('tutorial-modal')?.classList.remove('flex');
-    }
-
-    function toggleImportTutorial() {
-        const tut = document.getElementById('import-tutorial');
-        if (tut) {
-            tut.classList.toggle('hidden');
-        }
-    }
-
-    function baixarWatchlistCompleta() {
-        if (!oraculoRecomendacoesGlobais || oraculoRecomendacoesGlobais.length === 0) {
-            alert('O sistema de curadoria ainda não encontrou os filmes. Aguarde um momento!');
-            return;
-        }
-        
-        if (filmesSelecionados.size === 0) {
-            alert('Você precisa selecionar pelo menos um filme para exportar.');
-            return;
-        }
-        
-        let csvContent = "Title,Year\n";
-        filmesSelecionados.forEach(idx => {
-            let f = oraculoRecomendacoesGlobais[idx];
-            let title = f.rec.replace(/"/g, '""'); 
-            csvContent += `"${title}",${f.ano}\n`;
-        });
-
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = "recomendacoes_oraculo.csv";
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        fecharTutorial();
-    }
-
-    async function iniciarFluxoWatchlist(forceRefresh = false) {
-        document.getElementById('loading-container')?.classList.remove('hidden');
-        document.getElementById('streaming-panel')?.classList.add('hidden');
-        document.getElementById('movies-panel')?.classList.add('hidden');
-        document.getElementById('price-disclaimer')?.classList.add('hidden');
-        
-        const progFill = document.getElementById('progress-bar-fill');
-        if (progFill) progFill.style.width = '0%';
-        const loadPct = document.getElementById('load-percent');
-        if (loadPct) loadPct.innerText = '0%';
-        const loadCnt = document.getElementById('loading-count');
-        if (loadCnt) loadCnt.innerText = '0 / 0';
-        const curMov = document.getElementById('current-movie-name');
-        if (curMov) curMov.innerText = 'Preparando pesquisa...';
-        const etaTm = document.getElementById('eta-timer');
-        if (etaTm) etaTm.innerText = '--:--';
-        const fnTxt = document.getElementById('funny-text');
-        
-        iniciarCicloDeFrases(); 
-        
-        if(forceRefresh) activePlatformFilters.clear();
-
-        if (!forceRefresh) {
-            try {
-                const resDados = await fetch('/dados');
-                const dataSalva = await resDados.json();
-                if (dataSalva && dataSalva.watchlist && Object.keys(dataSalva.watchlist).length > 0) {
-                    pararCicloDeFrases();
-                    if (fnTxt) {
-                        fnTxt.style.opacity = '0';
-                        setTimeout(() => {
-                            fnTxt.innerText = "Carregando arquivos do Cache Local...";
-                            fnTxt.style.opacity = '1';
-                        }, 300);
-                    }
-                    if (progFill) progFill.style.width = '100%';
-                    if (loadPct) loadPct.innerText = '100%';
-                    if (loadCnt) loadCnt.innerText = `${Object.keys(dataSalva.watchlist).length} Filmes Encontrados`;
-                    if (curMov) curMov.innerText = "Arquivo carregado com sucesso!";
-                    if (etaTm) etaTm.innerText = "00:00";
-                    
-                    setTimeout(() => {
-                        rawDatabase = normalizeDatabase(dataSalva.watchlist);
-                        document.getElementById('loading-container')?.classList.add('hidden');
-                        mostrarVeredito();
-                    }, 1500);
-                    return; 
-                }
-            } catch (e) {}
-        }
-
-        fetch('/process_watchlist', { method: 'POST' });
-        
-        const monitor = setInterval(async () => {
-            try {
-                const res = await fetch('/progress');
-                const prog = await res.json();
-                if (prog.total > 0) {
-                    const perc = (prog.atual / prog.total) * 100;
-                    if (progFill) progFill.style.width = perc + '%';
-                    if (loadPct) loadPct.innerText = Math.floor(perc) + '%';
-                    if (loadCnt) loadCnt.innerText = `${prog.atual} / ${prog.total}`;
-                    if (curMov) curMov.innerText = prog.filme_atual;
-                    
-                    const itemsRemaining = prog.total - prog.atual;
-                    const etaSeconds = itemsRemaining * 1.5; 
-                    
-                    const m = Math.floor(etaSeconds / 60);
-                    const s = Math.floor(etaSeconds % 60);
-                    const formatM = m.toString().padStart(2, '0');
-                    const formatS = s.toString().padStart(2, '0');
-                    
-                    if (etaSeconds > 0) {
-                        if (etaTm) etaTm.innerText = m > 0 ? `${formatM}:${formatS}` : `00:${formatS}`;
-                    } else {
-                        if (etaTm) etaTm.innerText = "A análise está quase finalizando...";
-                    }
-
-                    if(prog.finalizado) {
-                        clearInterval(monitor);
-                        pararCicloDeFrases(); 
-                        document.getElementById('loading-container')?.classList.add('hidden');
-                        const resDados = await fetch('/dados');
-                        const dataFinais = await resDados.json();
-                        rawDatabase = normalizeDatabase(dataFinais.watchlist);
-                        mostrarVeredito();
-                    }
-                }
-            } catch(e) { console.log("Aguardando resposta do servidor interno..."); }
-        }, 800);
-    }
-
-    async function mostrarVeredito() {
-        const counts = {};
-        for(let f in rawDatabase) {
-            rawDatabase[f].forEach(s => {
-                if(s !== "Não disponível") counts[s] = (counts[s] || 0) + 1;
+            `);
+            fetch(`/api/tmdb/search?query=${encodeURIComponent(r.rec)}&year=${r.ano}`).then(r=>r.json()).then(d=>{
+                if(d.results?.[0]?.poster_path) { const img=document.querySelector(`#${id} img`); img.src=`https://image.tmdb.org/t/p/w500${d.results[0].poster_path}`; img.onload=()=>img.style.opacity='1'; }
             });
-        }
-        
-        const sorted = Object.entries(counts).sort((a,b) => b[1] - a[1]);
-        const winner = sorted.length > 0 ? sorted[0] : ["Nenhum Serviço", 0];
-        
-        const runner = sorted.length > 1 ? sorted[1] : null;
-        
-        let winnerPrice = platformPrices[winner[0]] !== undefined ? platformPrices[winner[0]] : 29.90;
-        let winnerPriceStr = winnerPrice === 0 ? "Gratuito" : `R$ ${winnerPrice.toFixed(2).replace('.', ',')}/mês`;
-        let winnerCostPerMovie = winnerPrice === 0 ? "0,00" : (winnerPrice / winner[1]).toFixed(2).replace('.', ',');
+            setTimeout(()=>document.getElementById(id)?.classList.remove('opacity-0','translate-y-4'), 100+(i*200));
+        });
+    }
 
-        document.getElementById('streaming-panel')?.classList.remove('hidden');
-        document.getElementById('price-disclaimer')?.classList.remove('hidden');
-        
-        const podium = document.getElementById('dynamic-podium');
-        
-        if (podium) {
-            podium.innerHTML = `
-                <div class="glass-panel p-10 text-center border-[#40bcf4]/20 shadow-[0_0_50px_rgba(64,188,244,0.1)] relative overflow-hidden group flex flex-col justify-center h-full min-h-[180px]">
-                    <div class="absolute top-0 left-0 w-full h-2 bg-[#40bcf4]"></div> <!-- Topo Azul -->
-                    <h3 class="text-[#40bcf4] font-black tracking-[0.3em] text-[10px] mb-4 uppercase shrink-0 flex justify-center items-center gap-1">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        1º Principal Indicação
-                    </h3>
-                    <h1 class="font-black text-3xl md:text-4xl text-white mb-2 tracking-tighter group-hover:scale-105 transition-transform break-words line-clamp-2">${winner[0].toUpperCase()}</h1>
-                    <p class="text-[#8c9bab] font-bold uppercase text-xs tracking-widest shrink-0 mb-1">${winner[1]} Filmes Prontos</p>
-                    <p class="text-[#40bcf4]/80 text-[10px] font-bold tracking-wider">${winnerPriceStr} (Aprox. R$ ${winnerCostPerMovie} por filme)*</p>
-                </div>
-            `;
-            
-            if(runner) {
-                let runnerPrice = platformPrices[runner[0]] !== undefined ? platformPrices[runner[0]] : 29.90;
-                let runnerPriceStr = runnerPrice === 0 ? "Gratuito" : `R$ ${runnerPrice.toFixed(2).replace('.', ',')}/mês`;
-                let runnerCostPerMovie = runnerPrice === 0 ? "0,00" : (runnerPrice / runner[1]).toFixed(2).replace('.', ',');
+    function abrirTutorial() { document.getElementById('tutorial-modal').classList.remove('hidden'); document.getElementById('tutorial-modal').classList.add('flex'); }
+    function fecharTutorial() { document.getElementById('tutorial-modal').classList.add('hidden'); document.getElementById('tutorial-modal').classList.remove('flex'); }
+    function toggleImportTutorial() { document.getElementById('import-tutorial').classList.toggle('hidden'); }
+    function baixarWatchlistCompleta() {
+        let c = "Title,Year\n"; filmesSelecionados.forEach(i => { c += `"${oraculoRecomendacoesGlobais[i].rec.replace(/"/g,'""')}",${oraculoRecomendacoesGlobais[i].ano}\n`; });
+        const a = document.createElement('a'); a.href = window.URL.createObjectURL(new Blob([c], {type:'text/csv'})); a.download = "oraculo.csv"; a.click(); fecharTutorial();
+    }
 
-                podium.innerHTML += `
-                    <div class="glass-panel p-10 text-center border-[#00e054]/20 shadow-[0_0_50px_rgba(0,224,84,0.1)] relative group flex flex-col justify-center h-full min-h-[180px]">
-                        <div class="absolute top-0 left-0 w-full h-2 bg-[#00e054]"></div> <!-- Topo Verde -->
-                        <h3 class="text-[#00e054] font-black tracking-[0.3em] text-[10px] mb-4 uppercase shrink-0 flex justify-center items-center gap-1">
-                            2º Excelente Alternativa
-                        </h3>
-                        <h1 class="font-black text-2xl md:text-3xl text-white mb-2 tracking-tighter group-hover:scale-105 transition-transform break-words line-clamp-2">${runner[0].toUpperCase()}</h1>
-                        <p class="text-[#8c9bab] font-bold uppercase text-xs tracking-widest shrink-0 mb-1">${runner[1]} Filmes na Lista</p>
-                        <p class="text-[#00e054]/80 text-[10px] font-bold tracking-wider">${runnerPriceStr} (Aprox. R$ ${runnerCostPerMovie} por filme)*</p>
-                    </div>
-                `;
+    async function iniciarFluxoWatchlist() {
+        document.getElementById('loading-container').classList.remove('hidden');
+        iniciarCicloDeFrases(); fetch('/process_watchlist', { method: 'POST' });
+        
+        const m = setInterval(async () => {
+            const p = await (await fetch('/progress')).json();
+            if(p.total > 0) {
+                const pct = (p.atual/p.total)*100;
+                document.getElementById('progress-bar-fill').style.width = pct+'%';
+                document.getElementById('load-percent').innerText = Math.floor(pct)+'%';
+                document.getElementById('loading-count').innerText = `${p.atual}/${p.total}`;
+                
+                if(p.finalizado) {
+                    clearInterval(m); pararCicloDeFrases(); document.getElementById('loading-container').classList.add('hidden');
+                    rawDatabase = normalizeDatabase((await(await fetch('/dados')).json()).watchlist);
+                    mostrarVeredito();
+                }
             }
-        }
+        }, 1000);
+    }
 
-        renderStreamingCards(counts);
+    function mostrarVeredito() {
+        const c = {}; for(let f in rawDatabase) rawDatabase[f].forEach(s => { if(s!=="Não disponível") c[s]=(c[s]||0)+1; });
+        const srt = Object.entries(c).sort((a,b)=>b[1]-a[1]);
         
-        document.getElementById('movies-panel')?.classList.add('hidden');
-        activePlatformFilters.clear();
-        
-        const searchInput = document.getElementById('search-input');
-        if(searchInput) searchInput.value = '';
+        document.getElementById('streaming-panel').classList.remove('hidden');
+        document.getElementById('dynamic-podium').innerHTML = srt.slice(0,2).map((x,i) => `
+            <div class="glass-panel p-6 text-center border-${i===0?'#40bcf4':'#00e054'}/20 relative">
+                <div class="absolute top-0 left-0 w-full h-1 bg-${i===0?'#40bcf4':'#00e054'}"></div>
+                <h3 class="text-${i===0?'#40bcf4':'#00e054'} font-black text-[9px] uppercase mb-2">${i+1}º Recomendação</h3>
+                <h1 class="font-black text-2xl text-white mb-1 truncate">${x[0].toUpperCase()}</h1>
+                <p class="text-[#8c9bab] font-bold uppercase text-[10px]">${x[1]} Filmes</p>
+            </div>
+        `).join('');
+        renderStreamingCards(c);
     }
 
     function toggleFilter(name) {
-        if (name === 'Todos') {
-            activePlatformFilters.clear();
-        } else {
-            if (activePlatformFilters.has(name)) {
-                activePlatformFilters.delete(name);
-            } else {
-                activePlatformFilters.add(name);
-            }
-        }
+        if(name==='Todos') activePlatformFilters.clear();
+        else activePlatformFilters.has(name) ? activePlatformFilters.delete(name) : activePlatformFilters.add(name);
         renderMovies();
     }
 
     function renderStreamingCards(counts) {
-        const cont = document.getElementById('stats-container');
-        if (!cont) return;
-        
-        cont.innerHTML = `
-            <button onclick="toggleFilter('Todos')" class="filter-btn flex items-center gap-2 bg-[#1c2228] border border-[#2c3440] hover:border-[#40bcf4] px-4 py-2 rounded-full transition-all group shrink-0">
-                <span class="text-white font-bold text-xs group-hover:text-[#40bcf4] transition-colors whitespace-nowrap">Mostrar Todos</span>
-            </button>
-        `;
-        
-        Object.entries(counts).sort((a,b) => b[1]-a[1]).forEach(([name, count]) => {
-            const logoSrc = getPlatformLogo(name);
-            cont.innerHTML += `
-                <button onclick="toggleFilter('${name}')" class="filter-btn flex items-center gap-2 bg-[#1c2228] border border-[#2c3440] hover:border-[#40bcf4] px-4 py-2 rounded-full transition-all group shrink-0" data-platform="${name}">
-                    <img src="${logoSrc}" class="w-4 h-4 object-contain rounded-sm" onerror="this.style.display='none'">
-                    <span class="text-white font-bold text-xs group-hover:text-[#40bcf4] transition-colors whitespace-nowrap">${name}</span>
-                    <span class="bg-[#14181c] text-[#8c9bab] text-[9px] px-2 py-0.5 rounded-full font-black">${count}</span>
-                </button>
-            `;
+        const c = document.getElementById('stats-container');
+        c.innerHTML = `<button onclick="toggleFilter('Todos')" class="filter-btn flex items-center bg-[#1c2228] border border-[#2c3440] px-3 py-1.5 rounded-lg shrink-0"><span class="text-white font-bold text-[10px]">Todos</span></button>`;
+        Object.entries(counts).sort((a,b)=>b[1]-a[1]).forEach(([n, count]) => {
+            c.innerHTML += `<button onclick="toggleFilter('${n}')" class="filter-btn flex items-center gap-1.5 bg-[#1c2228] border border-[#2c3440] px-3 py-1.5 rounded-lg shrink-0" data-platform="${n}"><img src="${getPlatformLogo(n)}" class="w-3 h-3 rounded-sm"><span class="text-white font-bold text-[10px]">${n}</span><span class="bg-[#14181c] text-[#8c9bab] text-[8px] px-1.5 rounded">${count}</span></button>`;
         });
     }
 
-    function handleSearch() {
-        renderMovies();
-    }
+    function handleSearch() { renderMovies(); }
 
-    function renderMovies(isInitialLoad = false) {
-        const searchInput = document.getElementById('search-input');
-        const searchQ = searchInput ? searchInput.value.toLowerCase() : '';
+    function renderMovies() {
+        const q = document.getElementById('search-input').value.toLowerCase();
+        document.getElementById('movies-panel').classList.remove('hidden');
         
-        const panel = document.getElementById('movies-panel');
-        const list = document.getElementById('results'); 
-        
-        if (!isInitialLoad) {
-            panel?.classList.remove('hidden');
-        }
-        
-        if(list) list.innerHTML = ''; 
-        
-        document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn?.classList.remove('filter-btn-active', 'border-[#00e054]', 'border-[#40bcf4]');
-            const platform = btn.getAttribute('data-platform');
-            if (activePlatformFilters.size === 0 && btn.innerText.includes('Mostrar Todos')) {
-                btn?.classList.add('filter-btn-active', 'border-[#40bcf4]');
-            } else if (platform && activePlatformFilters.has(platform)) {
-                btn?.classList.add('filter-btn-active', 'border-[#40bcf4]');
-            }
+        document.querySelectorAll('.filter-btn').forEach(b => {
+            b.classList.remove('border-[#40bcf4]');
+            if((activePlatformFilters.size===0 && b.innerText==='Todos') || activePlatformFilters.has(b.getAttribute('data-platform'))) b.classList.add('border-[#40bcf4]');
         });
 
-        const title = document.getElementById('current-filter-title');
-        if (title) {
-            if (searchQ && activePlatformFilters.size > 0) {
-                title.innerText = `BUSCA EM ${activePlatformFilters.size} PLATAFORMAS`;
-            } else if (searchQ) {
-                title.innerText = `RESULTADOS DA BUSCA`;
-            } else if (activePlatformFilters.size > 0) {
-                title.innerText = `FILTRADO POR ${activePlatformFilters.size} PLATAFORMAS`;
-            } else {
-                title.innerText = `TODOS OS FILMES DA WATCHLIST`;
-            }
-        }
-
-        let count = 0;
-        let htmlBuffer = '';
-        
+        let html = '', count = 0;
         for(let f in rawDatabase) {
-            const match = f.match(/(.*)\s\((\d{4})\)$/);
-            const titulo = match ? match[1] : f;
-            const ano = match ? match[2] : "";
+            let m = f.match(/(.*)\s\((\d{4})\)$/), t = m?m[1]:f, y = m?m[2]:"";
+            if(activePlatformFilters.size>0 && !Array.from(activePlatformFilters).some(p=>rawDatabase[f].includes(p))) continue;
+            if(q && !t.toLowerCase().includes(q)) continue;
+            if(activePlatformFilters.size===0 && !q && rawDatabase[f][0]==="Não disponível") continue;
             
-            let matchesPlatform = activePlatformFilters.size === 0;
-            if (activePlatformFilters.size > 0) {
-                matchesPlatform = Array.from(activePlatformFilters).some(p => rawDatabase[f].includes(p));
-            }
-            if (!matchesPlatform) continue;
-
-            if(searchQ && !titulo.toLowerCase().includes(searchQ)) continue;
+            count++; const id = f.replace(/[^a-zA-Z0-9]/g, '');
             
-            if(activePlatformFilters.size === 0 && !searchQ && rawDatabase[f][0] === "Não disponível") continue;
-
-            count++;
-            const idSafe = f.replace(/[^a-zA-Z0-9]/g, '');
-
-            const streamingsFilme = rawDatabase[f];
-            const maxStreamingsShow = 3;
-            const visibleStreamings = streamingsFilme.slice(0, maxStreamingsShow);
-            const extraStreamings = streamingsFilme.length > maxStreamingsShow ? streamingsFilme.length - maxStreamingsShow : 0;
-
-            htmlBuffer += `
-                <li class="glass-panel p-3 flex justify-between items-center border-l-4 border-l-[#40bcf4] hover:bg-white/5 transition-colors group mb-2 gap-3 overflow-hidden min-h-[5rem] h-auto"> 
-                    <div class="flex items-center gap-3 flex-1 min-w-0 overflow-hidden">
-                        <div class="w-10 h-14 bg-[#14181c] rounded overflow-hidden shrink-0 hidden sm:block relative">
-                            <div class="absolute inset-0 flex items-center justify-center bg-[#1c2228] animate-pulse" id="loader-wl-${idSafe}"></div>
-                            <img id="poster-wl-${idSafe}" src="" class="w-full h-full object-cover opacity-0 transition-opacity duration-300 relative z-10">
-                        </div>
-                        <div class="flex-1 min-w-0 pr-2">
-                            <span class="text-white font-bold text-sm tracking-tight group-hover:translate-x-1 transition-transform block truncate" title="${titulo}">${titulo}</span>
-                            <span class="text-[10px] text-[#8c9bab] font-bold block mt-0.5">${ano}</span>
+            html += `
+                <li class="glass-panel p-2.5 flex flex-col sm:flex-row justify-between items-start sm:items-center border-l-2 border-l-[#40bcf4] gap-2"> 
+                    <div class="flex items-center gap-2 w-full sm:w-auto min-w-0">
+                        <div class="flex-1 min-w-0">
+                            <span class="text-white font-bold text-xs truncate block">${t}</span>
+                            <span class="text-[8px] text-[#8c9bab]">${y}</span>
                         </div>
                     </div>
-                    <div class="flex gap-1 flex-wrap justify-end shrink-0 w-auto max-w-[50%] sm:max-w-[40%] text-right overflow-hidden">
-                        ${visibleStreamings.map(s => `<span class="bg-[#14181c] text-[8px] px-2 py-1 rounded-md text-[#8c9bab] font-black uppercase border border-[#2c3440] whitespace-nowrap" title="${s}">${s}</span>`).join('')}
-                        ${extraStreamings > 0 ? `<span class="bg-[#14181c] text-[8px] px-2 py-1 rounded-md text-[#8c9bab] font-black uppercase border border-[#2c3440] whitespace-nowrap" title="Mais ${extraStreamings} platforms">+${extraStreamings}</span>` : ''}
+                    <div class="flex gap-1 overflow-x-auto no-scrollbar w-full sm:w-auto shrink-0 pb-1 snap-x">
+                        ${rawDatabase[f].map(s => `<span class="bg-[#14181c] text-[8px] px-2 py-1 rounded text-[#8c9bab] font-black uppercase border border-[#2c3440] whitespace-nowrap shrink-0 snap-start">${s}</span>`).join('')}
                     </div>
                 </li>
             `;
         }
-        
-        if (count === 0 && !isInitialLoad) {
-            htmlBuffer = `<li class="p-8 text-center text-[#8c9bab] col-span-full">Nenhum resultado encontrado para os filtros atuais.</li>`;
-        }
-
-        if(list) list.innerHTML = htmlBuffer;
-        const movCounter = document.getElementById('movie-counter');
-        if(movCounter) movCounter.innerText = `${count} FILMES`;
-
-        for(let f in rawDatabase) {
-            const match = f.match(/(.*)\s\((\d{4})\)$/);
-            const titulo = match ? match[1] : f;
-            const ano = match ? match[2] : "";
-            
-            let matchesPlatform = activePlatformFilters.size === 0;
-            if (activePlatformFilters.size > 0) {
-                matchesPlatform = Array.from(activePlatformFilters).some(p => rawDatabase[f].includes(p));
-            }
-            if (!matchesPlatform) continue;
-            if(searchQ && !titulo.toLowerCase().includes(searchQ)) continue;
-            if(activePlatformFilters.size === 0 && !searchQ && rawDatabase[f][0] === "Não disponível") continue;
-
-            const idSafe = f.replace(/[^a-zA-Z0-9]/g, '');
-            const imgEl = document.getElementById(`poster-wl-${idSafe}`);
-            const loaderEl = document.getElementById(`loader-wl-${idSafe}`);
-            
-            if (!imgEl) continue;
-
-            if (posterCache[f]) {
-                setTimeout(() => {
-                    if(imgEl) imgEl.src = posterCache[f]; 
-                    if(imgEl) imgEl.onload = () => {
-                        imgEl.style.opacity = '1'; 
-                        if(loaderEl) loaderEl.style.display = 'none';
-                    }
-                }, 50);
-            } else {
-                fetch(`/api/tmdb/search?query=${encodeURIComponent(titulo)}&year=${ano}`)
-                .then(res => res.json())
-                .then(data => {
-                    if(data.results && data.results.length > 0 && data.results[0].poster_path) {
-                        const imgUrl = `https://image.tmdb.org/t/p/w200${data.results[0].poster_path}`;
-                        posterCache[f] = imgUrl; 
-                        if(imgEl) imgEl.src = imgUrl;
-                        if(imgEl) imgEl.onload = () => {
-                            imgEl.style.opacity = '1';
-                            if(loaderEl) loaderEl.style.display = 'none';
-                        }
-                    } else {
-                         if(imgEl) imgEl.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(titulo.substring(0,2))}&background=14181c&color=fff&size=150`;
-                         if(imgEl) imgEl.onload = () => {
-                             imgEl.style.opacity = '0.5';
-                             if(loaderEl) loaderEl.style.display = 'none';
-                         }
-                    }
-                }).catch(err => {});
-            }
-        }
+        document.getElementById('results').innerHTML = html || `<li class="p-4 text-center text-xs text-[#8c9bab]">Nenhum resultado.</li>`;
+        document.getElementById('movie-counter').innerText = `${count} FILMES`;
     }
-
 </script>
 </body>
 </html>
