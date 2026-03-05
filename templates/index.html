@@ -299,8 +299,9 @@
                 <div class="w-3 h-3 rounded-full bg-[#ff8000] shadow-[0_0_10px_rgba(255,128,0,0.5)]"></div>
             </div>
             <div>
-                <h1 class="text-base sm:text-xl font-bold tracking-widest text-white uppercase drop-shadow-md">Letterboxd <span class="text-[#40bcf4] hidden sm:inline">Analyzer</span></h1>
-                <p class="text-[9px] sm:text-[10px] text-[#8c9bab] font-bold tracking-[0.3em] uppercase drop-shadow-md">v19.7</p>
+                <!-- TÍTULO CORRIGIDO PARA MOBILE -->
+                <h1 class="text-sm sm:text-xl font-bold tracking-widest text-white uppercase drop-shadow-md">Letterboxd <span class="text-[#40bcf4]">Analyzer</span></h1>
+                <p class="text-[8px] sm:text-[10px] text-[#8c9bab] font-bold tracking-[0.3em] uppercase drop-shadow-md">v1.0.0 Oficial</p>
             </div>
         </div>
 
@@ -335,18 +336,30 @@
                     <div class="w-20 h-20 bg-[#40bcf4]/10 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform border border-[#40bcf4]/20">
                         <svg class="w-10 h-10 text-[#40bcf4]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v16m8-8H4"></path></svg>
                     </div>
-                    <p class="text-2xl font-bold text-white mb-2">Arraste seu arquivo <span class="text-[#40bcf4]">.zip</span> aqui</p>
-                    <p class="text-sm text-[#8c9bab] uppercase tracking-widest font-bold">ou clique para procurar no computador</p>
+                    <!-- TEXTOS CORRIGIDOS PARA PC/MOBILE -->
+                    <p class="text-xl sm:text-2xl font-bold text-white mb-2">
+                        <span class="hidden sm:inline">Arraste seu arquivo <span class="text-[#40bcf4]">.zip</span> aqui</span>
+                        <span class="sm:hidden">Envie seu arquivo <span class="text-[#40bcf4]">.zip</span></span>
+                    </p>
+                    <p class="text-xs sm:text-sm text-[#8c9bab] uppercase tracking-widest font-bold">
+                        <span class="hidden sm:inline">ou clique para procurar no computador</span>
+                        <span class="sm:hidden">ou toque para procurar nos arquivos</span>
+                    </p>
                 </label>
                 <input type="file" id="csv-file" class="hidden" accept=".zip" onchange="handleFileUpload()">
                 <p id="file-name-display" class="mt-6 text-[#40bcf4] font-mono text-xs hidden"></p>
             </div>
         </div>
 
-        <div class="text-center mt-4">
-            <button onclick="toggleImportTutorial()" class="text-[11px] text-[#8c9bab] hover:text-[#40bcf4] font-bold tracking-widest uppercase transition-colors underline decoration-dashed underline-offset-4 flex items-center justify-center gap-1 mx-auto">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                Não sabe como conseguir o arquivo .zip?
+        <div class="text-center mt-6 space-y-4">
+            <!-- BOTÃO DIRETO DE DOWNLOAD SUPER VISÍVEL -->
+            <a href="https://letterboxd.com/data/export/" target="_blank" class="inline-flex items-center justify-center gap-2 bg-[#40bcf4]/10 hover:bg-[#40bcf4]/20 text-[#40bcf4] border border-[#40bcf4]/30 px-5 py-3 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-widest transition-all hover:scale-105 shadow-[0_0_15px_rgba(64,188,244,0.15)] w-[90%] sm:w-auto mx-auto">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                Baixar meu .zip do Letterboxd
+            </a>
+            
+            <button onclick="toggleImportTutorial()" class="block w-full text-[10px] text-[#8c9bab] hover:text-white font-bold tracking-widest uppercase transition-colors underline decoration-dashed underline-offset-4 mx-auto">
+                Ver outras formas de importar
             </button>
             
             <div id="import-tutorial" class="hidden mt-6 p-6 bg-[#1c2228]/95 border border-[#2c3440] rounded-xl text-left text-sm text-gray-300 max-w-lg mx-auto shadow-xl animate-fade-in-fast">
@@ -356,27 +369,25 @@
                 </h4>
                 
                 <div class="space-y-4">
-                    <div>
-                        <h5 class="text-[#40bcf4] font-bold text-xs uppercase mb-1">Pelo Computador:</h5>
-                        <ol class="space-y-1 list-decimal list-inside marker:text-[#40bcf4] text-xs">
-                            <li>Vá em <strong>Settings</strong> no menu superior.</li>
-                            <li>Clique na aba <strong>Import & Export</strong>.</li>
-                            <li>Clique em <strong>Export Your Data</strong>.</li>
+                    <div class="bg-[#00e054]/10 border border-[#00e054]/30 p-4 rounded-xl text-xs">
+                        <h5 class="text-[#00e054] font-black uppercase mb-2 text-[13px] flex items-center gap-1.5"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg> O Jeito Mais Rápido (PC ou Celular)</h5>
+                        <ol class="space-y-2 list-decimal list-inside marker:text-[#00e054]">
+                            <li>Acesse o link direto: <a href="https://letterboxd.com/data/export/" target="_blank" class="text-white font-bold underline decoration-dashed hover:text-[#00e054] transition-colors break-all">letterboxd.com/data/export/</a></li>
+                            <li>Faça login na sua conta (se pedir).</li>
+                            <li>O download do seu <span class="text-white font-mono">.zip</span> vai começar na hora!</li>
                         </ol>
                     </div>
-                    <div>
-                        <h5 class="text-[#40bcf4] font-bold text-xs uppercase mb-1">Pelo Celular (App):</h5>
-                        <ol class="space-y-1 list-decimal list-inside marker:text-[#40bcf4] text-xs">
-                            <li>Vá em <strong>Settings</strong> (ícone de engrenagem).</li>
-                            <li>Clique em <strong>Advanced Settings</strong>.</li>
-                            <li>Role para baixo e clique em <strong>Import & Export</strong>.</li>
+
+                    <div class="opacity-60 hover:opacity-100 transition-opacity p-2">
+                        <h5 class="text-[#8c9bab] font-bold text-[10px] uppercase mb-1">Método Antigo (Menus do App/Site):</h5>
+                        <ol class="space-y-1 list-decimal list-inside marker:text-[#8c9bab] text-[10px]">
+                            <li>Vá em <strong>Settings</strong> > <strong>Import & Export</strong>.</li>
                             <li>Clique em <strong>Export Your Data</strong>.</li>
+                            <li class="text-[#ff8000] mt-1"><em>Aviso: O app do celular às vezes entra num loop infinito nessa tela. Recomendamos usar o link direto acima!</em></li>
                         </ol>
                     </div>
-                    <div class="bg-[#40bcf4]/10 border border-[#40bcf4]/30 p-3 rounded-lg text-xs">
-                        <p><strong>Aviso Importante:</strong> A opção de exportação/importação costumava ser exclusiva para assinantes <strong>Pro/Patron</strong>, mas o Letterboxd começou a liberar para todos recentemente. Se não encontrar a opção, verifique se a sua conta já tem acesso a essa função.</p>
-                    </div>
-                    <p class="text-xs font-bold text-center mt-2 border-t border-[#2c3440] pt-3">Por fim, arraste o arquivo <span class="text-[#40bcf4] font-mono">.zip</span> baixado para a área tracejada acima!</p>
+
+                    <p class="text-xs font-bold text-center mt-2 border-t border-[#2c3440] pt-3">Por fim, envie o arquivo <span class="text-[#40bcf4] font-mono">.zip</span> baixado para a área tracejada acima!</p>
                 </div>
             </div>
         </div>
@@ -484,7 +495,6 @@
             <div class="text-center mb-8">
                 <!-- Frase Engraçada Isolada no Topo -->
                 <div class="mb-6 h-8 flex items-center justify-center">
-                    <!-- REMOVIDO o "animate-pulse" e ADICIONADO "transition-opacity duration-500" para fade suave -->
                     <p id="funny-text" class="text-[#40bcf4] font-bold uppercase text-[11px] md:text-xs tracking-widest text-center drop-shadow-md transition-opacity duration-500">Iniciando processos...</p>
                 </div>
                 
@@ -597,7 +607,7 @@
     let activePlatformFilters = new Set();
     let backdropInterval;
     let initialBackdropInterval;
-    let fraseTimerInterval; // Timer separado para as frases
+    let fraseTimerInterval;
 
     // ======= FILMES ICÔNICOS INICIAIS (CARROSSEL) =======
     const iconicMovies = [
@@ -660,7 +670,7 @@
     document.addEventListener('DOMContentLoaded', startInitialSlideshow);
 
 
-    // ======= SISTEMA DE CRÉDITOS E DOAÇÕES (NOVO) =======
+    // ======= SISTEMA DE CRÉDITOS E DOAÇÕES =======
     async function verificarCredito() {
         try {
             const res = await fetch('/api/creditos');
@@ -693,24 +703,19 @@
     }
 
     function abrirMercadoPago() {
-        // Link oficial de apoio do Mercado Pago (R$ 1,90)
         const linkMercadoPago = "https://mpago.la/15FPHv4"; 
         window.open(linkMercadoPago, '_blank');
-        
-        // Agradece recarregando a conta do usuário automaticamente (5 créditos extra)
         recarregarGratis();
     }
 
     async function recarregarGratis() {
         try {
-            // Recarrega mais 5 usos gratuitos
             for(let i=0; i<5; i++) {
                 await fetch('/api/adicionar_credito', { method: 'POST' });
             }
         } catch (e) {}
         fecharDoacao();
     }
-    // =============================================
 
     const platformPrices = {
         "Netflix": 39.90,
@@ -784,7 +789,6 @@
         if (c.includes('runtime')) return 'Runtime';
         if (c.includes('kocowa')) return 'Kocowa';
         if (c.includes('diamond films')) return 'Diamond Films';
-        
         if (c.includes('prime') || c.includes('amazon')) return 'Prime Video';
         
         return cleanName; 
@@ -825,12 +829,10 @@
 
     fetch('/frases').then(res => res.json()).then(data => { if(data.length > 0) frasesAleatorias = data; }).catch(e => {});
 
-    // Controla o carrossel de frases de forma independente
     function iniciarCicloDeFrases() {
         const fnTxt = document.getElementById('funny-text');
         if (!fnTxt) return;
         
-        // Define uma frase inicial imediatamente
         if (frasesAleatorias.length > 0) {
             fnTxt.innerText = frasesAleatorias[Math.floor(Math.random() * frasesAleatorias.length)];
         }
@@ -839,14 +841,13 @@
         
         fraseTimerInterval = setInterval(() => {
             if (frasesAleatorias.length > 0) {
-                // Efeito suave de fade out / fade in
                 fnTxt.style.opacity = '0';
                 setTimeout(() => {
                     fnTxt.innerText = frasesAleatorias[Math.floor(Math.random() * frasesAleatorias.length)];
                     fnTxt.style.opacity = '1';
-                }, 500); // 500ms para a transição suave acontecer
+                }, 500); 
             }
-        }, 6000); // Aumentado de 4s para 6s para dar um tempinho confortável de leitura
+        }, 6000); 
     }
 
     function pararCicloDeFrases() {
@@ -924,11 +925,9 @@
         gerarPerfilIA();
     }
 
-    // NOVA LÓGICA: Busca profunda e Sistema de Troféu
     function mostrarTrofeuConquista() {
         const trophy = document.getElementById('ps-trophy');
         if(trophy && !trophy.classList.contains('show')) {
-            // Toca um sonzinho mental de conquista do PS5
             trophy.classList.add('show');
             setTimeout(() => {
                 trophy.classList.remove('show');
@@ -939,10 +938,9 @@
     async function buscarAteQuatroIneditos() {
         let filmesEncontrados = [];
         let tentativasAPI = 0;
-        let limiteTentativas = 4; // Tenta no máximo 4 vezes para não torrar limites
+        let limiteTentativas = 4;
 
         while (filmesEncontrados.length < 4 && tentativasAPI < limiteTentativas) {
-            // Se já teve que tentar mais de uma vez, é porque a watchlist do cara é gigante! Libera o troféu.
             if (tentativasAPI === 1) {
                 mostrarTrofeuConquista();
             }
@@ -952,7 +950,6 @@
                 const data = await res.json();
                 
                 if(data.recomendacoes && data.recomendacoes.length > 0) {
-                    // Filtra para garantir que não pega repetido do que já está na tela ou do que acabou de achar no loop
                     const ineditosNaTela = data.recomendacoes.filter(r => 
                         !oraculoRecomendacoesGlobais.some(og => og.rec.toLowerCase() === r.rec.toLowerCase()) &&
                         !filmesEncontrados.some(nf => nf.rec.toLowerCase() === r.rec.toLowerCase())
@@ -961,12 +958,12 @@
                 }
             } catch (e) {
                 console.error("Erro no loop do Oráculo:", e);
-                break; // Se der erro de servidor, quebra o loop
+                break; 
             }
             tentativasAPI++;
         }
         
-        return filmesEncontrados.slice(0, 4); // Garante que retorna no máximo 4, mesmo se o último fetch trouxer 15
+        return filmesEncontrados.slice(0, 4); 
     }
 
     async function carregarMaisSugestoes() {
@@ -983,7 +980,6 @@
 
         await consumirCredito();
 
-        // Adiciona Cartões Esqueletos Temporários
         const startSkeletonIdx = oraculoRecomendacoesGlobais.length;
         let skeletonHTML = '';
         for(let i=0; i<4; i++) {
@@ -994,10 +990,8 @@
         }
         if(grid) grid.insertAdjacentHTML('beforeend', skeletonHTML);
 
-        // Busca profunda usando o novo sistema inteligente
         const novosFilmes = await buscarAteQuatroIneditos();
 
-        // Remove os esqueletos
         for(let i=0; i<4; i++) {
             const skel = document.getElementById(`skeleton-${startSkeletonIdx+i}`);
             if(skel) skel.remove();
@@ -1078,7 +1072,7 @@
                     
                     if(heroImg) {
                         heroImg.style.opacity = '0';
-                        heroImg.classList.remove('grayscale-[20%]'); // Retira o P&B para os favoritos coloridos
+                        heroImg.classList.remove('grayscale-[20%]');
                     }
                     if (slideInfo) slideInfo.style.opacity = '0';
                     
@@ -1186,15 +1180,14 @@
 
     async function carregarOraculo() {
         try {
-            // Usa o sistema de busca profunda logo na primeira vez
             const recomendacoesSeguras = await buscarAteQuatroIneditos();
             
             if(recomendacoesSeguras && recomendacoesSeguras.length > 0) {
                 oraculoRecomendacoesGlobais = recomendacoesSeguras;
-                filmesSelecionados = new Set(oraculoRecomendacoesGlobais.map((_, i) => i)); // Seleciona todos
+                filmesSelecionados = new Set(oraculoRecomendacoesGlobais.map((_, i) => i));
                 
                 const grid = document.getElementById('oracle-grid');
-                if(grid) grid.innerHTML = ''; // Limpa os esqueletos iniciais
+                if(grid) grid.innerHTML = ''; 
                 
                 renderizarOraculoCards(oraculoRecomendacoesGlobais, 0);
             } else {
@@ -1239,19 +1232,18 @@
         
         if(filmesSelecionados.has(idx)) {
             filmesSelecionados.delete(idx);
-            card.classList.remove('border-[#40bcf4]', 'shadow-[0_0_15px_rgba(64,188,244,0.3)]'); /* Borda e sombra azuis */
+            card.classList.remove('border-[#40bcf4]', 'shadow-[0_0_15px_rgba(64,188,244,0.3)]'); 
             card.classList.add('border-[#2c3440]', 'brightness-50');
             check.classList.add('scale-0', 'opacity-0');
         } else {
             filmesSelecionados.add(idx);
-            card.classList.add('border-[#40bcf4]', 'shadow-[0_0_15px_rgba(64,188,244,0.3)]'); /* Borda e sombra azuis */
+            card.classList.add('border-[#40bcf4]', 'shadow-[0_0_15px_rgba(64,188,244,0.3)]'); 
             card.classList.remove('border-[#2c3440]', 'brightness-50');
             check.classList.remove('scale-0', 'opacity-0');
         }
         atualizarBotoesExportar();
     }
 
-    // Renderiza apenas os cartões passados, sem limpar a grelha toda
     function renderizarOraculoCards(recs, startIndex = 0) {
         const grid = document.getElementById('oracle-grid');
         if(!grid) return;
@@ -1259,14 +1251,14 @@
         atualizarBotoesExportar();
         
         recs.forEach((r, i) => {
-            const idx = startIndex + i; // Calcula o Índice Real Global
+            const idx = startIndex + i; 
             const cardId = `oracle-card-${idx}`;
             const hue = (r.rec.length * 25) % 360; 
             
             const cardHTML = `
-                <div id="${cardId}" class="movie-card group opacity-0 translate-y-10 transition-all duration-[800ms] ease-out cursor-pointer border-[#40bcf4] shadow-[0_0_15px_rgba(64,188,244,0.3)]" onclick="toggleSelecao(${idx})"> <!-- Cartão Azul -->
+                <div id="${cardId}" class="movie-card group opacity-0 translate-y-10 transition-all duration-[800ms] ease-out cursor-pointer border-[#40bcf4] shadow-[0_0_15px_rgba(64,188,244,0.3)]" onclick="toggleSelecao(${idx})"> 
                     
-                    <div id="check-${idx}" class="absolute top-3 right-3 z-40 bg-[#40bcf4] text-[#14181c] rounded-full p-1.5 shadow-[0_0_10px_rgba(64,188,244,0.8)] transition-all duration-300"> <!-- Ícone Azul -->
+                    <div id="check-${idx}" class="absolute top-3 right-3 z-40 bg-[#40bcf4] text-[#14181c] rounded-full p-1.5 shadow-[0_0_10px_rgba(64,188,244,0.8)] transition-all duration-300"> 
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
                     </div>
 
@@ -1278,17 +1270,17 @@
                     <img class="fav-poster absolute inset-0 w-full h-full object-cover z-10" src="" alt="${r.rec}">
 
                     <div class="card-info z-20 group-hover:opacity-0 transition-opacity duration-300">
-                        <span class="text-[#40bcf4] text-[8px] font-black uppercase tracking-widest bg-[#14181c]/80 px-2 py-0.5 rounded-sm mb-1.5 inline-block truncate max-w-full">${r.base}</span> <!-- Tag Azul -->
+                        <span class="text-[#40bcf4] text-[8px] font-black uppercase tracking-widest bg-[#14181c]/80 px-2 py-0.5 rounded-sm mb-1.5 inline-block truncate max-w-full">${r.base}</span>
                         <h5 class="text-white font-bold text-sm leading-tight mb-1 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] line-clamp-2">${r.rec}</h5>
                         <span class="text-[11px] text-[#8c9bab] font-bold tracking-widest drop-shadow-md">${r.ano}</span>
                     </div>
 
-                    <div class="absolute inset-0 bg-[#14181c]/95 z-30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col p-4 text-center border border-[#40bcf4]/50 rounded-xl"> <!-- Fundo hover azul -->
+                    <div class="absolute inset-0 bg-[#14181c]/95 z-30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col p-4 text-center border border-[#40bcf4]/50 rounded-xl"> 
                         <svg class="w-10 h-10 mb-2 text-white/80 shrink-0 mt-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                         <div class="w-full flex-1 overflow-y-auto no-scrollbar my-2 flex flex-col justify-center items-center">
                             <p class="text-[11px] text-gray-300 leading-relaxed line-clamp-4">"${r.desc}"</p>
                         </div>
-                        <span class="text-[9px] text-[#40bcf4] font-black uppercase tracking-widest mt-auto">CLIQUE PARA SELECIONAR</span> <!-- Texto Azul -->
+                        <span class="text-[9px] text-[#40bcf4] font-black uppercase tracking-widest mt-auto">CLIQUE PARA SELECIONAR</span> 
                     </div>
                 </div>
             `;
@@ -1386,7 +1378,7 @@
         if (etaTm) etaTm.innerText = '--:--';
         const fnTxt = document.getElementById('funny-text');
         
-        iniciarCicloDeFrases(); // Inicia a troca de frases com temporizador separado
+        iniciarCicloDeFrases(); 
         
         if(forceRefresh) activePlatformFilters.clear();
 
@@ -1448,7 +1440,7 @@
 
                     if(prog.finalizado) {
                         clearInterval(monitor);
-                        pararCicloDeFrases(); // Para a animação do texto
+                        pararCicloDeFrases(); 
                         document.getElementById('loading-container')?.classList.add('hidden');
                         const resDados = await fetch('/dados');
                         const dataFinais = await resDados.json();
@@ -1626,7 +1618,7 @@
             const extraStreamings = streamingsFilme.length > maxStreamingsShow ? streamingsFilme.length - maxStreamingsShow : 0;
 
             htmlBuffer += `
-                <li class="glass-panel p-3 flex justify-between items-center border-l-4 border-l-[#40bcf4] hover:bg-white/5 transition-colors group mb-2 gap-3 overflow-hidden min-h-[5rem] h-auto"> <!-- Borda Azul -->
+                <li class="glass-panel p-3 flex justify-between items-center border-l-4 border-l-[#40bcf4] hover:bg-white/5 transition-colors group mb-2 gap-3 overflow-hidden min-h-[5rem] h-auto"> 
                     <div class="flex items-center gap-3 flex-1 min-w-0 overflow-hidden">
                         <div class="w-10 h-14 bg-[#14181c] rounded overflow-hidden shrink-0 hidden sm:block relative">
                             <div class="absolute inset-0 flex items-center justify-center bg-[#1c2228] animate-pulse" id="loader-wl-${idSafe}"></div>
