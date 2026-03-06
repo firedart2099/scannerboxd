@@ -138,25 +138,13 @@ def resolve_boxd_links(links_str):
 # ==========================================
 @app.route('/api/creditos', methods=['GET'])
 def check_creditos():
-    ip = get_ip()
-    with get_db() as conn:
-        row = conn.execute('SELECT creditos FROM credits WHERE ip = ?', (ip,)).fetchone()
-        if not row:
-            conn.execute('INSERT INTO credits (ip, creditos) VALUES (?, ?)', (ip, 1))
-            conn.commit()
-            return jsonify({"creditos": 1})
-        return jsonify({"creditos": row['creditos']})
+    # Modo ilimitado ativado temporariamente para amigos
+    return jsonify({"creditos": 999})
 
 @app.route('/api/consumir_credito', methods=['POST'])
 def consume_credito():
-    ip = get_ip()
-    with get_db() as conn:
-        row = conn.execute('SELECT creditos FROM credits WHERE ip = ?', (ip,)).fetchone()
-        if row and row['creditos'] > 0:
-            conn.execute('UPDATE credits SET creditos = creditos - 1 WHERE ip = ?', (ip,))
-            conn.commit()
-            return jsonify({"sucesso": True, "creditos": row['creditos'] - 1})
-    return jsonify({"sucesso": False, "erro": "Sem créditos"}), 403
+    # Modo ilimitado ativado temporariamente para amigos
+    return jsonify({"sucesso": True, "creditos": 999})
 
 @app.route('/api/adicionar_credito', methods=['POST'])
 def add_credito():
@@ -412,42 +400,42 @@ def oraculo():
 
         if GROQ_API_KEY:
             temas_aleatorios = [
-                "Obras-primas aclamadas universalmente (nota 4.0+ no Letterboxd).",
-                "Thrillers, suspenses e mistérios geniais com finais surpreendentes.",
-                "Grandes épicos, ficção científica e fantasia de altíssima qualidade.",
-                "Clássicos modernos imperdíveis (anos 2000 para frente).",
-                "Filmes aclamados pela crítica e premiados (Oscar, Cannes, etc).",
-                "Filmes com roteiros brilhantes e atuações memoráveis (nota 4.0+)."
+                "Favoritos do público e da crítica (nota 3.8+ no Letterboxd).",
+                "Grandes filmes de estúdios aclamados como A24, Neon, ou clássicos modernos.",
+                "Thrillers famosos, suspenses e filmes que prendem do início ao fim.",
+                "Comédias, romances ou dramas muito bem avaliados e populares.",
+                "Filmes com elencos estelares e diretores renomados que o usuário pode ter deixado passar.",
+                "Obras que foram um sucesso cultural e pop nos últimos 20 anos."
             ]
             tema_escolhido = random.choice(temas_aleatorios)
 
-            prompt = f"""Atue como um curador de cinema profissional e focado em OBRAS-PRIMAS. 
+            prompt = f"""Atue como um curador de cinema profissional, focado em entender a vibe exata do usuário. 
             
             DADOS DE GOSTO DO USUÁRIO:
             {top_4_texto}
             - Outros filmes que amou (nota máxima): {amados_amostra}
             - Filmes que odiou (nota baixa): {odiados_amostra}
 
-            Recomende EXATAMENTE 15 filmes EXCEPCIONAIS (Nota média > 4.0) que o usuário provavelmente ainda não viu.
+            Recomende EXATAMENTE 15 filmes MUITO BONS (Nota média > 3.6) que o usuário provavelmente ainda não viu, MAS QUE COMBINEM COM O GOSTO DELE.
             
-            DIRETRIZ DE CURADORIA MESTRE: Analise os TOP 4 FAVORITOS do usuário (se houver). Extraia a essência, a atmosfera e os temas predominantes desses 4 filmes e use isso como base principal para as recomendações. Cruze essa essência com: {tema_escolhido}
+            DIRETRIZ DE CURADORIA MESTRE: Analise os TOP 4 FAVORITOS do usuário. Extraia a essência, os gêneros (ex: comédia, terror, romance, ficção) e a atmosfera deles e use isso como base principal. Cruze essa essência com: {tema_escolhido}
             
-            REGRA CRÍTICA 1: O usuário é um CINÉFILO HARDCORE. Ele JÁ VIU todos os filmes óbvios! 
-            É ABSOLUTAMENTE PROIBIDO recomendar megaproduções, franquias famosas ou escolhas óbvias do Top 250 do IMDb (EXEMPLOS PROIBIDOS: O Senhor dos Anéis, Star Wars, Harry Potter, Matrix, Clube da Luta, O Poderoso Chefão, Interestelar, Batman, Marvel, Tarantino, Nolan).
-            Esforce-se para trazer filmes aclamados (nota > 4.0), mas que sejam tesouros escondidos, cinema independente brilhante ou obras internacionais maravilhosas.
+            REGRA CRÍTICA 1 - PERSONALIZAÇÃO EXTREMA: O perfil do usuário dita as regras. Não empurre filmes obscuros iranianos se ele gosta de comédia romântica ou ação. 
+            
+            REGRA CRÍTICA 2 - FILMES FAMOSOS LIBERADOS: VOCÊ DEVE recomendar filmes populares, aclamados e "famosinhos" do Letterboxd. Pode recomendar grandes sucessos de Hollywood, filmes cult muito conhecidos, sucessos recentes ou clássicos muito amados. Apenas EVITE mega-franquias óbvias (Marvel, DC, Star Wars, Harry Potter, Velozes e Furiosos).
             
             {texto_exclusao}
 
             REGRAS DE FORMATO (OBRIGATÓRIO):
             1. "rec_original": Título original do filme em INGLÊS.
             2. "rec": MESMO TÍTULO EM INGLÊS.
-            3. "base": Uma definição de gênero objetiva e elegante (ex: "Thriller Psicológico", "Ficção Científica Épica"). (Máximo 4 palavras).
-            4. "desc": Uma sinopse profissional, culta e muito bem escrita que venda o filme, SEM usar gírias ou emojis. Foque na narrativa e no clima da obra. (Aproximadamente 15 a 25 palavras). PT-BR.
+            3. "base": Uma definição de gênero curta (ex: "Thriller Psicológico", "Comédia Romântica"). (Máximo 4 palavras).
+            4. "desc": Uma sinopse chamativa e bem escrita que venda o filme, PT-BR. (Aproximadamente 15 a 25 palavras).
 
             É OBRIGATÓRIO responder APENAS em JSON estruturado:
             {{
               "recomendacoes": [
-                {{"rec_original": "Prisoners", "rec": "Prisoners", "ano": 2013, "base": "Suspense Policial Intenso", "desc": "Um pai desesperado cruza todos os limites éticos e morais para encontrar sua filha desaparecida em um thriller angustiante e magistralmente dirigido."}}
+                {{"rec_original": "Gone Girl", "rec": "Gone Girl", "ano": 2014, "base": "Suspense Psicológico Intenso", "desc": "Um homem vê sua vida desmoronar e se torna o principal suspeito quando sua esposa desaparece misteriosamente no dia do aniversário de casamento."}}
               ]
             }}"""
             
