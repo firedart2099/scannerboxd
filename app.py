@@ -311,7 +311,7 @@ def gerar_perfil():
           "descricao": "[SEU TEXTO AQUI]"
         }}"""
     else:
-        # PROMPT NORMAL PARA OS OUTROS USUÁRIOS COMPLETAMENTE BLINDADO
+        # PROMPT NORMAL COM METÁFORAS FORÇADAS E EMOJIS OBRIGATÓRIOS
         prompt = f"""Atue como um crítico de cinema gen-z cronicamente online.
         DADOS PESSOAIS DO USUÁRIO:
         - Username: {stats.get('username', 'Cinéfilo')}
@@ -325,20 +325,23 @@ def gerar_perfil():
 
         Crie um "Perfil Psicológico" na chave "descricao" com EXATAMENTE DOIS PARÁGRAFOS (separe-os usando \\n\\n):
         
-        PARÁGRAFO 1 (O Deboche Cronicamente Online): Fale DIRETAMENTE com o usuário (use sempre a palavra "você"). Faça um "roast" sarcástico e letal. Aponte o contraste absurdo entre o que a pessoa escreveu na Bio ou os favoritos que escolheu para "parecer cult" versus as outras notas que ela tem. Se a pessoa tiver visto poucos filmes ou só filmes esquisitos, zombe disso impiedosamente.
-        PARÁGRAFO 2 (A Análise Romântica e Sensível): Mude completamente o TOM DAS PALAVRAS. Sem usar ironia nas palavras, faça uma análise poética, madura e profunda baseada nos filmes que ela viu. Continue falando diretamente com o usuário ("você"). Elogie a forma como o usuário usa o cinema como catarse. 
+        PARÁGRAFO 1 (O Deboche Cronicamente Online): Fale DIRETAMENTE com o usuário (use sempre a palavra "você"). Faça um "roast" sarcástico e letal. Aponte o contraste absurdo entre o que a pessoa escreveu na Bio ou os favoritos que escolheu para "parecer cult" versus as outras notas que ela tem. Se a pessoa tiver visto poucos filmes ou só filmes esquisitos (como animações de carros de baixo orçamento), zombe disso impiedosamente.
         
-        REGRA DE GÊNERO: NUNCA assuma o gênero do usuário baseado no nome. Trate o usuário de forma neutra ou diretamente por "você". É ESTRITAMENTE PROIBIDO usar palavras como "rainha", "rei", "ela" ou "ele" para se referir ao usuário.
+        PARÁGRAFO 2 (A Análise Poética Forçada): Mude o tom das palavras. Faça uma análise poética e madura ESTREITAMENTE BASEADA NOS FILMES ESPECÍFICOS QUE O USUÁRIO VIU. 
+        MUITO IMPORTANTE: É ESTRITAMENTE PROIBIDO usar frases genéricas como "você usa o cinema como catarse" ou "você encontra significado profundo". INVENTE UMA METÁFORA NOVA! Exemplo: se ele só viu filmes de carros infantis, faça uma metáfora sobre "acelerar na estrada solitária da vida"; se viu terror, fale sobre "enfrentar monstros debaixo da cama".
         
-        REGRA DE COERÊNCIA (MUITO IMPORTANTE): O "personagem_referencia" DEVE OBRIGATORIAMENTE pertencer ao "filme_referencia". Não coloque o nome de um personagem de uma série com o nome de outro filme. Eles devem ser um "match" perfeito (exemplo: se o filme for "Cars", o personagem pode ser "Lightning McQueen").
-        O "filme_referencia" deve ser um título original em INGLÊS que represente perfeitamente o gosto BIZARRO ou CULT do usuário.
+        REGRA DE GÊNERO: NUNCA assuma o gênero do usuário. Trate o usuário de forma neutra ou diretamente por "você".
         
-        É OBRIGATÓRIO responder APENAS em JSON estruturado. VOCÊ DEVE CRIAR SEUS PRÓPRIOS VALORES, NÃO COPIE ESTE EXEMPLO:
+        REGRA DE EMOJIS (EXTREMAMENTE OBRIGATÓRIO): Você TEM QUE colocar pelo menos 3 destes emojis (🙄🤤😔😓😞😭😢🥺💀☠️👍🤌💅🫦💋🔥😻😿🥺😼🤓🙈) dentro do PARÁGRAFO 1 e também espalhados dentro do PARÁGRAFO 2. O parágrafo 2 tem que ser profundo, mas os emojis irônicos DEVEM estar presentes para quebrar o clima!
+        
+        REGRA DE COERÊNCIA (MUITO IMPORTANTE): O "personagem_referencia" DEVE OBRIGATORIAMENTE pertencer ao "filme_referencia" escolhido. Não misture personagens e filmes. O "filme_referencia" deve ser um título original em INGLÊS que o usuário assistiu ou que represente a sua energia bizarra.
+        
+        É OBRIGATÓRIO responder APENAS em JSON estruturado. GERE TEXTOS 100% NOVOS E ÚNICOS (NÃO COPIE O EXEMPLO ABAIXO):
         {{
           "titulo": "[CRIE UM TITULO SARCASTICO AQUI]",
-          "personagem_referencia": "[CRIE UM PERSONAGEM AQUI]",
-          "filme_referencia": "[COLOQUE O FILME DESSE PERSONAGEM AQUI]",
-          "descricao": "[CRIE SEUS DOIS PARAGRAFOS AQUI]"
+          "personagem_referencia": "[NOME DO PERSONAGEM EXATO DO FILME AQUI]",
+          "filme_referencia": "[NOME DO FILME AQUI]",
+          "descricao": "[CRIE SEUS DOIS PARAGRAFOS COM EMOJIS AQUI]"
         }}"""
 
     url = "https://api.groq.com/openai/v1/chat/completions"
