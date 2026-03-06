@@ -311,7 +311,7 @@ def gerar_perfil():
           "descricao": "[SEU TEXTO AQUI]"
         }}"""
     else:
-        # PROMPT NORMAL COM METÁFORAS FORÇADAS E EMOJIS OBRIGATÓRIOS
+        # PROMPT NORMAL COM METÁFORAS FORÇADAS E PROIBIÇÃO ABSOLUTA DE EMOJIS EXTRAS
         prompt = f"""Atue como um crítico de cinema gen-z cronicamente online.
         DADOS PESSOAIS DO USUÁRIO:
         - Username: {stats.get('username', 'Cinéfilo')}
@@ -332,7 +332,9 @@ def gerar_perfil():
         
         REGRA DE GÊNERO: NUNCA assuma o gênero do usuário. Trate o usuário de forma neutra ou diretamente por "você".
         
-        REGRA DE EMOJIS (EXTREMAMENTE OBRIGATÓRIO): Você TEM QUE colocar pelo menos 3 destes emojis (🙄🤤😔😓😞😭😢🥺💀☠️👍🤌💅🫦💋🔥😻😿🥺😼🤓🙈) dentro do PARÁGRAFO 1 e também espalhados dentro do PARÁGRAFO 2. O parágrafo 2 tem que ser profundo, mas os emojis irônicos DEVEM estar presentes para quebrar o clima!
+        REGRA DE EMOJIS (PROIBIÇÃO ABSOLUTA DE OUTROS EMOJIS): Você ESTÁ TOTALMENTE PROIBIDO de usar qualquer emoji que não seja exatamente um destes: 🙄 🤤 😔 😓 😞 😭 😢 🥺 💀 ☠️ 👍 🤌 💅 🫦 💋 🔥 😻 😿 😼 🤓 🙈. 
+        NÃO USE NENHUM OUTRO EMOJI ALÉM DOS PERMITIDOS NESSA LISTA (nada de carros, corações, estrelinhas, mapas, etc). Use EXCLUSIVAMENTE a lista fornecida.
+        A graça é falar coisas lindíssimas e poéticas no segundo parágrafo, mas continuar a pontuar as frases apenas com esses emojis irônicos e debochados (ex: "...sua busca genuína por beleza 😭💅"). Coloque pelo menos 3 desses emojis autorizados em CADA parágrafo.
         
         REGRA DE COERÊNCIA (MUITO IMPORTANTE): O "personagem_referencia" DEVE OBRIGATORIAMENTE pertencer ao "filme_referencia" escolhido. Não misture personagens e filmes. O "filme_referencia" deve ser um título original em INGLÊS que o usuário assistiu ou que represente a sua energia bizarra.
         
@@ -341,7 +343,7 @@ def gerar_perfil():
           "titulo": "[CRIE UM TITULO SARCASTICO AQUI]",
           "personagem_referencia": "[NOME DO PERSONAGEM EXATO DO FILME AQUI]",
           "filme_referencia": "[NOME DO FILME AQUI]",
-          "descricao": "[CRIE SEUS DOIS PARAGRAFOS COM EMOJIS AQUI]"
+          "descricao": "[CRIE SEUS DOIS PARAGRAFOS COM OS EMOJIS AQUI]"
         }}"""
 
     url = "https://api.groq.com/openai/v1/chat/completions"
