@@ -396,19 +396,20 @@ def gerar_perfil():
     Média: {stats.get('media_notas')}
     
     REGRAS DA MISSÃO:
-    1. Escreva um Roast letal em EXATAMENTE 2 PARÁGRAFOS. Tamanho alvo: Cerca de 4 a 6 frases bem elaboradas por parágrafo (nem muito curto, nem uma redação gigante). Seja direto, ácido e NUNCA use metáforas chatas ou poéticas. É pra fazer bullying cinematográfico pesado!
-    2. DESTRUA O GOSTO DA PESSOA COM PRECISÃO. Faça piadas com os ESTEREÓTIPOS REAIS dos filmes que ela assiste. Não use gírias aleatórias que não combinam com o filme (ex: é ridículo chamar indie/romance adolescente de "filme de hétero top"). Se ela gosta de blockbusters, zombe do gosto comercial; se gosta de filmes cults e europeus, chame de pseudo-intelectual pedante; se gosta de comédias românticas ou coming-of-age, chame de emocionado, carente ou "sadboy/sadgirl". Bata onde dói com coerência!
-    3. ESPALHE MUITOS EMOJIS (pelo menos 6 no total) no meio do texto. USE EXCLUSIVAMENTE ESTES EMOJIS: 🙈🤓😼🥺😿😻💋🫦🔥💅👍☠️💀😢😭😞😓😔🤤🙄.
-    4. "personagem_referencia" DEVE SER O NOME DE UM PERSONAGEM FAMOSO DE FILME QUE ESTA PESSOA ASSISTIU. É estritamente PROIBIDO usar o nome "{username}" como personagem!
-    5. ZERO asteriscos (*) ou formatação Markdown.
+    1. Escreva um Roast letal em EXATAMENTE 2 PARÁGRAFOS. Tamanho alvo: Cerca de 4 a 6 frases bem elaboradas por parágrafo. Seja direto e ácido.
+    2. O FOCO DA PIADA É O USUÁRIO, NÃO OS FILMES: Não fale mal de filmes consagrados. Reconheça que os filmes são bons/aclamados, mas DESTRUA O USUÁRIO por achar que tem um gosto "único" ao escolhê-los. O problema não é o filme (Forrest Gump é ótimo), é a pessoa ser "básica", "emocionada" ou querer pagar de intelectual e diferentão com os filmes mais famosos do planeta. Bata no ego da pessoa!
+    3. O TÍTULO DA RESPOSTA: O campo "titulo" DEVE SER UM RÓTULO/ARQUÉTIPO sarcástico inventado para classificar a pessoa (ex: "O Falso Cinéfilo", "O Sommelier de Blockbuster", "O Emocionado Básico"). NUNCA use frases genéricas de notícia tipo "O Crítico Ataca".
+    4. ESPALHE MUITOS EMOJIS (pelo menos 6 no total) no meio do texto. USE EXCLUSIVAMENTE ESTES EMOJIS: 🙈🤓😼🥺😿😻💋🫦🔥💅👍☠️💀😢😭😞😓😔🤤🙄.
+    5. "personagem_referencia" DEVE SER O NOME DE UM PERSONAGEM FAMOSO DE FILME QUE ESTA PESSOA ASSISTIU. É estritamente PROIBIDO usar o nome "{username}" como personagem!
+    6. ZERO asteriscos (*) ou formatação Markdown.
     
     Responda OBRIGATORIAMENTE em formato json estruturado exatamente assim:
     {{ 
-        "titulo": "TÍTULO DEBOCHADO", 
+        "titulo": "SEU RÓTULO SARCÁSTICO AQUI (Ex: O Pseudo-Cult)", 
         "personagem_referencia": "NOME DO PERSONAGEM FICTÍCIO (NUNCA O USERNAME)", 
         "filme_referencia": "NOME DO FILME", 
         "descricao": [
-            "SEU PRIMEIRO PARÁGRAFO AQUI, RECHEADO DE EMOJIS DEBOCHADOS E GÍRIAS",
+            "SEU PRIMEIRO PARÁGRAFO AQUI, ATACANDO O EGO DO USUÁRIO E NÃO O FILME",
             "SEU SEGUNDO PARÁGRAFO AQUI"
         ]
     }}"""
