@@ -137,7 +137,7 @@ def gerar_resposta_ia(prompt):
                     "contents": [{"parts": [{"text": prompt}]}],
                     "generationConfig": {
                         "responseMimeType": "application/json",
-                        "maxOutputTokens": 400 # Limite físico para evitar textos gigantes
+                        "maxOutputTokens": 500 # Limite físico para evitar textos gigantes
                     },
                     "safetySettings": [
                         {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
@@ -166,7 +166,7 @@ def gerar_resposta_ia(prompt):
                     "model": "llama-3.3-70b-versatile",
                     "messages": [{"role": "user", "content": prompt}],
                     "temperature": 0.85,
-                    "max_tokens": 400, # Limite físico na Groq para cortar loops de repetição
+                    "max_tokens": 500, # Limite físico na Groq para cortar loops de repetição
                     "response_format": {"type": "json_object"} 
                 }
                 # Timeout REDUZIDO para 12s para evitar SIGKILL no Render
@@ -593,3 +593,4 @@ if __name__ == '__main__':
     liberar_porta(PORTA)
     threading.Timer(1.5, lambda: webbrowser.open(f'http://127.0.0.1:{PORTA}')).start()
     app.run(port=PORTA, debug=False, threaded=True)
+
