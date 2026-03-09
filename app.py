@@ -136,7 +136,7 @@ def gerar_resposta_ia(prompt):
                     "contents": [{"parts": [{"text": prompt}]}],
                     "generationConfig": {
                         "responseMimeType": "application/json",
-                        "maxOutputTokens": 600
+                        "maxOutputTokens": 2500 # Aumentado para NUNCA cortar o JSON antes do fim
                     },
                     "safetySettings": [
                         {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
@@ -163,7 +163,7 @@ def gerar_resposta_ia(prompt):
                     "model": "llama-3.3-70b-versatile",
                     "messages": [{"role": "user", "content": prompt}],
                     "temperature": 0.85,
-                    "max_tokens": 600,
+                    "max_tokens": 2500, # Aumentado para garantir que a Groq consiga fechar o JSON
                     "response_format": {"type": "json_object"} 
                 }
                 res_groq = requests.post(url_groq, headers=headers_groq, json=payload_groq, timeout=12)
@@ -389,7 +389,6 @@ def gerar_perfil():
     stats = request.json.get('stats', {})
     username = stats.get('username', 'Usuário')
     
-    # Prompt agressivo com ordem para ser sarcástico e injetar vários emojis
     prompt = f"""Atue como o crítico MAIS TÓXICO, venenoso e cronicamente online do Letterboxd. Você tem um ego colossal e julga as pessoas como se estivesse fazendo uma fofoca maldosa no Twitter.
     O nome do alvo é: {username}
     Bio: "{stats.get('bio')}"
@@ -397,9 +396,9 @@ def gerar_perfil():
     Média: {stats.get('media_notas')}
     
     REGRAS DA MISSÃO:
-    1. Escreva um Roast letal em EXATAMENTE 2 PARÁGRAFOS DE TAMANHO MÉDIO (5 a 7 linhas cada). Seja direto, ácido e NUNCA use metáforas chatas ou poéticas (nada de 'como um beijo sem paixão'). É pra fazer bullying cinematográfico pesado!
-    2. DESTRUA O GOSTO DA PESSOA. Use sarcasmo puro e gírias modernas (ex: "básico", "pagar de cult", "filme de hétero top", "desespero por atenção"). Exponha a hipocrisia de colocar filmes genéricos ao lado de filmes complexos só para parecer inteligente.
-    3. ESPALHE MUITOS EMOJIS (pelo menos 6 no total) no meio do texto para dar aquele tom passivo-agressivo perfeito. USE EXCLUSIVAMENTE ESTES EMOJIS: 🙈🤓😼🥺😿😻💋🫦🔥💅👍☠️💀😢😭😞😓😔🤤🙄.
+    1. Escreva um Roast letal em EXATAMENTE 2 PARÁGRAFOS. Tamanho alvo: Cerca de 4 a 6 frases bem elaboradas por parágrafo (nem muito curto, nem uma redação gigante). Seja direto, ácido e NUNCA use metáforas chatas ou poéticas. É pra fazer bullying cinematográfico pesado!
+    2. DESTRUA O GOSTO DA PESSOA COM PRECISÃO. Faça piadas com os ESTEREÓTIPOS REAIS dos filmes que ela assiste. Não use gírias aleatórias que não combinam com o filme (ex: é ridículo chamar indie/romance adolescente de "filme de hétero top"). Se ela gosta de blockbusters, zombe do gosto comercial; se gosta de filmes cults e europeus, chame de pseudo-intelectual pedante; se gosta de comédias românticas ou coming-of-age, chame de emocionado, carente ou "sadboy/sadgirl". Bata onde dói com coerência!
+    3. ESPALHE MUITOS EMOJIS (pelo menos 6 no total) no meio do texto. USE EXCLUSIVAMENTE ESTES EMOJIS: 🙈🤓😼🥺😿😻💋🫦🔥💅👍☠️💀😢😭😞😓😔🤤🙄.
     4. "personagem_referencia" DEVE SER O NOME DE UM PERSONAGEM FAMOSO DE FILME QUE ESTA PESSOA ASSISTIU. É estritamente PROIBIDO usar o nome "{username}" como personagem!
     5. ZERO asteriscos (*) ou formatação Markdown.
     
