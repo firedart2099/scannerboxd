@@ -3,9 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oráculo de Streaming | Letterboxd Analyzer</title>
+    <title>Oráculo do Letterboxd</title>
     
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- SISTEMA ANTI-TRAVAMENTO DE FIREWALL CORPORATIVO -->
+    <!-- Carrega o Tailwind em background para não travar o "loading" do navegador da empresa -->
+    <script>
+        const twScript = document.createElement('script');
+        twScript.src = "https://cdn.tailwindcss.com";
+        document.head.appendChild(twScript);
+
+        // Se passar 4 segundos e o visual não baixar, avisa do bloqueio e mata a tela branca infinita
+        setTimeout(() => {
+            if (typeof tailwind === 'undefined') {
+                document.body.innerHTML = `
+                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; background: #14181c; color: #8c9bab; font-family: sans-serif; text-align: center; padding: 20px; box-sizing: border-box;">
+                        <div style="font-size: 4rem; margin-bottom: 10px;">🚧</div>
+                        <h2 style="color: #ff8000; font-size: 1.5rem; font-weight: bold; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 2px;">Bloqueio Corporativo</h2>
+                        <p style="max-width: 400px; line-height: 1.6; margin-bottom: 10px;">A rede da sua empresa está bloqueando os arquivos visuais (Tailwind CSS) do Oráculo.</p>
+                        <p style="max-width: 400px; line-height: 1.6; color: #fff; font-weight: bold; background: #1c2228; padding: 15px; border-radius: 8px; border: 1px solid #2c3440;">Acesse pelo 4G do seu celular ou na rede da sua casa para usar a ferramenta!</p>
+                    </div>
+                `;
+            }
+        }, 4000);
+    </script>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&family=Space+Grotesk:wght@300;700&display=swap" rel="stylesheet">
     <style>
@@ -26,6 +46,7 @@
             font-family: 'Inter', sans-serif;
             background-image: radial-gradient(circle at 50% -20%, #202830 0%, #14181c 80%);
             overflow-x: hidden;
+            margin: 0;
         }
 
         h1, h2, h3, .stat-value { font-family: 'Space Grotesk', sans-serif; }
@@ -137,14 +158,6 @@
             border-color: var(--lb-blue) !important; 
             background-color: rgba(64, 188, 244, 0.1) !important;
         }
-        
-        .profile-img-effect {
-            animation: profileGlow 3s infinite alternate;
-        }
-        @keyframes profileGlow {
-            0% { box-shadow: 0 0 10px rgba(64, 188, 244, 0.2); border-color: rgba(64, 188, 244, 0.5); }
-            100% { box-shadow: 0 0 20px rgba(64, 188, 244, 0.6); border-color: rgba(64, 188, 244, 1); }
-        }
 
         .ps-trophy {
             position: fixed;
@@ -206,7 +219,7 @@
     <div>
         <p class="text-[#40bcf4] text-[9px] font-black uppercase tracking-widest mb-0.5">Conquista Desbloqueada</p>
         <h4 class="text-white font-bold text-sm leading-tight mb-1">O Terror do Letterboxd 💀</h4>
-        <p class="text-[#8c9bab] text-[10px] leading-snug">Sua lista é tão gigante que a IA entrou em pânico. Escavando os confins da internet...</p>
+        <p class="text-[#8c9bab] text-[10px] leading-snug">Sua lista é tão gigante que o Oráculo entrou em pânico. Escavando os confins da internet...</p>
     </div>
 </div>
 
@@ -282,7 +295,7 @@
         <h3 class="text-xl md:text-2xl font-black text-white uppercase tracking-tighter mb-2">Apoie o Projeto</h3>
         
         <p class="text-[#8c9bab] text-[11px] sm:text-xs md:text-sm mb-6 leading-relaxed flex-1">
-            As consultas à IA e os bancos de dados de streaming têm um custo.<br><br>
+            As consultas e os bancos de dados de streaming têm um custo.<br><br>
             Se você está curtindo a experiência, considere dar um apoio de apenas <strong>R$ 1,90</strong>. E já aviso: se os servidores caírem e o site sair do ar, a culpa é sua! 💀
         </p>
         
@@ -303,7 +316,7 @@
                 <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[#ff8000]"></div>
             </div>
             <div class="flex flex-col justify-center">
-                <h1 class="text-sm sm:text-xl font-bold tracking-widest text-white uppercase drop-shadow-md leading-none">Letterboxd <span class="text-[#40bcf4] block sm:inline text-[10px] sm:text-xl mt-0.5 sm:mt-0">Analyzer</span></h1>
+                <h1 class="text-sm sm:text-xl font-bold tracking-widest text-white uppercase drop-shadow-md leading-none">Oráculo do <span class="text-[#40bcf4] block sm:inline text-[10px] sm:text-xl mt-0.5 sm:mt-0">Letterboxd</span></h1>
                 <p class="text-[8px] sm:text-[10px] text-[#8c9bab] font-bold tracking-[0.3em] uppercase drop-shadow-md mt-1 sm:mt-0.5">v1.0.0 Oficial</p>
             </div>
         </div>
@@ -336,7 +349,6 @@
         </div>
 
         <div class="max-w-2xl mx-auto mt-8 sm:mt-12">
-            <!-- TEXTO DISCRETO INTRODUTÓRIO -->
             <div class="text-center mb-5">
                 <p class="text-[#8c9bab] text-[10px] sm:text-xs uppercase tracking-widest font-bold opacity-60">
                     Passo a passo de como conseguir:
@@ -344,16 +356,13 @@
             </div>
             
             <div class="space-y-4">
-                <!-- PASSO 1: BAIXAR ZIP -->
                 <div class="flex justify-center">
-                    <!-- Versão Desktop -->
                     <a href="https://letterboxd.com/data/export/" target="_blank" class="hidden sm:flex items-center gap-4 bg-[#1c2228] border border-[#2c3440] hover:border-[#40bcf4] text-[#8c9bab] hover:text-white px-6 py-4 rounded-xl transition-all w-full shadow-md group">
                         <span class="bg-[#40bcf4]/20 text-[#40bcf4] w-6 h-6 rounded-full flex items-center justify-center text-xs font-black shrink-0 group-hover:bg-[#40bcf4] group-hover:text-[#14181c] transition-colors">1</span>
                         <span class="font-bold text-sm tracking-wide">Baixar arquivo .ZIP oficial</span>
                         <svg class="w-5 h-5 text-[#40bcf4] ml-auto opacity-70 group-hover:opacity-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                     </a>
 
-                    <!-- Versão Mobile -->
                     <div class="sm:hidden w-full bg-[#1c2228] border border-[#2c3440] p-4 rounded-xl shadow-md text-left">
                         <p class="text-white text-[12px] font-bold uppercase tracking-widest mb-2 flex items-center gap-2">
                             <span class="bg-[#40bcf4]/20 text-[#40bcf4] w-5 h-5 rounded-full flex items-center justify-center text-[9px] shrink-0">1</span>
@@ -369,7 +378,6 @@
                     </div>
                 </div>
 
-                <!-- PASSO 2: UPLOAD BOX -->
                 <div class="glass-panel p-6 md:p-10 text-center border-dashed border-2 border-[#2c3440] hover:border-[#40bcf4]/50 transition-all group" id="upload-container">
                     <label for="csv-file" id="dropzone-label" class="cursor-pointer group block">
                         <div class="flex items-center justify-center gap-2 mb-6">
@@ -403,7 +411,6 @@
                 </div>
             </div>
 
-            <!-- TUTORIAL MANUAL EXTRA -->
             <div class="text-center mt-6">
                 <button onclick="toggleImportTutorial()" class="inline-block text-[10px] text-[#8c9bab] hover:text-white font-bold tracking-widest uppercase transition-colors underline decoration-dashed underline-offset-4">
                     Ver passo a passo manual
@@ -468,7 +475,7 @@
                         <svg class="w-5 h-5 text-[#40bcf4] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"></path></svg>
                         <h4 class="text-white font-bold text-lg sm:text-2xl drop-shadow-md">Oráculo de Recomendações</h4>
                     </div>
-                    <p class="text-[#8c9bab] text-[10px] md:text-xs mt-1 px-2 md:px-0">O sistema cruzou o seu histórico. <br class="sm:hidden"><strong class="text-[#40bcf4]">Toque nos cartazes para exportar.</strong></p>
+                    <p class="text-[#8c9bab] text-[10px] md:text-xs mt-1 px-2 md:px-0">Cruzamos o seu histórico. <br class="sm:hidden"><strong class="text-[#40bcf4]">Toque nos cartazes para exportar.</strong></p>
                 </div>
                 <button id="btn-export-desktop" onclick="abrirTutorial()" class="hidden md:flex items-center gap-1.5 px-6 py-3 bg-[#40bcf4]/20 text-[#40bcf4] border border-[#40bcf4]/50 rounded-lg font-black text-[10px] uppercase tracking-widest hover:bg-[#40bcf4] hover:text-[#14181c] transition-all disabled:opacity-50 disabled:cursor-not-allowed">
                     EXPORTAR SELECIONADOS (4)
@@ -477,7 +484,7 @@
             
             <div id="oracle-warning" class="hidden mb-4 bg-[#ff8000]/10 border border-[#ff8000]/30 p-3 rounded-xl text-center mx-1">
                 <p class="text-[#ff8000] text-[10px] sm:text-xs font-bold leading-relaxed">
-                    🚨 Sua lista é GIGANTE! IA improvisando clássicos obscuros.
+                    🚨 Sua lista é GIGANTE! O Oráculo está improvisando clássicos obscuros.
                 </p>
             </div>
 
@@ -552,7 +559,7 @@
     <div id="streaming-panel" class="hidden space-y-6 md:space-y-10 animate-fade-in pb-10 md:pb-20 mt-10 relative z-20">
         <div class="text-center">
             <h2 class="text-3xl md:text-5xl font-black text-white tracking-tighter uppercase mb-1 drop-shadow-lg">A Sua <span class="text-[#40bcf4]">Watchlist</span></h2>
-            <p class="text-[#8c9bab] font-bold uppercase tracking-widest text-[9px] md:text-xs">Pronta para dar o play</p>
+            <p class="text-[#8c9bab] font-bold uppercase tracking-widest text-[9px] md:text-xs">Pronta para dar play</p>
         </div>
 
         <div id="dynamic-podium" class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8"></div>
@@ -595,7 +602,7 @@
     </div>
     
     <footer class="mt-12 border-t border-[#2c3440] pt-6 pb-10 text-center text-[#8c9bab] text-[8px] sm:text-[10px] uppercase tracking-widest leading-relaxed relative z-20">
-        <p class="mb-1">Oráculo de Streaming é independente e não afiliado ao Letterboxd.</p>
+        <p class="mb-1">Oráculo do Letterboxd é independente e não afiliado ao Letterboxd.</p>
         <p>Dados de TMDB API.</p>
     </footer>
 </div>
@@ -832,6 +839,7 @@
         
         try {
             const res = await fetch('/upload_profile', { method: 'POST', body: fd });
+            if (!res.ok) throw new Error("Falha na rede ou bloqueio corporativo");
             statsData = (await res.json()).stats;
             await consumirCredito();
             
@@ -845,7 +853,7 @@
                 exibirRaioX(); carregarOraculo(); iniciarFluxoWatchlist();
             });
         } catch(e) { 
-            mostrarErro("Erro ao ler arquivo .zip. Tente novamente."); 
+            mostrarErro("Erro de conexão. A rede bloqueou o envio do .zip!"); 
             btn.disabled = false;
             btnSpinner.classList.add('hidden');
             btnText.innerText = "Iniciar Análise";
@@ -939,6 +947,19 @@
             const res = await fetch('/gerar_perfil', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({stats: statsData}) });
             if(res.ok) {
                 const data = await res.json();
+                
+                // --- AJUSTE: SE FOR RATE_LIMIT, AVISA NA TELA E MOSTRA FALLBACK RÁPIDO ---
+                if(data.erro === "RATE_LIMIT") {
+                    mostrarErro("As APIs estão superlotadas. Mostrando perfil genérico.");
+                    if(tt) tt.innerHTML = "Algoritmo em Choque 💀";
+                    if(td) td.innerText = "As IAs bateram no limite de velocidade! Tente analisar outro perfil em 1 minuto. 💅";
+                    if(tv) tv.innerText = "Patrick Bateman";
+                    fetch(`/api/tmdb/search?query=American%20Psycho`).then(r=>r.json()).then(d=>{
+                        if(d.results?.[0]?.poster_path){ ti.src=`https://image.tmdb.org/t/p/w500${d.results[0].poster_path}`; ti.classList.remove('hidden'); pl.classList.add('hidden'); }
+                    });
+                    return;
+                }
+
                 if(!data.erro) {
                     if(tt) tt.innerHTML = data.titulo; 
                     if(td) td.innerText = data.descricao; 
@@ -966,7 +987,7 @@
             grid.innerHTML = `
                 <div class="col-span-full text-center p-6 bg-[#ff8000]/10 border border-[#ff8000]/30 rounded-xl mx-2">
                     <p class="text-[#ff8000] text-xs font-bold leading-relaxed">
-                        A API da Groq atingiu o limite de acessos por minuto 💀.<br>Aguarde 60 segundos e tente recarregar a página!
+                        O Oráculo atingiu o limite de acessos por minuto 💀.<br>Aguarde 60 segundos e tente recarregar a página!
                     </p>
                 </div>
             `;
@@ -991,7 +1012,7 @@
                 
                 // Puxa o freio de mão se o servidor mandar o código de Rate Limit
                 if (r.erro === "RATE_LIMIT") {
-                    mostrarErro("Limite de velocidade da API atingido. Aguarde 1 minuto!");
+                    mostrarErro("Limite de velocidade do Oráculo atingido. Aguarde 1 minuto!");
                     break; 
                 }
 
@@ -1004,12 +1025,11 @@
                     });
                 }
                 
-                // Se a IA ainda não deu os 4 filmes perfeitos e não estamos bloqueados, espera 2.5s antes de pedir de novo
                 if (f.length < 4 && r.erro !== "RATE_LIMIT") {
                     await new Promise(resolve => setTimeout(resolve, 2500));
                 }
             } catch(e) { 
-                console.error("Erro na tentativa de recomendação da IA:", e); 
+                console.error("Erro na tentativa de recomendação:", e); 
                 await new Promise(resolve => setTimeout(resolve, 2500));
             }
             t++;
@@ -1028,7 +1048,7 @@
             const s = oraculoRecomendacoesGlobais.length; oraculoRecomendacoesGlobais.push(...nov);
             nov.forEach((_,i)=>filmesSelecionados.add(s+i)); renderizarOraculoCards(nov, s);
         } else {
-            mostrarErro("A IA precisa de uma pausa de 1 minuto por limites de acesso!");
+            mostrarErro("O Oráculo precisa de uma pausa de 1 minuto por limites de acesso!");
         }
         
         document.getElementById('load-more-spinner').classList.add('hidden');
@@ -1085,55 +1105,95 @@
         document.getElementById('loading-container').classList.remove('hidden');
         iniciarCicloDeFrases(); 
         
-        fetch('/process_watchlist', { 
-            method: 'POST', 
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({session_id: sessionId}) 
-        });
+        try {
+            await fetch('/process_watchlist', { 
+                method: 'POST', 
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({session_id: sessionId}) 
+            });
+        } catch(e) {
+            console.warn("Aviso na chamada inicial do backend:", e);
+        }
         
         let startTime = Date.now();
+        let lastAtual = -1;
+        let stuckCount = 0;
         
+        // Intervalo aumentado para 2.5s para evitar bloqueio de Rate Limit em Firewalls de Empresas
         const m = setInterval(async () => {
-            const p = await (await fetch(`/progress?session_id=${sessionId}`)).json();
-            if(p.total > 0) {
-                const pct = (p.atual/p.total)*100;
-                document.getElementById('progress-bar-fill').style.width = pct+'%';
-                document.getElementById('load-percent').innerText = Math.floor(pct)+'%';
-                document.getElementById('loading-count').innerText = `${p.atual}/${p.total}`;
+            try {
+                const res = await fetch(`/progress?session_id=${sessionId}`);
+                if (!res.ok) return; // Ignora erros temporários de proxy 
+                const p = await res.json();
                 
-                const currentMovie = document.getElementById('current-movie-name');
-                if (currentMovie) currentMovie.innerText = p.filme_atual || "Processando...";
-                
-                const itemsRemaining = p.total - p.atual;
-                const elapsedSeconds = (Date.now() - startTime) / 1000;
-                let etaSeconds = 0;
-                
-                if (p.atual > 0) {
-                    const timePerItem = elapsedSeconds / p.atual;
-                    etaSeconds = itemsRemaining * timePerItem;
-                } else {
-                    etaSeconds = itemsRemaining * 0.1;
-                }
-                
-                const min = Math.floor(etaSeconds / 60);
-                const sec = Math.floor(etaSeconds % 60);
-                
-                const etaTimer = document.getElementById('eta-timer');
-                if (etaTimer) {
-                    if (etaSeconds > 0) {
-                        etaTimer.innerText = `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+                if(p.total > 0) {
+                    const pct = (p.atual/p.total)*100;
+                    document.getElementById('progress-bar-fill').style.width = pct+'%';
+                    document.getElementById('load-percent').innerText = Math.floor(pct)+'%';
+                    document.getElementById('loading-count').innerText = `${p.atual}/${p.total}`;
+                    
+                    const currentMovie = document.getElementById('current-movie-name');
+                    if (currentMovie) currentMovie.innerText = p.filme_atual || "Processando...";
+                    
+                    // Sistema Anti-Travamento (Se ficar na mesma %. o site percebe e cancela)
+                    if (p.atual === lastAtual && !p.finalizado) {
+                        stuckCount++;
+                        if (stuckCount > 20) { // Cerca de 50 segundos travado no mesmo número
+                            clearInterval(m);
+                            pararCicloDeFrases();
+                            mostrarErro("A rede da empresa pode ter cortado a conexão. Tente no 4G.");
+                            // Força a finalização com o que conseguiu carregar
+                            p.finalizado = true;
+                        }
                     } else {
-                        etaTimer.innerText = "Quase lá...";
+                        lastAtual = p.atual;
+                        stuckCount = 0;
+                    }
+
+                    const itemsRemaining = p.total - p.atual;
+                    const elapsedSeconds = (Date.now() - startTime) / 1000;
+                    let etaSeconds = 0;
+                    
+                    if (p.atual > 0) {
+                        const timePerItem = elapsedSeconds / p.atual;
+                        etaSeconds = itemsRemaining * timePerItem;
+                    } else {
+                        etaSeconds = itemsRemaining * 0.1;
+                    }
+                    
+                    const min = Math.floor(etaSeconds / 60);
+                    const sec = Math.floor(etaSeconds % 60);
+                    
+                    const etaTimer = document.getElementById('eta-timer');
+                    if (etaTimer) {
+                        if (etaSeconds > 0 && !p.finalizado) {
+                            etaTimer.innerText = `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+                        } else {
+                            etaTimer.innerText = "Quase lá...";
+                        }
+                    }
+                    
+                    if(p.finalizado) {
+                        clearInterval(m); pararCicloDeFrases(); document.getElementById('loading-container').classList.add('hidden');
+                        try {
+                            const dadosRes = await fetch(`/dados?session_id=${sessionId}`);
+                            if(dadosRes.ok) {
+                                const dadosJson = await dadosRes.json();
+                                rawDatabase = normalizeDatabase(dadosJson.watchlist || {});
+                                mostrarVeredito();
+                            } else {
+                                throw new Error("Erro dados HTTP");
+                            }
+                        } catch(e) {
+                            mostrarErro("Não foi possível carregar os resultados finais.");
+                        }
                     }
                 }
-                
-                if(p.finalizado) {
-                    clearInterval(m); pararCicloDeFrases(); document.getElementById('loading-container').classList.add('hidden');
-                    rawDatabase = normalizeDatabase((await(await fetch(`/dados?session_id=${sessionId}`)).json()).watchlist);
-                    mostrarVeredito();
-                }
+            } catch(e) {
+                // Silencia erros de timeout de proxy para não estourar o console
+                console.warn("Interferência na rede corporativa. Tentando novamente...", e);
             }
-        }, 1000);
+        }, 2500); // 2.5 segundos
     }
 
     function mostrarVeredito() {
@@ -1204,4 +1264,3 @@
 </script>
 </body>
 </html>
-
