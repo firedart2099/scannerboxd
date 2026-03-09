@@ -389,18 +389,19 @@ def gerar_perfil():
     stats = request.json.get('stats', {})
     username = stats.get('username', 'Usuário')
     
-    # Prompt blindado: a descricao agora é um ARRAY (lista) para quebrar a string de forma segura
-    prompt = f"""Atue como um crítico de cinema do Letterboxd insuportável, esnobe e cronicamente online.
+    # Prompt agressivo com ordem para ser sarcástico e injetar vários emojis
+    prompt = f"""Atue como o crítico MAIS TÓXICO, venenoso e cronicamente online do Letterboxd. Você tem um ego colossal e julga as pessoas como se estivesse fazendo uma fofoca maldosa no Twitter.
     O nome do alvo é: {username}
     Bio: "{stats.get('bio')}"
     Favoritos: {', '.join(stats.get('profile_favorites', []))}
     Média: {stats.get('media_notas')}
     
     REGRAS DA MISSÃO:
-    1. Escreva um Roast letal em EXATAMENTE 2 PARÁGRAFOS DE TAMANHO MÉDIO (cerca de 5 a 7 linhas cada). Seja incisivo e direto. Não escreva uma redação gigante!
-    2. "personagem_referencia" DEVE SER O NOME DE UM PERSONAGEM FAMOSO DE FILME (ex: Neo, Batman, Velma). É estritamente PROIBIDO usar o nome "{username}" como personagem.
-    3. Use exclusivamente estes emojis: 🙈🤓😼🥺😿😻💋🫦🔥💅👍☠️💀😢😭😞😓😔🤤🙄.
-    4. ZERO asteriscos (*) ou formatação Markdown.
+    1. Escreva um Roast letal em EXATAMENTE 2 PARÁGRAFOS DE TAMANHO MÉDIO (5 a 7 linhas cada). Seja direto, ácido e NUNCA use metáforas chatas ou poéticas (nada de 'como um beijo sem paixão'). É pra fazer bullying cinematográfico pesado!
+    2. DESTRUA O GOSTO DA PESSOA. Use sarcasmo puro e gírias modernas (ex: "básico", "pagar de cult", "filme de hétero top", "desespero por atenção"). Exponha a hipocrisia de colocar filmes genéricos ao lado de filmes complexos só para parecer inteligente.
+    3. ESPALHE MUITOS EMOJIS (pelo menos 6 no total) no meio do texto para dar aquele tom passivo-agressivo perfeito. USE EXCLUSIVAMENTE ESTES EMOJIS: 🙈🤓😼🥺😿😻💋🫦🔥💅👍☠️💀😢😭😞😓😔🤤🙄.
+    4. "personagem_referencia" DEVE SER O NOME DE UM PERSONAGEM FAMOSO DE FILME QUE ESTA PESSOA ASSISTIU. É estritamente PROIBIDO usar o nome "{username}" como personagem!
+    5. ZERO asteriscos (*) ou formatação Markdown.
     
     Responda OBRIGATORIAMENTE em formato json estruturado exatamente assim:
     {{ 
@@ -408,7 +409,7 @@ def gerar_perfil():
         "personagem_referencia": "NOME DO PERSONAGEM FICTÍCIO (NUNCA O USERNAME)", 
         "filme_referencia": "NOME DO FILME", 
         "descricao": [
-            "SEU PRIMEIRO PARÁGRAFO AQUI",
+            "SEU PRIMEIRO PARÁGRAFO AQUI, RECHEADO DE EMOJIS DEBOCHADOS E GÍRIAS",
             "SEU SEGUNDO PARÁGRAFO AQUI"
         ]
     }}"""
