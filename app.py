@@ -344,38 +344,50 @@ def upload_profile():
     sid = request.form.get('session_id', 'default')
     
     try:
-        stats = {"total_avaliados": 0, "media_notas": 0, "favoritos": [], "username": "", "bio": "", "profile_favorites": []}
+        stats = {"total_avaliados": 0, "media_notas": 0, "favoritos": [], "username": "", "bio": "", "profile_favorites": [], "amados_recentes": [], "odiados_recentes": []}
         vistos, amados, watchlist = set(), [], []
+        
         if file.filename.lower().endswith('.zip'):
             with zipfile.ZipFile(file, 'r') as z:
-                if 'profile.csv' in z.namelist():
-                    with z.open('profile.csv') as f:
-                        df = pd.read_csv(f)
-                        if not df.empty:
-                            stats["username"] = str(df.iloc[0].get("Username", ""))
-                            stats["bio"] = re.sub(r'<[^>]+>', '', str(df.iloc[0].get("Bio", ""))) if str(df.iloc[0].get("Bio", "")) != 'nan' else ""
-                            stats["profile_favorites"] = resolve_boxd_links(str(df.iloc[0].get("Favorite Films", "")))
-                
-                if 'watched.csv' in z.namelist():
-                    with z.open('watched.csv') as f: 
-                        vistas_list = pd.read_csv(f)['Name'].fillna("").str.lower().tolist()
-                        vistos.update(vistas_list)
-                
-                if 'ratings.csv' in z.namelist():
-                    with z.open('ratings.csv') as f:
-                        df = pd.read_csv(f)
-                        vistos.update(df['Name'].fillna("").str.lower().tolist())
-                        stats["total_avaliados"] = len(df)
-                        stats["media_notas"] = round(float(df['Rating'].mean()), 2)
-                        favs = df[df['Rating'] >= 4.5]
-                        amados = favs['Name'].fillna("").tolist()
-                        top_favs = pd.concat([favs, df[df['Rating'] < 4.5].sort_values(by='Rating', ascending=False)]).head(20)
-                        stats["favoritos"] = top_favs[['Name', 'Year', 'Rating']].fillna("").to_dict('records')
-                
-                if 'watchlist.csv' in z.namelist():
-                    with z.open('watchlist.csv') as f:
-                        df = pd.read_csv(f)
-                        watchlist = df[['Name', 'Year']].fillna("").to_dict('records')
+                for name in z.namelist():
+                    if '__MACOSX' in name: continue # Ignora lixo de pastas da Apple que corrompe a leitura
+                    
+                    if name.lower().endswith('profile.csv'):
+                        with z.open(name) as f:
+                            df = pd.read_csv(f)
+                            if not df.empty:
+                                stats["username"] = str(df.iloc[0].get("Username", ""))
+                                stats["bio"] = re.sub(r'<[^>]+>', '', str(df.iloc[0].get("Bio", ""))) if str(df.iloc[0].get("Bio", "")) != 'nan' else ""
+                                stats["profile_favorites"] = resolve_boxd_links(str(df.iloc[0].get("Favorite Films", "")))
+                    
+                    elif name.lower().endswith('watched.csv'):
+                        with z.open(name) as f: 
+                            df_watched = pd.read_csv(f)
+                            vistas_list = df_watched['Name'].fillna("").str.lower().tolist()
+                            vistos.update(vistas_list)
+                    
+                    elif name.lower().endswith('ratings.csv'):
+                        with z.open(name) as f:
+                            df = pd.read_csv(f)
+                            vistos.update(df['Name'].fillna("").str.lower().tolist())
+                            stats["total_avaliados"] = len(df)
+                            if 'Rating' in df.columns and not df.empty:
+                                stats["media_notas"] = round(float(df['Rating'].mean()), 2)
+                                
+                                favs = df[df['Rating'] >= 4.5]
+                                amados = favs['Name'].fillna("").tolist()
+                                stats["amados_recentes"] = amados[:5] # Guarda os filmes amados pro Roast
+                                
+                                odiados = df[df['Rating'] <= 2.0]
+                                stats["odiados_recentes"] = odiados['Name'].fillna("").tolist()[:5] # Guarda os filmes odiados pro Roast
+                                
+                                top_favs = pd.concat([favs, df[df['Rating'] < 4.5].sort_values(by='Rating', ascending=False)]).head(20)
+                                stats["favoritos"] = top_favs[['Name', 'Year', 'Rating']].fillna("").to_dict('records')
+                    
+                    elif name.lower().endswith('watchlist.csv'):
+                        with z.open(name) as f:
+                            df = pd.read_csv(f)
+                            watchlist = df[['Name', 'Year']].fillna("").to_dict('records')
         
         salvar_sessao(sid, list(vistos), amados, [], watchlist)
         set_progresso(sid, 0, 0, False, "Aguardando...")
@@ -388,20 +400,34 @@ def upload_profile():
 def gerar_perfil():
     stats = request.json.get('stats', {})
     username = stats.get('username', 'Usuário')
+    bio = stats.get('bio', '')
+    
+    profile_favs = stats.get('profile_favorites', [])
+    favoritos_calc = [f['Name'] for f in stats.get('favoritos', [])[:5]]
+    filmes_amados = profile_favs if profile_favs else favoritos_calc
+    
+    amados_recentes = stats.get('amados_recentes', [])
+    odiados_recentes = stats.get('odiados_recentes', [])
     
     prompt = f"""Atue como o crítico MAIS TÓXICO, venenoso e cronicamente online do Letterboxd. Você tem um ego colossal e julga as pessoas como se estivesse fazendo uma fofoca maldosa no Twitter.
-    O nome do alvo é: {username}
-    Bio: "{stats.get('bio')}"
-    Favoritos: {', '.join(stats.get('profile_favorites', []))}
-    Média: {stats.get('media_notas')}
+    
+    DADOS DA VÍTIMA:
+    - Nome: {username}
+    - Bio do Perfil: "{bio}"
+    - Filmes que a pessoa mais ama: {', '.join(filmes_amados) if filmes_amados else 'Nenhum'}
+    - Outros filmes que avaliou com 5 estrelas: {', '.join(amados_recentes) if amados_recentes else 'Nenhum'}
+    - Filmes que a pessoa odiou (Nota baixa): {', '.join(odiados_recentes) if odiados_recentes else 'Nenhum'}
+    - Média de Notas: {stats.get('media_notas', 0)}
+    - Total de Filmes Avaliados: {stats.get('total_avaliados', 0)}
     
     REGRAS DA MISSÃO:
     1. Escreva um Roast letal em EXATAMENTE 2 PARÁGRAFOS. Tamanho alvo: Cerca de 4 a 6 frases bem elaboradas por parágrafo. Seja direto e ácido.
-    2. O FOCO DA PIADA É O USUÁRIO, NÃO OS FILMES: Não fale mal de filmes consagrados. Reconheça que os filmes são bons/aclamados, mas DESTRUA O USUÁRIO por achar que tem um gosto "único" ao escolhê-los. O problema não é o filme (Forrest Gump é ótimo), é a pessoa ser "básica", "emocionada" ou querer pagar de intelectual e diferentão com os filmes mais famosos do planeta. Bata no ego da pessoa!
-    3. O TÍTULO DA RESPOSTA: O campo "titulo" DEVE SER UM RÓTULO/ARQUÉTIPO sarcástico inventado para classificar a pessoa (ex: "O Falso Cinéfilo", "O Sommelier de Blockbuster", "O Emocionado Básico"). NUNCA use frases genéricas de notícia tipo "O Crítico Ataca".
-    4. ESPALHE MUITOS EMOJIS (pelo menos 6 no total) no meio do texto. USE EXCLUSIVAMENTE ESTES EMOJIS: 🙈🤓😼🥺😿😻💋🫦🔥💅👍☠️💀😢😭😞😓😔🤤🙄.
-    5. "personagem_referencia" DEVE SER O NOME DE UM PERSONAGEM FAMOSO DE FILME QUE ESTA PESSOA ASSISTIU. É estritamente PROIBIDO usar o nome "{username}" como personagem!
-    6. ZERO asteriscos (*) ou formatação Markdown.
+    2. OBRIGATÓRIO: USE OS DADOS ACIMA! Zombe da Bio da pessoa, cite e destrua o ego dela com base nos filmes que ela diz que "Ama" e exponha a hipocrisia comparando com os filmes que ela "Odiou".
+    3. O FOCO DA PIADA É O USUÁRIO, NÃO OS FILMES: Não fale mal de filmes consagrados. Reconheça que os filmes são bons/aclamados, mas DESTRUA O USUÁRIO por achar que tem um gosto "único" ao escolhê-los.
+    4. O TÍTULO DA RESPOSTA: O campo "titulo" DEVE SER UM RÓTULO/ARQUÉTIPO sarcástico inventado para classificar a pessoa (ex: "O Falso Cinéfilo", "O Sommelier de Blockbuster"). NUNCA use frases genéricas de notícia.
+    5. ESPALHE MUITOS EMOJIS (pelo menos 6 no total) no meio do texto. USE EXCLUSIVAMENTE: 🙈🤓😼🥺😿😻💋🫦🔥💅👍☠️💀😢😭😞😓😔🤤🙄.
+    6. "personagem_referencia" DEVE SER O NOME DE UM PERSONAGEM FAMOSO DE FILME QUE ESTA PESSOA ASSISTIU. PROIBIDO usar o nome "{username}" como personagem!
+    7. ZERO asteriscos (*) ou formatação Markdown.
     
     Responda OBRIGATORIAMENTE em formato json estruturado exatamente assim:
     {{ 
@@ -409,8 +435,8 @@ def gerar_perfil():
         "personagem_referencia": "NOME DO PERSONAGEM FICTÍCIO (NUNCA O USERNAME)", 
         "filme_referencia": "NOME DO FILME", 
         "descricao": [
-            "SEU PRIMEIRO PARÁGRAFO AQUI, ATACANDO O EGO DO USUÁRIO E NÃO O FILME",
-            "SEU SEGUNDO PARÁGRAFO AQUI"
+            "SEU PRIMEIRO PARÁGRAFO AQUI MENCIONANDO A BIO E OS FILMES DA VÍTIMA",
+            "SEU SEGUNDO PARÁGRAFO AQUI DETONANDO O GOSTO DELA E A MÉDIA DE NOTAS"
         ]
     }}"""
     
