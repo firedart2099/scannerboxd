@@ -99,13 +99,14 @@ def limpar_e_parsear_json(content):
     
     if match:
         try:
-            dados = json.loads(match.group(0))
+            # strict=False permite que o Python leia "enters" literais (newlines) dentro das strings sem crachar
+            dados = json.loads(match.group(0), strict=False)
         except Exception as e: 
             print(f"Erro ao fazer parse do regex JSON: {e}")
             
     if not dados:
         try:
-            dados = json.loads(content)
+            dados = json.loads(content, strict=False)
         except Exception as e:
             print(f"Erro no fallback do parse JSON: {e}")
             return {}
@@ -127,17 +128,15 @@ def limpar_e_parsear_json(content):
 
 def gerar_resposta_ia(prompt):
     with ia_lock: 
-        # Tenta Gemini primeiro (Modelo Flash 2.5 estável)
         if GEMINI_API_KEY:
             try:
                 url_gemini = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={GEMINI_API_KEY}"
                 
-                # Desligando os filtros de segurança do Google para permitir o 'Roast' letal
                 payload_gemini = {
                     "contents": [{"parts": [{"text": prompt}]}],
                     "generationConfig": {
                         "responseMimeType": "application/json",
-                        "maxOutputTokens": 600 # Ajustado para o tamanho ideal médio
+                        "maxOutputTokens": 600
                     },
                     "safetySettings": [
                         {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
@@ -146,7 +145,6 @@ def gerar_resposta_ia(prompt):
                         {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"}
                     ]
                 }
-                # Timeout REDUZIDO para 15s para evitar SIGKILL no Render
                 res_gemini = requests.post(url_gemini, json=payload_gemini, timeout=15) 
                 
                 if res_gemini.status_code == 200:
@@ -157,7 +155,6 @@ def gerar_resposta_ia(prompt):
             except Exception as e: 
                 print(f"Erro de conexão com Gemini: {e}")
 
-        # Tenta Groq como Plano B
         if GROQ_API_KEY:
             try:
                 url_groq = "https://api.groq.com/openai/v1/chat/completions"
@@ -166,10 +163,9 @@ def gerar_resposta_ia(prompt):
                     "model": "llama-3.3-70b-versatile",
                     "messages": [{"role": "user", "content": prompt}],
                     "temperature": 0.85,
-                    "max_tokens": 600, # Ajustado para o tamanho ideal médio
+                    "max_tokens": 600,
                     "response_format": {"type": "json_object"} 
                 }
-                # Timeout REDUZIDO para 12s para evitar SIGKILL no Render
                 res_groq = requests.post(url_groq, headers=headers_groq, json=payload_groq, timeout=12)
                 
                 if res_groq.status_code == 200:
@@ -180,7 +176,6 @@ def gerar_resposta_ia(prompt):
             except Exception as e: 
                 print(f"Erro de conexão com Groq: {e}")
         
-        # Se chegou aqui, TODAS as IAs falharam. Repassa a exceção.
         raise Exception("RATE_LIMIT")
 
 # ==========================================
@@ -394,6 +389,7 @@ def gerar_perfil():
     stats = request.json.get('stats', {})
     username = stats.get('username', 'Usuário')
     
+    # Prompt blindado: a descricao agora é um ARRAY (lista) para quebrar a string de forma segura
     prompt = f"""Atue como um crítico de cinema do Letterboxd insuportável, esnobe e cronicamente online.
     O nome do alvo é: {username}
     Bio: "{stats.get('bio')}"
@@ -406,20 +402,26 @@ def gerar_perfil():
     3. Use exclusivamente estes emojis: 🙈🤓😼🥺😿😻💋🫦🔥💅👍☠️💀😢😭😞😓😔🤤🙄.
     4. ZERO asteriscos (*) ou formatação Markdown.
     
-    Responda OBRIGATORIAMENTE em formato json:
+    Responda OBRIGATORIAMENTE em formato json estruturado exatamente assim:
     {{ 
         "titulo": "TÍTULO DEBOCHADO", 
         "personagem_referencia": "NOME DO PERSONAGEM FICTÍCIO (NUNCA O USERNAME)", 
         "filme_referencia": "NOME DO FILME", 
-        "descricao": "PARÁGRAFO 1 MÉDIO\\n\\nPARÁGRAFO 2 MÉDIO" 
+        "descricao": [
+            "SEU PRIMEIRO PARÁGRAFO AQUI",
+            "SEU SEGUNDO PARÁGRAFO AQUI"
+        ]
     }}"""
     
     try: 
         dados = gerar_resposta_ia(prompt)
         
-        # Prevenção Definitiva contra o 'undefined' na Interface
         if not dados or "titulo" not in dados:
             raise Exception("IA falhou ou retornou JSON invalido")
+            
+        # Se a IA retornou os parágrafos em lista como pedimos, junta tudo direitinho pro site
+        if isinstance(dados.get("descricao"), list):
+            dados["descricao"] = "\n\n".join(dados["descricao"])
             
         return jsonify(dados)
     except Exception as e: 
