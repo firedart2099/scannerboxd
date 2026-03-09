@@ -12,6 +12,7 @@ import platform
 import webbrowser
 import sqlite3
 import concurrent.futures
+from contextlib import closing
 from flask import Flask, render_template, request, jsonify, Response
 from urllib.parse import quote
 from dotenv import load_dotenv
@@ -37,13 +38,12 @@ ia_lock = threading.Lock() # Fila indiana para as IAs
 def check_db_health():
     if os.path.exists(DB_NAME):
         try:
-            conn = sqlite3.connect(DB_NAME)
-            cursor = conn.cursor()
-            cursor.execute('PRAGMA integrity_check;')
-            result = cursor.fetchone()
-            conn.close()
-            if result and str(result[0]).lower() != 'ok':
-                os.remove(DB_NAME)
+            with closing(sqlite3.connect(DB_NAME)) as conn:
+                cursor = conn.cursor()
+                cursor.execute('PRAGMA integrity_check;')
+                result = cursor.fetchone()
+                if result and str(result[0]).lower() != 'ok':
+                    os.remove(DB_NAME)
         except Exception as e:
             print(f"Erro ao verificar integridade do DB: {e}")
             try: os.remove(DB_NAME)
@@ -62,19 +62,19 @@ def init_db():
     check_db_health()
     with db_lock:
         try:
-            with get_db() as conn:
-                c = conn.cursor()
-                c.execute('''CREATE TABLE IF NOT EXISTS sessions
-                             (session_id TEXT PRIMARY KEY, vistos TEXT, amados TEXT, odiados TEXT, watchlist TEXT)''')
-                c.execute('''CREATE TABLE IF NOT EXISTS progress
-                             (session_id TEXT PRIMARY KEY, atual INTEGER, total INTEGER, finalizado INTEGER, filme_atual TEXT)''')
-                c.execute('''CREATE TABLE IF NOT EXISTS credits
-                             (ip TEXT PRIMARY KEY, creditos INTEGER)''')
-                c.execute('''CREATE TABLE IF NOT EXISTS global_cache
-                             (chave TEXT PRIMARY KEY, streamings TEXT)''')
-                c.execute('''CREATE TABLE IF NOT EXISTS dados_finais
-                             (session_id TEXT PRIMARY KEY, dados TEXT)''')
-                conn.commit()
+            with closing(get_db()) as conn:
+                with conn:
+                    c = conn.cursor()
+                    c.execute('''CREATE TABLE IF NOT EXISTS sessions
+                                 (session_id TEXT PRIMARY KEY, vistos TEXT, amados TEXT, odiados TEXT, watchlist TEXT)''')
+                    c.execute('''CREATE TABLE IF NOT EXISTS progress
+                                 (session_id TEXT PRIMARY KEY, atual INTEGER, total INTEGER, finalizado INTEGER, filme_atual TEXT)''')
+                    c.execute('''CREATE TABLE IF NOT EXISTS credits
+                                 (ip TEXT PRIMARY KEY, creditos INTEGER)''')
+                    c.execute('''CREATE TABLE IF NOT EXISTS global_cache
+                                 (chave TEXT PRIMARY KEY, streamings TEXT)''')
+                    c.execute('''CREATE TABLE IF NOT EXISTS dados_finais
+                                 (session_id TEXT PRIMARY KEY, dados TEXT)''')
         except Exception as e:
             print(f"Aviso na inicialização do DB: {e}")
 
@@ -181,19 +181,21 @@ def gerar_resposta_ia(prompt):
 
 # ==========================================
 # FUNÇÕES DE ESTADO (BANCO DE DADOS)
+# Uso de `closing` para evitar o temido Memory Leak no Render
 # ==========================================
 def set_progresso(session_id, atual, total, finalizado, filme_atual):
     with db_lock:
         try:
-            with get_db() as conn:
-                conn.execute('''INSERT OR REPLACE INTO progress (session_id, atual, total, finalizado, filme_atual)
-                                VALUES (?, ?, ?, ?, ?)''', (session_id, atual, total, int(finalizado), filme_atual))
+            with closing(get_db()) as conn:
+                with conn:
+                    conn.execute('''INSERT OR REPLACE INTO progress (session_id, atual, total, finalizado, filme_atual)
+                                    VALUES (?, ?, ?, ?, ?)''', (session_id, atual, total, int(finalizado), filme_atual))
         except Exception as e: 
             pass
 
 def get_progresso(session_id):
     try:
-        with get_db() as conn:
+        with closing(get_db()) as conn:
             row = conn.execute('SELECT * FROM progress WHERE session_id = ?', (session_id,)).fetchone()
             if row:
                 return {"atual": row['atual'], "total": row['total'], "finalizado": bool(row['finalizado']), "filme_atual": row['filme_atual']}
@@ -204,16 +206,17 @@ def get_progresso(session_id):
 def salvar_sessao(session_id, vistos, amados, odiados, watchlist):
     with db_lock:
         try:
-            with get_db() as conn:
-                conn.execute('''INSERT OR REPLACE INTO sessions (session_id, vistos, amados, odiados, watchlist)
-                                VALUES (?, ?, ?, ?, ?)''', 
-                                (session_id, json.dumps(vistos), json.dumps(amados), json.dumps(odiados), json.dumps(watchlist)))
+            with closing(get_db()) as conn:
+                with conn:
+                    conn.execute('''INSERT OR REPLACE INTO sessions (session_id, vistos, amados, odiados, watchlist)
+                                    VALUES (?, ?, ?, ?, ?)''', 
+                                    (session_id, json.dumps(vistos), json.dumps(amados), json.dumps(odiados), json.dumps(watchlist)))
         except Exception as e: 
             pass
 
 def carregar_sessao(session_id):
     try:
-        with get_db() as conn:
+        with closing(get_db()) as conn:
             row = conn.execute('SELECT * FROM sessions WHERE session_id = ?', (session_id,)).fetchone()
             if row:
                 return {
@@ -228,7 +231,7 @@ def carregar_sessao(session_id):
 
 def get_cache_streamings(chave):
     try:
-        with get_db() as conn:
+        with closing(get_db()) as conn:
             row = conn.execute('SELECT streamings FROM global_cache WHERE chave = ?', (chave,)).fetchone()
             if row:
                 return json.loads(row['streamings'])
@@ -239,22 +242,24 @@ def get_cache_streamings(chave):
 def set_cache_streamings(chave, streamings):
     with db_lock:
         try:
-            with get_db() as conn:
-                conn.execute('INSERT OR REPLACE INTO global_cache (chave, streamings) VALUES (?, ?)', (chave, json.dumps(streamings)))
+            with closing(get_db()) as conn:
+                with conn:
+                    conn.execute('INSERT OR REPLACE INTO global_cache (chave, streamings) VALUES (?, ?)', (chave, json.dumps(streamings)))
         except Exception as e: 
             pass
 
 def salvar_dados_finais(session_id, dados):
     with db_lock:
         try:
-            with get_db() as conn:
-                conn.execute('INSERT OR REPLACE INTO dados_finais (session_id, dados) VALUES (?, ?)', (session_id, json.dumps(dados)))
+            with closing(get_db()) as conn:
+                with conn:
+                    conn.execute('INSERT OR REPLACE INTO dados_finais (session_id, dados) VALUES (?, ?)', (session_id, json.dumps(dados)))
         except Exception as e: 
             pass
 
 def get_dados_finais(session_id):
     try:
-        with get_db() as conn:
+        with closing(get_db()) as conn:
             row = conn.execute('SELECT dados FROM dados_finais WHERE session_id = ?', (session_id,)).fetchone()
             if row:
                 return json.loads(row['dados'])
@@ -388,10 +393,16 @@ def gerar_perfil():
     Username: {stats.get('username')}, Bio: "{stats.get('bio')}", Favoritos: {', '.join(stats.get('profile_favorites', []))}, Média: {stats.get('media_notas')}.
     MISSÃO: Escreva um Roast letal em 2 PARÁGRAFOS curtos. Use apenas: 🙈🤓😼🥺😿😻💋🫦🔥💅👍☠️💀😢😭😞😓😔🤤🙄.
     NÃO USE asteriscos (*) ou qualquer formatação Markdown nos nomes dos filmes ou no texto.
-    Responda OBRIGATORIAMENTE em formato JSON:
+    Responda OBRIGATORIAMENTE em formato json:
     {{ "titulo": "TÍTULO", "personagem_referencia": "NOME", "filme_referencia": "FILME", "descricao": "ROAST" }}"""
     try: 
-        return jsonify(gerar_resposta_ia(prompt))
+        dados = gerar_resposta_ia(prompt)
+        
+        # Prevenção Definitiva contra o 'undefined' na Interface
+        if not dados or "titulo" not in dados:
+            raise Exception("IA falhou ou retornou JSON invalido")
+            
+        return jsonify(dados)
     except Exception as e: 
         print(f"Erro ao gerar perfil IA: {e}")
         if "RATE_LIMIT" in str(e):
@@ -415,7 +426,6 @@ def oraculo():
         tentativas_ia = 0
         is_real_terror = False
 
-        # Reduzimos o máximo de tentativas para 2, para evitar que o servidor sofra Timeout do Render (SIGKILL)
         while len(recs_finais) < 4 and tentativas_ia < 2:
             favoritos = request.json.get('favorites', [])
             blacklist_amostra = random.sample(list(blacklist_total), min(100, len(blacklist_total)))
@@ -429,10 +439,15 @@ def oraculo():
             
             DICA: Se ele gosta de coisas populares, procure o 'lado B'. Se gosta de cult, procure o 'underground'.
             NÃO USE asteriscos (*) nos nomes.
-            Responda OBRIGATORIAMENTE em formato JSON:
+            Responda OBRIGATORIAMENTE em formato json:
             {{ "recomendacoes": [ {{"rec_original": "TITLE", "rec": "TITLE", "ano": 2000, "base": "GENERO", "desc": "DESC"}} ] }}"""
 
             dados_json = gerar_resposta_ia(prompt)
+            
+            if not dados_json or "recomendacoes" not in dados_json:
+                tentativas_ia += 1
+                continue
+                
             recs_ia = dados_json.get("recomendacoes", [])
             
             for r in recs_ia:
@@ -510,7 +525,8 @@ def processar_em_segundo_plano(watchlist_data, sid):
         return chave, streamings
     
     try:
-        with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+        # Reduced max_workers to 3 for stability on free hosting
+        with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
             futures = {executor.submit(fetch_movie, row): row for row in watchlist_data}
             for future in concurrent.futures.as_completed(futures):
                 try:
