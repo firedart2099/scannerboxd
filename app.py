@@ -137,7 +137,7 @@ def gerar_resposta_ia(prompt):
                     "contents": [{"parts": [{"text": prompt}]}],
                     "generationConfig": {
                         "responseMimeType": "application/json",
-                        "maxOutputTokens": 500 # Limite físico para evitar textos gigantes
+                        "maxOutputTokens": 800 # Limite aumentado para textos maiores, mas seguro contra loops
                     },
                     "safetySettings": [
                         {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
@@ -166,7 +166,7 @@ def gerar_resposta_ia(prompt):
                     "model": "llama-3.3-70b-versatile",
                     "messages": [{"role": "user", "content": prompt}],
                     "temperature": 0.85,
-                    "max_tokens": 500, # Limite físico na Groq para cortar loops de repetição
+                    "max_tokens": 800, # Limite físico na Groq aumentado para caber o textão
                     "response_format": {"type": "json_object"} 
                 }
                 # Timeout REDUZIDO para 12s para evitar SIGKILL no Render
@@ -402,7 +402,7 @@ def gerar_perfil():
     Média: {stats.get('media_notas')}
     
     REGRAS DA MISSÃO:
-    1. Escreva um Roast letal em EXATAMENTE 2 PARÁGRAFOS CURTOS (máximo absoluto de 3 a 4 frases por parágrafo). Seja direto.
+    1. Escreva um Roast letal em EXATAMENTE 2 PARÁGRAFOS GRANDES, DENSOS E DETALHADOS. Mergulhe fundo na mediocridade do gosto da pessoa, seja dramático e tagarela. Sem economia de palavras!
     2. "personagem_referencia" DEVE SER O NOME DE UM PERSONAGEM FAMOSO DE FILME (ex: Neo, Batman, Velma). É estritamente PROIBIDO usar o nome "{username}" como personagem.
     3. Use exclusivamente estes emojis: 🙈🤓😼🥺😿😻💋🫦🔥💅👍☠️💀😢😭😞😓😔🤤🙄.
     4. ZERO asteriscos (*) ou formatação Markdown.
@@ -412,7 +412,7 @@ def gerar_perfil():
         "titulo": "TÍTULO DEBOCHADO", 
         "personagem_referencia": "NOME DO PERSONAGEM FICTÍCIO (NUNCA O USERNAME)", 
         "filme_referencia": "NOME DO FILME", 
-        "descricao": "PARÁGRAFO 1 CURTO\\n\\nPARÁGRAFO 2 CURTO" 
+        "descricao": "PARÁGRAFO 1 LONGO E ÁCIDO\\n\\nPARÁGRAFO 2 LONGO E ÁCIDO" 
     }}"""
     
     try: 
@@ -593,4 +593,3 @@ if __name__ == '__main__':
     liberar_porta(PORTA)
     threading.Timer(1.5, lambda: webbrowser.open(f'http://127.0.0.1:{PORTA}')).start()
     app.run(port=PORTA, debug=False, threaded=True)
-
