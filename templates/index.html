@@ -6,13 +6,11 @@
     <title>Oráculo do Letterboxd</title>
     
     <!-- SISTEMA ANTI-TRAVAMENTO DE FIREWALL CORPORATIVO -->
-    <!-- Carrega o Tailwind em background para não travar o "loading" do navegador da empresa -->
     <script>
         const twScript = document.createElement('script');
         twScript.src = "https://cdn.tailwindcss.com";
         document.head.appendChild(twScript);
 
-        // Se passar 4 segundos e o visual não baixar, avisa do bloqueio e mata a tela branca infinita
         setTimeout(() => {
             if (typeof tailwind === 'undefined') {
                 document.body.innerHTML = `
@@ -208,7 +206,6 @@
 </head>
 <body class="p-2 sm:p-4 md:p-8 min-h-screen relative">
 
-<!-- Sistema de Notificações Toast -->
 <div id="custom-toast" class="fixed bottom-10 left-1/2 transform -translate-x-1/2 bg-[#1c2228]/95 backdrop-blur-md border border-[#ff8000]/50 text-[#ff8000] px-5 py-3.5 rounded-2xl shadow-[0_10px_30px_rgba(255,128,0,0.15)] z-[100000] flex items-center gap-3 transition-all duration-500 opacity-0 pointer-events-none translate-y-10 max-w-[90vw]">
     <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
     <p id="custom-toast-msg" class="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-center">Erro.</p>
@@ -235,7 +232,6 @@
     <div id="countdown-text" class="countdown-number">3</div>
 </div>
 
-<!-- Modal de Tutorial Reduzido -->
 <div id="tutorial-modal" class="fixed inset-0 bg-[#14181c]/90 z-[10000] hidden items-center justify-center backdrop-blur-sm p-4">
     <div class="bg-[#1c2228] border border-[#40bcf4]/30 rounded-2xl p-6 md:p-8 max-w-lg w-full shadow-2xl relative animate-fade-in-fast max-h-[90vh] flex flex-col">
         <button onclick="fecharTutorial()" class="absolute top-4 right-5 text-[#8c9bab] hover:text-white text-3xl font-light z-10">&times;</button>
@@ -451,8 +447,14 @@
                     </h3>
                 </div>
                 <p id="roast-desc" class="text-gray-300 text-xs md:text-sm leading-relaxed font-light whitespace-pre-line">Processando avaliações...</p>
-                <div class="pt-1">
+                <div class="pt-1 flex flex-col items-center md:items-start gap-2">
                     <span id="roast-vibe" class="text-[9px] md:text-xs text-[#14181c] font-black uppercase tracking-widest bg-[#40bcf4] px-2 py-1 rounded-sm truncate max-w-full inline-block">CALCULANDO...</span>
+                    
+                    <!-- BOTÃO DE RETRY (ESCONDIDO POR PADRÃO) -->
+                    <button id="btn-retry-profile" onclick="tentarRefazerPerfil()" class="hidden mt-2 text-[9px] sm:text-[10px] bg-[#ff8000]/10 text-[#ff8000] border border-[#ff8000]/30 px-3 py-1.5 rounded uppercase tracking-widest font-black flex items-center gap-1.5 transition-all w-fit">
+                        <svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                        <span id="retry-btn-text">Refazer Análise</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -624,6 +626,7 @@
     let backdropInterval;
     let initialBackdropInterval;
     let fraseTimerInterval;
+    let retryProfileInterval; // Variável para controlar o timer do botão
 
     const iconicMovies = [
         { Name: "Interstellar", Year: 2014, backdrop: "https://image.tmdb.org/t/p/original/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg" },
@@ -936,9 +939,13 @@
         }
     }
 
-    async function gerarPerfilIA() {
+    async function gerarPerfilIA(isRetry = false) {
         const tt=document.getElementById('roast-title'), td=document.getElementById('roast-desc'), tv=document.getElementById('roast-vibe'),
               ti=document.getElementById('profile-img-element'), pl=document.getElementById('profile-pulse-loader');
+        const retryBtn = document.getElementById('btn-retry-profile');
+
+        // Se clicou no botão de retry, oculta o botão
+        if (retryBtn) retryBtn.classList.add('hidden');
               
         ti?.classList.add('hidden'); pl?.classList.remove('hidden');
         if(tt) tt.innerHTML = `Analisando gosto... <svg class="animate-spin w-4 h-4 ml-1 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>`;
@@ -948,18 +955,21 @@
             if(res.ok) {
                 const data = await res.json();
                 
-                // --- AJUSTE: SE FOR RATE_LIMIT, AVISA NA TELA E MOSTRA FALLBACK RÁPIDO ---
-                if(data.erro === "RATE_LIMIT") {
-                    mostrarErro("As APIs estão superlotadas. Mostrando perfil genérico.");
+                // Se a IA der erro ou Rate Limit, mostra a mensagem e ATIVA O BOTÃO DE REFazer
+                if(data.erro === "RATE_LIMIT" || data.titulo?.includes("Algoritmo em Choque")) {
+                    if(!isRetry) mostrarErro("As APIs estão superlotadas. Mostrando perfil genérico.");
                     if(tt) tt.innerHTML = "Algoritmo em Choque 💀";
-                    if(td) td.innerText = "As IAs bateram no limite de velocidade! Tente analisar outro perfil em 1 minuto. 💅";
+                    if(td) td.innerText = "As IAs bateram no limite de velocidade! Aguarde o tempo e tente refazer a análise. 💅";
                     if(tv) tv.innerText = "Patrick Bateman";
                     fetch(`/api/tmdb/search?query=American%20Psycho`).then(r=>r.json()).then(d=>{
                         if(d.results?.[0]?.poster_path){ ti.src=`https://image.tmdb.org/t/p/w500${d.results[0].poster_path}`; ti.classList.remove('hidden'); pl.classList.add('hidden'); }
                     });
+                    
+                    ativarCooldownRetry();
                     return;
                 }
 
+                // Se deu sucesso, preenche normal e o botão continua escondido
                 if(!data.erro) {
                     if(tt) tt.innerHTML = data.titulo; 
                     if(td) td.innerText = data.descricao; 
@@ -973,6 +983,40 @@
             } throw new Error();
         } catch(e) {
             if(tt) tt.innerHTML = "O Inclassificável"; pl?.classList.remove('hidden');
+            ativarCooldownRetry();
+        }
+    }
+
+    function ativarCooldownRetry() {
+        const btn = document.getElementById('btn-retry-profile');
+        const textSpan = document.getElementById('retry-btn-text');
+        if (!btn || !textSpan) return;
+
+        btn.classList.remove('hidden');
+        btn.disabled = true;
+        btn.classList.add('opacity-50', 'cursor-not-allowed', 'hover:bg-[#ff8000]/10', 'hover:text-[#ff8000]');
+
+        let timeLeft = 60; // 60 segundos de punição anti-spam
+        textSpan.innerText = `Aguarde ${timeLeft}s...`;
+
+        if (retryProfileInterval) clearInterval(retryProfileInterval);
+        retryProfileInterval = setInterval(() => {
+            timeLeft--;
+            textSpan.innerText = `Aguarde ${timeLeft}s...`;
+            if (timeLeft <= 0) {
+                clearInterval(retryProfileInterval);
+                btn.disabled = false;
+                btn.classList.remove('opacity-50', 'cursor-not-allowed', 'hover:bg-[#ff8000]/10', 'hover:text-[#ff8000]');
+                btn.classList.add('hover:bg-[#ff8000]', 'hover:text-[#14181c]'); // Retorna as cores de Hover original
+                textSpan.innerText = "Refazer Análise";
+            }
+        }, 1000);
+    }
+
+    function tentarRefazerPerfil() {
+        const btn = document.getElementById('btn-retry-profile');
+        if(btn && !btn.disabled) {
+            gerarPerfilIA(true);
         }
     }
 
