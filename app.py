@@ -426,17 +426,18 @@ def gerar_perfil():
     3. O FOCO DA PIADA É O USUÁRIO, NÃO OS FILMES: Não fale mal de filmes consagrados. Reconheça que os filmes são bons/aclamados, mas DESTRUA O USUÁRIO por achar que tem um gosto "único" ao escolhê-los.
     4. O TÍTULO DA RESPOSTA: O campo "titulo" DEVE SER UM RÓTULO/ARQUÉTIPO sarcástico inventado para classificar a pessoa (ex: "O Falso Cinéfilo", "O Sommelier de Blockbuster"). NUNCA use frases genéricas de notícia.
     5. ESPALHE MUITOS EMOJIS (pelo menos 6 no total) no meio do texto. USE EXCLUSIVAMENTE: 🙈🤓😼🥺😿😻💋🫦🔥💅👍☠️💀😢😭😞😓😔🤤🙄.
-    6. "personagem_referencia" DEVE SER O NOME DE UM PERSONAGEM FAMOSO DE FILME QUE ESTA PESSOA ASSISTIU. PROIBIDO usar o nome "{username}" como personagem!
-    7. ZERO asteriscos (*) ou formatação Markdown.
+    6. "personagem_referencia": ESCOLHA COM INTELIGÊNCIA! Seja brilhante. Olhe para a Bio e para os favoritos da pessoa e escolha um personagem que represente a "vibe" dela perfeitamente (Ex: Se a bio cita "napalm", escolha o Coronel Kurtz. Se gosta de filmes "sadboy", escolha o Ryan Gosling em Drive, etc). É PROIBIDO usar o nome "{username}" como personagem!
+    7. EXPLICAÇÃO DO PERSONAGEM: No FINAL do seu segundo parágrafo, você DEVE explicar de forma inteligente (e com um toque de deboche) o porquê de ter escolhido esse personagem específico para representar a pessoa.
+    8. ZERO asteriscos (*) ou formatação Markdown.
     
     Responda OBRIGATORIAMENTE em formato json estruturado exatamente assim:
     {{ 
         "titulo": "SEU RÓTULO SARCÁSTICO AQUI (Ex: O Pseudo-Cult)", 
-        "personagem_referencia": "NOME DO PERSONAGEM FICTÍCIO (NUNCA O USERNAME)", 
-        "filme_referencia": "NOME DO FILME", 
+        "personagem_referencia": "NOME DO PERSONAGEM FICTÍCIO GENIALMENTE ESCOLHIDO (NUNCA O USERNAME)", 
+        "filme_referencia": "NOME DO FILME DESSE PERSONAGEM", 
         "descricao": [
             "SEU PRIMEIRO PARÁGRAFO AQUI MENCIONANDO A BIO E OS FILMES DA VÍTIMA",
-            "SEU SEGUNDO PARÁGRAFO AQUI DETONANDO O GOSTO DELA E A MÉDIA DE NOTAS"
+            "SEU SEGUNDO PARÁGRAFO AQUI DETONANDO O GOSTO DELA E A MÉDIA DE NOTAS, E TERMINANDO COM A EXPLICAÇÃO GENIAL DO PERSONAGEM ESCOLHIDO"
         ]
     }}"""
     
