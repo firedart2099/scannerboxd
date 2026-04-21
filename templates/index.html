@@ -15,44 +15,42 @@
             background-color: #0f1115;
             margin: 0; padding: 0;
             width: 100vw; height: 100vh;
-            overflow: hidden; /* Trava o global, a rolagem é nas divs internas */
-            color: #8c9bab;
+            overflow: hidden; 
         }
 
         h1, h2, h3, .space-font { font-family: 'Space Grotesk', sans-serif; }
 
-        /* Esconde a barra de rolagem mas mantém a função */
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-        /* Efeito de Acrílico (Fluent Design) */
+        /* O Glassmorphism Premium estilo Tidal/Windows 11 */
         .fluent-glass {
-            background: rgba(20, 24, 28, 0.45) !important; 
+            background: rgba(24, 28, 33, 0.55) !important; 
             backdrop-filter: blur(24px) saturate(150%) !important; 
             -webkit-backdrop-filter: blur(24px) saturate(150%) !important;
-            border: 1px solid rgba(255, 255, 255, 0.03) !important; 
-            border-top: 1px solid rgba(255, 255, 255, 0.15) !important; /* Luz na quina */
-            border-left: 1px solid rgba(255, 255, 255, 0.08) !important;
+            border: 1px solid rgba(255, 255, 255, 0.04) !important; 
+            border-top: 1px solid rgba(255, 255, 255, 0.08) !important; /* Brilho sutil no topo do vidro */
             box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05) !important; 
             border-radius: 16px;
             transition: all 0.3s ease;
         }
 
         .fluent-glass:hover {
-            border-top: 1px solid rgba(64, 188, 244, 0.5) !important;
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(64, 188, 244, 0.2) !important;
+            background: rgba(30, 35, 42, 0.65) !important;
+            border-color: rgba(64, 188, 244, 0.2) !important;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
         }
 
-        /* Bolinhas do Rodapé */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* As 3 Bolinhas da Bottom Nav (Logo) */
         .bottom-nav-dot {
             width: 12px; height: 12px;
             border-radius: 50%;
             cursor: pointer;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
-            opacity: 0.4;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.6);
+            position: relative;
         }
-        .bottom-nav-dot.active { transform: scale(1.4); opacity: 1; z-index: 10; box-shadow: 0 0 10px currentColor; }
+        .bottom-nav-dot.active { transform: scale(1.5); z-index: 10; box-shadow: 0 0 15px currentColor; }
         
         .dot-green { background-color: #00e054; color: #00e054; }
         .dot-blue { background-color: #40bcf4; color: #40bcf4; }
@@ -73,11 +71,10 @@
 </head>
 <body class="text-white relative w-full h-full">
 
-<!-- Fundo Rotativo dos Filmes -->
+<!-- Fundo com a Imagem (Tonalidade ajustada pra deixar o vidro brilhar) -->
 <div class="fixed inset-0 w-full h-full z-0 bg-[#0f1115]">
-    <img id="hero-backdrop-img" src="https://image.tmdb.org/t/p/original/nMKdUUepR0i5zn0y1T4CsSB5chy.jpg" class="w-full h-full object-cover opacity-30 transition-opacity duration-1000 grayscale-[40%]">
-    <!-- Degradê mais leve pra imagem brilhar mais -->
-    <div class="absolute inset-0 bg-gradient-to-b from-[#0f1115]/60 via-[#0f1115]/40 to-[#0f1115]/90"></div>
+    <img id="hero-backdrop-img" src="https://image.tmdb.org/t/p/original/nMKdUUepR0i5zn0y1T4CsSB5chy.jpg" class="w-full h-full object-cover opacity-50 transition-opacity duration-1000 grayscale-[30%]">
+    <div class="absolute inset-0 bg-gradient-to-b from-[#0f1115]/60 via-[#0f1115]/30 to-[#0f1115]/90"></div>
 </div>
 
 <header class="absolute top-6 left-6 md:top-8 md:left-8 flex items-center gap-3 z-40">
@@ -92,111 +89,115 @@
     </div>
 </header>
 
-<!-- TELA PRINCIPAL (Agora destravada e sem paredes invisíveis) -->
-<div id="main-content" class="absolute inset-0 w-full h-full z-20 overflow-y-auto no-scrollbar transition-transform duration-700 ease-in-out pt-[30vh] md:pt-[35vh] px-4 md:px-8 pb-32">
+<!-- TELA INICIAL: Container com Scroll Destravado -->
+<div id="main-content" class="absolute inset-0 w-full h-full z-20 flex flex-col pt-[30vh] px-4 md:px-8 overflow-y-auto no-scrollbar transition-transform duration-700 ease-in-out pb-32">
     <div class="max-w-2xl mx-auto w-full">
         
+        <!-- Título Branco Puro e Elegante -->
         <div class="text-center space-y-2 mb-12">
-            <!-- Título Branco Puro e Elegante com pr-2 para não cortar a interrogação em itálico -->
-            <h2 class="text-4xl md:text-6xl font-black text-white leading-tight tracking-tighter drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]">
-                QUAL É O SEU PERFIL <br><span class="italic pr-2">CINEMATOGRÁFICO?</span>
+            <h2 class="text-4xl md:text-6xl font-black text-white leading-tight tracking-tighter drop-shadow-[0_0_25px_rgba(255,255,255,0.3)]">
+                QUAL É O SEU PERFIL <br>
+                <span class="italic pr-2">CINEMATOGRÁFICO?</span>
             </h2>
             <p class="text-[#8c9bab] max-w-xl mx-auto text-sm md:text-base font-medium drop-shadow-md">Descubra a verdade sobre o seu gosto e encontre onde assistir a sua Watchlist.</p>
         </div>
 
         <div class="space-y-4 relative z-30">
-            <!-- PASSO 1: Azul e Branco Estilo Dashboard -->
-            <a href="https://letterboxd.com/data/export/" target="_blank" class="flex items-center gap-4 fluent-glass border-[#40bcf4]/30 hover:border-[#40bcf4] text-gray-300 hover:text-white px-6 py-4 transition-all w-full group">
+            <!-- PASSO 1: Azul/Branco no Glassmorphism -->
+            <a href="https://letterboxd.com/data/export/" target="_blank" class="fluent-glass flex items-center gap-4 px-6 py-4 w-full group hover:border-[#40bcf4]/50">
                 <span class="bg-[#40bcf4]/20 text-[#40bcf4] w-7 h-7 rounded-full flex items-center justify-center text-xs font-black shrink-0 group-hover:bg-[#40bcf4] group-hover:text-[#0f1115] transition-colors">1</span>
                 <div class="text-left">
-                    <span class="font-bold text-sm tracking-wide block text-white">Baixar arquivo .ZIP oficial</span>
+                    <span class="font-bold text-sm tracking-wide block text-white drop-shadow-sm">Baixar arquivo .ZIP oficial</span>
                     <span class="text-[9px] uppercase tracking-widest text-[#40bcf4] opacity-80">Abre o Letterboxd em nova aba</span>
                 </div>
                 <svg class="w-5 h-5 text-[#40bcf4] ml-auto opacity-70 group-hover:opacity-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
             </a>
 
-            <!-- PASSO 2: Upload Zone (Azul e Branco) -->
-            <div class="fluent-glass p-8 text-center border-dashed border-2 border-[#40bcf4]/40 hover:border-[#40bcf4] transition-all group cursor-pointer relative overflow-hidden">
+            <!-- PASSO 2: Upload Zone -->
+            <div class="fluent-glass p-8 text-center border-dashed border-2 border-[#40bcf4]/30 hover:border-[#40bcf4]/60 transition-all group cursor-pointer relative overflow-hidden">
                 <label for="csv-file" id="dropzone-label" class="cursor-pointer block w-full h-full">
-                    <div class="w-16 h-16 bg-[#40bcf4]/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 group-hover:bg-[#40bcf4]/20 transition-all border border-[#40bcf4]/30">
-                        <!-- Ícone de Nuvem 100% Simétrica (Heroicons) -->
-                        <svg class="w-8 h-8 text-[#40bcf4]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z"></path>
-                        </svg>
+                    <div class="w-16 h-16 bg-[#40bcf4]/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 group-hover:bg-[#40bcf4]/20 transition-all border border-[#40bcf4]/30 shadow-inner">
+                        <!-- Flecha Heroicons Simétrica -->
+                        <svg class="w-8 h-8 text-[#40bcf4]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z"></path></svg>
                     </div>
-                    <p class="text-xl md:text-2xl font-bold text-white mb-1">Arraste seu arquivo <span class="text-[#40bcf4]">.zip</span> aqui</p>
+                    <p class="text-xl md:text-2xl font-bold text-white mb-1 drop-shadow-sm">Arraste seu arquivo <span class="text-[#40bcf4]">.zip</span> aqui</p>
                     <p class="text-[9px] md:text-[10px] text-[#8c9bab] uppercase tracking-widest font-bold">Nenhum dado é salvo nos servidores</p>
                 </label>
                 <input type="file" id="csv-file" class="hidden" accept=".zip" onchange="fileSelected()">
                 
                 <!-- Área de Ação -->
                 <div id="action-area" class="hidden mt-4 flex-col items-center gap-4 relative z-10 animate-fade-in">
-                    <div class="flex items-center gap-2 bg-[#0f1115]/60 px-4 py-3 rounded-lg border border-[#40bcf4]/30 w-full justify-center">
+                    <div class="flex items-center gap-2 bg-[#0f1115]/40 px-4 py-3 rounded-lg border border-[#40bcf4]/20 w-full justify-center shadow-inner">
                         <svg class="w-4 h-4 text-[#40bcf4]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                        <p id="file-name-display" class="text-[#40bcf4] font-mono text-sm truncate max-w-[250px]"></p>
+                        <p id="file-name-display" class="text-[#40bcf4] font-mono text-sm truncate max-w-[250px] drop-shadow-md"></p>
                     </div>
-                    <!-- BOTÃO AZUL DE INICIAR -->
-                    <button onclick="iniciarMockupTeste()" class="w-full bg-[#40bcf4] text-[#0f1115] font-black py-4 rounded-xl uppercase tracking-widest transition-all shadow-[0_0_20px_rgba(64,188,244,0.3)] hover:shadow-[0_0_30px_rgba(64,188,244,0.6)] flex items-center justify-center gap-2 hover:scale-[1.02]">
-                        Iniciar Análise
+                    <!-- Botão Principal Plugado no Backend -->
+                    <button id="btn-iniciar-real" onclick="handleFileUpload()" class="w-full bg-[#40bcf4] text-[#0f1115] font-black py-4 rounded-xl uppercase tracking-widest transition-all shadow-[0_0_20px_rgba(64,188,244,0.3)] hover:shadow-[0_0_35px_rgba(64,188,244,0.6)] flex items-center justify-center gap-2 hover:scale-[1.02]">
+                        <span id="btn-text-real">Iniciar Análise</span>
                     </button>
                     <button onclick="resetUpload()" class="text-[10px] text-[#8c9bab] hover:text-white uppercase tracking-widest underline decoration-dashed">Escolher outro arquivo</button>
                 </div>
             </div>
 
-            <!-- BOTÃO MODO TESTE -->
+            <!-- Botão Modo Mock para testes rápidos -->
             <div class="text-center pt-6 pb-10">
-                <button onclick="iniciarMockupTeste()" class="text-[10px] text-[#40bcf4] font-bold uppercase tracking-widest underline decoration-dashed hover:text-white transition-colors flex items-center justify-center gap-1.5 mx-auto opacity-70 hover:opacity-100">
-                    🧪 Testar Layout (Modo Mock)
+                <button onclick="iniciarMockupTeste()" class="text-[10px] text-[#8c9bab] font-bold uppercase tracking-widest underline decoration-dashed hover:text-white transition-colors flex items-center justify-center gap-1.5 mx-auto opacity-60 hover:opacity-100">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                    Testar Layout (Sem Arquivo)
                 </button>
             </div>
         </div>
     </div>
 </div>
 
-<!-- CONTAINER DO APP (Telas de Deslizar) -->
-<div id="app-view" class="fixed inset-0 w-full h-full z-30 pointer-events-none opacity-0 transition-opacity duration-700">
+<!-- TELA DO APP (3 ABAS) - Hidden nativo para destruir a parede invisível -->
+<div id="app-view" class="fixed inset-0 w-full h-full z-30 hidden opacity-0 transition-opacity duration-700">
     
-    <!-- Pílula Discreta no Topo -->
-    <div id="top-pill" class="absolute top-6 md:top-8 left-1/2 -translate-x-1/2 z-50 fluent-glass px-5 py-2.5 rounded-full flex items-center gap-3 shadow-2xl transition-all duration-500 opacity-0 -translate-y-4 border-[#40bcf4]/30 pointer-events-auto">
-        <svg class="animate-spin w-3.5 h-3.5 text-[#40bcf4]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-        <p class="text-[#8c9bab] text-[9px] font-bold uppercase tracking-widest whitespace-nowrap">O Oráculo está pensando...</p>
+    <!-- Pílula Discreta no Topo (Glassmorphism) -->
+    <div id="top-pill" class="absolute top-6 md:top-8 left-1/2 -translate-x-1/2 z-50 fluent-glass px-5 py-2.5 rounded-full flex items-center gap-3 transition-all duration-500 opacity-0 -translate-y-4">
+        <svg class="animate-spin w-3 h-3 text-[#40bcf4]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+        <p id="pill-text" class="text-white text-[8px] font-bold uppercase tracking-widest whitespace-nowrap drop-shadow-md">O Oráculo está trabalhando...</p>
     </div>
 
-    <!-- O Container das 3 Telas Lado a Lado (O pointer-events-none do pai #app-view resolve tudo agora) -->
+    <!-- Container do Carrossel (300vw) -->
     <div id="carousel-wrapper" class="flex w-[300vw] h-full transition-transform duration-500 ease-in-out">
         
-        <!-- TELA 1: PERFIL -->
+        <!-- TELA 1: PERFIL (Verde) -->
         <div class="w-[100vw] h-full overflow-y-auto no-scrollbar pb-32 pt-28 px-4 sm:px-8 flex flex-col items-center">
             <div class="max-w-2xl w-full space-y-6">
                 <div class="fluent-glass p-8 relative flex flex-col items-center text-center">
-                    <!-- Fundo de usuário neutro pra não ficar o buraco escuro -->
-                    <div class="w-20 h-20 rounded-full border-2 border-[#40bcf4] bg-[#0f1115] mb-6 flex items-center justify-center overflow-hidden shadow-[0_0_15px_rgba(64,188,244,0.3)]">
-                        <svg class="w-8 h-8 text-[#40bcf4]/50" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                    <!-- Foto -->
+                    <div id="profile-avatar" class="w-20 h-20 rounded-full border-2 border-[#00e054] bg-[#0f1115] mb-6 flex items-center justify-center overflow-hidden shadow-[0_0_20px_rgba(0,224,84,0.3)]">
+                        <svg class="w-8 h-8 text-[#2c3440]" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
                     </div>
-                    <h2 class="text-2xl md:text-3xl font-black text-white tracking-tighter mb-4" id="roast-title">Analisando sua Vibe...</h2>
-                    <p class="text-gray-300 text-[11px] md:text-[13px] leading-loose px-2 md:px-6" id="roast-desc">
-                        O algoritmo está cruzando seus filmes 5 estrelas e seus piores pesadelos.
+                    
+                    <h2 class="text-2xl md:text-3xl font-black text-white tracking-tighter mb-4 drop-shadow-md" id="roast-title">
+                        Analisando sua Vibe... <svg class="animate-spin w-5 h-5 ml-2 text-[#00e054] inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                    </h2>
+                    
+                    <p class="text-gray-300 text-[11px] md:text-[12px] leading-loose px-2 md:px-6 drop-shadow-sm" id="roast-desc">
+                        O algoritmo está cruzando seus dados na matriz e preparando a análise.
                     </p>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
-                    <div class="fluent-glass p-6 text-center">
-                        <span id="stat-total" class="space-font text-3xl font-black text-[#40bcf4] block mb-1">0</span>
-                        <p class="text-[#8c9bab] text-[9px] font-black uppercase tracking-widest">Filmes Avaliados</p>
+                    <div class="fluent-glass p-6 text-center border-t-[#00e054]/30">
+                        <span id="stat-total" class="space-font text-3xl font-black text-white block mb-1 drop-shadow-md">0</span>
+                        <p class="text-[#00e054] text-[9px] font-black uppercase tracking-widest">Avaliados</p>
                     </div>
-                    <div class="fluent-glass p-6 text-center">
-                        <span id="stat-avg" class="space-font text-3xl font-black text-[#00e054] block mb-1">0.00</span>
-                        <p class="text-[#8c9bab] text-[9px] font-black uppercase tracking-widest">Sua Média</p>
+                    <div class="fluent-glass p-6 text-center border-t-[#00e054]/30">
+                        <span id="stat-avg" class="space-font text-3xl font-black text-white block mb-1 drop-shadow-md">0.00</span>
+                        <p class="text-[#00e054] text-[9px] font-black uppercase tracking-widest">Sua Média</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- TELA 2: ORÁCULO -->
+        <!-- TELA 2: ORÁCULO (Azul) -->
         <div class="w-[100vw] h-full overflow-y-auto no-scrollbar pb-32 pt-28 px-4 sm:px-8">
             <div class="max-w-4xl mx-auto">
                 <div class="text-center mb-8">
-                    <h2 class="text-3xl font-black text-white uppercase tracking-tighter">O Oráculo</h2>
+                    <h2 class="text-3xl font-black text-white uppercase tracking-tighter drop-shadow-md">O Oráculo</h2>
                     <p class="text-[#40bcf4] text-[10px] font-bold tracking-widest uppercase">Escondidos no catálogo</p>
                 </div>
 
@@ -205,28 +206,28 @@
                     <p class="text-[#40bcf4] text-[10px] uppercase tracking-widest font-bold mt-6 animate-pulse">Escavando recomendações lado B...</p>
                 </div>
 
-                <div id="oracle-grid" class="hidden grid grid-cols-2 md:grid-cols-4 gap-4">
-                </div>
+                <div id="oracle-grid" class="hidden grid grid-cols-2 md:grid-cols-4 gap-4"></div>
             </div>
         </div>
 
-        <!-- TELA 3: WATCHLIST -->
+        <!-- TELA 3: WATCHLIST (Laranja) -->
         <div class="w-[100vw] h-full overflow-y-auto no-scrollbar pb-32 pt-28 px-4 sm:px-8">
             <div class="max-w-4xl mx-auto h-full flex flex-col items-center">
+                
                 <div class="text-center mb-8 shrink-0">
-                    <h2 class="text-3xl font-black text-white uppercase tracking-tighter">O Catálogo</h2>
+                    <h2 class="text-3xl font-black text-white uppercase tracking-tighter drop-shadow-md">O Catálogo</h2>
                     <p class="text-[#ff8000] text-[10px] font-bold tracking-widest uppercase">Onde assistir sua Watchlist</p>
                 </div>
 
                 <div id="watchlist-loading" class="flex flex-col items-center justify-center mt-10">
-                    <div class="w-20 h-20 rounded-full border-2 border-[#1c2228] border-t-[#ff8000] animate-spin mb-6"></div>
-                    <span id="load-percent" class="space-font text-5xl font-black text-white tracking-tighter mb-2">0%</span>
-                    <p class="text-[#8c9bab] text-[10px] uppercase tracking-widest font-bold">Verificando streamings do Brasil</p>
+                    <div class="w-16 h-16 rounded-full border-2 border-transparent border-t-[#ff8000] border-l-[#ff8000] animate-spin mb-6 shadow-[0_0_15px_rgba(255,128,0,0.2)]"></div>
+                    <span id="load-percent" class="space-font text-5xl font-black text-white tracking-tighter mb-2 drop-shadow-md">0%</span>
+                    <p class="text-[#ff8000] text-[9px] uppercase tracking-widest font-bold">Verificando streamings no Brasil</p>
                 </div>
 
                 <div id="watchlist-content" class="hidden w-full space-y-4">
                     <div class="fluent-glass p-4 shrink-0">
-                        <input type="text" placeholder="Buscar na sua watchlist..." class="w-full bg-[#0f1115]/50 border border-[#40bcf4]/30 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-[#ff8000] text-sm">
+                        <input type="text" placeholder="Buscar na sua watchlist..." class="w-full bg-[#0f1115]/30 border border-[#ff8000]/30 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-[#ff8000] text-sm shadow-inner">
                     </div>
                     <ul id="results" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></ul>
                 </div>
@@ -234,8 +235,8 @@
         </div>
     </div>
 
-    <!-- Bolinhas Flutuantes Fixas -->
-    <div class="absolute bottom-8 md:bottom-10 left-1/2 -translate-x-1/2 z-50 flex gap-2 pointer-events-auto" id="bottom-tabs">
+    <!-- Navegação Oficial da Logo (Coladinha, sem borda/fundo) -->
+    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 z-50 flex items-center justify-center gap-2.5">
         <div class="bottom-nav-dot dot-green active" onclick="slideTo(0)" title="Perfil"></div>
         <div class="bottom-nav-dot dot-blue" id="tab-oracle" onclick="slideTo(1)" title="Oráculo"></div>
         <div class="bottom-nav-dot dot-orange" id="tab-watch" onclick="slideTo(2)" title="Watchlist"></div>
@@ -243,11 +244,15 @@
 </div>
 
 <script>
+    let sessionId = localStorage.getItem('oraculo_session_id') || crypto.randomUUID();
+    localStorage.setItem('oraculo_session_id', sessionId);
+    let statsData = {};
+
     const iconicMovies = [
-        "https://image.tmdb.org/t/p/original/nMKdUUepR0i5zn0y1T4CsSB5chy.jpg", // Dark Knight
-        "https://image.tmdb.org/t/p/original/suaEOtk1N1sgg2MTM7oZd2cfVp3.jpg", // Pulp Fiction
-        "https://image.tmdb.org/t/p/original/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg", // Interstellar
-        "https://image.tmdb.org/t/p/original/8ZTVqvKDQ8emSGUEMjsS4yHAwrp.jpg"  // Inception
+        "https://image.tmdb.org/t/p/original/nMKdUUepR0i5zn0y1T4CsSB5chy.jpg", 
+        "https://image.tmdb.org/t/p/original/suaEOtk1N1sgg2MTM7oZd2cfVp3.jpg", 
+        "https://image.tmdb.org/t/p/original/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg", 
+        "https://image.tmdb.org/t/p/original/8ZTVqvKDQ8emSGUEMjsS4yHAwrp.jpg"  
     ];
 
     let currentBgIdx = 0;
@@ -262,11 +267,10 @@
             heroImg.style.opacity = '0'; 
             setTimeout(() => {
                 heroImg.src = iconicMovies[currentBgIdx]; 
-                heroImg.style.opacity = '0.3'; 
+                heroImg.style.opacity = '0.5'; 
             }, 1000);
         }, 6000);
     }
-    
     document.addEventListener('DOMContentLoaded', startBgSlideshow);
 
     function fileSelected() {
@@ -292,7 +296,6 @@
     function slideTo(index) {
         const wrapper = document.getElementById('carousel-wrapper');
         const tabs = document.querySelectorAll('.bottom-nav-dot');
-        
         if (!wrapper || tabs.length === 0) return;
 
         currentSlide = index;
@@ -307,7 +310,7 @@
     let startX = 0; let endX = 0;
     const wrapper = document.getElementById('carousel-wrapper');
     if (wrapper) {
-        wrapper.addEventListener('touchstart', e => { startX = e.touches[0].clientX; });
+        wrapper.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, {passive: true});
         wrapper.addEventListener('touchend', e => {
             endX = e.changedTouches[0].clientX;
             if(startX - endX > 50 && currentSlide < totalSlides - 1) slideTo(currentSlide + 1); 
@@ -315,73 +318,261 @@
         });
     }
 
+    async function handleFileUpload() {
+        const file = document.getElementById('csv-file')?.files[0];
+        if(!file) return;
+
+        const btn = document.getElementById('btn-iniciar-real');
+        const textSpan = document.getElementById('btn-text-real');
+        textSpan.innerHTML = `<svg class="animate-spin w-5 h-5 text-[#0f1115]" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Lendo Arquivo...`;
+        btn.disabled = true;
+
+        const fd = new FormData();
+        fd.append("file", file);
+        fd.append("session_id", sessionId);
+
+        try {
+            const res = await fetch('/upload_profile', { method: 'POST', body: fd });
+            if (!res.ok) throw new Error("Falha no upload");
+            
+            const data = await res.json();
+            statsData = data.stats;
+
+            // Transição Mágica (Desce a tela e Destroi a Parede Invisível)
+            clearInterval(bgInterval);
+            document.getElementById('main-content').style.transform = 'translateY(-100vh)';
+            
+            setTimeout(() => {
+                document.getElementById('main-content').classList.add('hidden');
+                
+                const appView = document.getElementById('app-view');
+                appView.classList.remove('hidden'); // Destroi display:none
+                
+                // Delay milimétrico pro CSS aplicar a opacidade
+                setTimeout(() => {
+                    appView.classList.remove('opacity-0');
+                    
+                    const pill = document.getElementById('top-pill');
+                    if(pill) pill.classList.remove('opacity-0', '-translate-y-4');
+
+                    document.getElementById('stat-total').innerText = statsData.total_avaliados || 0;
+                    document.getElementById('stat-avg').innerText = (statsData.media_notas || 0).toFixed(2);
+
+                    // Staggering (Cascata)
+                    gerarPerfilIA();
+                    iniciarFluxoWatchlist();
+                    setTimeout(() => carregarOraculo(), 6000); 
+                }, 50);
+
+            }, 700);
+
+        } catch (e) {
+            alert("Erro ao ler o arquivo. Tem certeza que é o .zip do Letterboxd?");
+            textSpan.innerHTML = `Iniciar Análise`;
+            btn.disabled = false;
+        }
+    }
+
+    async function gerarPerfilIA() {
+        try {
+            const res = await fetch('/gerar_perfil', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({stats: statsData})
+            });
+            const data = await res.json();
+            
+            if(!data.erro && data.titulo) {
+                document.getElementById('roast-title').innerText = data.titulo;
+                document.getElementById('roast-desc').innerHTML = data.descricao.replace(/\n/g, '<br><br>');
+                
+                if(data.filme_referencia) {
+                    fetch(`/api/tmdb/search?query=${encodeURIComponent(data.filme_referencia)}`)
+                    .then(r=>r.json()).then(d=>{
+                        if(d.results?.[0]?.poster_path) {
+                            const container = document.getElementById('profile-avatar');
+                            container.innerHTML = `<img src="https://image.tmdb.org/t/p/w500${d.results[0].poster_path}" class="w-full h-full object-cover">`;
+                        }
+                    });
+                }
+            } else {
+                throw new Error("Erro IA");
+            }
+        } catch(e) {
+            document.getElementById('roast-title').innerText = "O Explorador Silencioso";
+            document.getElementById('roast-desc').innerText = "As IAs estão congestionadas no momento. Mas os números frios nunca mentem. Deslize para o lado para ver seu Oráculo.";
+        }
+    }
+
+    async function carregarOraculo() {
+        const grid = document.getElementById('oracle-grid');
+        const load = document.getElementById('oracle-loading');
+        
+        try {
+            const res = await fetch(`/oraculo?session_id=${sessionId}`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ favorites: statsData.profile_favorites || [], exclude: [] })
+            });
+            const data = await res.json();
+            
+            load.classList.add('hidden');
+            grid.classList.remove('hidden');
+
+            if(data.recomendacoes && data.recomendacoes.length > 0) {
+                grid.innerHTML = '';
+                data.recomendacoes.forEach(r => {
+                    const id = 'movie-' + Math.random().toString(36).substr(2, 9);
+                    grid.innerHTML += `
+                        <div id="${id}" class="fluent-glass movie-card p-2 flex flex-col justify-center items-center cursor-pointer border-transparent border-2 hover:border-[#40bcf4] transition-all group relative overflow-hidden">
+                            <img src="" class="rounded w-full h-full object-cover absolute inset-0 opacity-0 transition-opacity z-0">
+                            <div class="absolute inset-0 bg-gradient-to-t from-[#0f1115] via-[#0f1115]/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity z-10 flex flex-col justify-end p-3 text-center">
+                                <span class="text-[8px] text-[#40bcf4] font-black uppercase tracking-widest drop-shadow-md">${r.base}</span>
+                                <p class="text-[11px] font-bold text-white mt-1 leading-tight drop-shadow-md">${r.rec}</p>
+                            </div>
+                            <span class="text-[#8c9bab] text-[8px] z-0 opacity-50 relative">${r.rec}</span>
+                        </div>
+                    `;
+                    fetch(`/api/tmdb/search?query=${encodeURIComponent(r.rec)}&year=${r.ano}`)
+                    .then(res=>res.json()).then(d=>{
+                        if(d.results?.[0]?.poster_path) {
+                            const img = document.querySelector(`#${id} img`);
+                            img.src = `https://image.tmdb.org/t/p/w500${d.results[0].poster_path}`;
+                            img.onload = () => img.classList.remove('opacity-0');
+                        }
+                    });
+                });
+                
+                // Avisa que o Oráculo terminou (bolinha do meio limpa)
+                const tabOracle = document.getElementById('tab-oracle');
+                tabOracle.innerHTML = '';
+            }
+        } catch(e) {
+            console.error(e);
+        }
+    }
+
+    async function iniciarFluxoWatchlist() {
+        try {
+            await fetch('/process_watchlist', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({session_id: sessionId})
+            });
+
+            const iv = setInterval(async () => {
+                const res = await fetch(`/progress?session_id=${sessionId}`);
+                const p = await res.json();
+                
+                if(p.total > 0) {
+                    const pct = Math.floor((p.atual / p.total) * 100);
+                    document.getElementById('load-percent').innerText = pct + '%';
+                    
+                    if(p.finalizado) {
+                        clearInterval(iv);
+                        document.getElementById('watchlist-loading').classList.add('hidden');
+                        document.getElementById('watchlist-content').classList.remove('hidden');
+                        
+                        const pill = document.getElementById('top-pill');
+                        if(pill) pill.classList.add('opacity-0', '-translate-y-4');
+
+                        const finalRes = await fetch(`/dados?session_id=${sessionId}`);
+                        const finalData = await finalRes.json();
+                        renderizarWatchlist(finalData.watchlist);
+                    }
+                }
+            }, 2500); 
+        } catch(e) {
+            console.error(e);
+        }
+    }
+
+    function renderizarWatchlist(watchlistDb) {
+        const res = document.getElementById('results');
+        res.innerHTML = '';
+        
+        for(const [filme, streamings] of Object.entries(watchlistDb)) {
+            const match = filme.match(/(.*)\s\((\d{4})\)$/);
+            const titulo = match ? match[1] : filme;
+            const ano = match ? match[2] : "";
+
+            const plats = streamings.map(s => {
+                let colorClass = "border-[#ff8000]/30 text-[#ff8000]"; 
+                return `<span class="bg-[#0f1115]/50 border ${colorClass} text-[8px] px-2 py-1 rounded font-black uppercase whitespace-nowrap shadow-sm">${s}</span>`;
+            }).join(' ');
+
+            res.innerHTML += `
+                <li class="fluent-glass p-4 border-l-4 border-l-[#ff8000] flex flex-col justify-between gap-3 hover:scale-[1.02] transition-transform">
+                    <div>
+                        <span class="text-white font-bold text-sm block leading-tight">${titulo}</span>
+                        <span class="text-[#8c9bab] text-[10px] block mt-0.5">${ano}</span>
+                    </div>
+                    <div class="flex gap-1.5 flex-wrap">${plats}</div>
+                </li>
+            `;
+        }
+    }
+
     function iniciarMockupTeste() {
         clearInterval(bgInterval);
-        
-        // Esconde a tela inicial deslizando pra cima
         document.getElementById('main-content').style.transform = 'translateY(-100vh)';
         
         setTimeout(() => {
             document.getElementById('main-content').classList.add('hidden');
-            
-            // O Segredo está aqui: A gente remove o pointer-events-none global do #app-view!
-            // Tudo dentro dele volta a ser clicável
             const appView = document.getElementById('app-view');
-            appView.classList.remove('hidden', 'pointer-events-none', 'opacity-0');
-            appView.classList.add('opacity-100');
+            appView.classList.remove('hidden'); 
             
-            const pill = document.getElementById('top-pill');
-            pill.classList.remove('opacity-0', '-translate-y-4');
-            
-            // Dados Mock
-            document.getElementById('stat-total').innerText = "487";
-            document.getElementById('stat-avg').innerText = "4.09";
-            document.getElementById('roast-title').innerText = "O Sommelier de Blockbuster";
-            document.getElementById('roast-desc').innerHTML = "Sua bio entrega o tipo de cinéfilo que você é: aquele que cita frases icônicas de filmes óbvios achando que está revelando uma profundidade secreta 🤓.<br><br>Com uma média inflada de 4.09 em quase 500 filmes, você não tem gosto, tem uma licença para endeusar o óbvio 🔥. Por isso, você é perfeitamente representado pelo <strong>Patrick Bateman</strong> 💅.";
-            
-            // Simula loading do Oraculo terminando
             setTimeout(() => {
-                document.getElementById('oracle-loading').classList.add('hidden');
-                const grid = document.getElementById('oracle-grid');
-                grid.classList.remove('hidden');
+                appView.classList.remove('opacity-0');
                 
-                for(let i=0; i<4; i++) {
-                    grid.innerHTML += `
-                        <div class="fluent-glass movie-card p-2 flex flex-col cursor-pointer border-transparent border-2 hover:border-[#40bcf4] transition-all">
-                            <img src="https://image.tmdb.org/t/p/w500/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg" class="rounded">
-                            <p class="text-[10px] font-bold text-center mt-2 text-white">Lado B Obscuro</p>
-                        </div>
-                    `;
-                }
-            }, 3000);
-
-            // Simula loading da Watchlist
-            let pct = 0;
-            const watchInt = setInterval(() => {
-                pct += 25;
-                document.getElementById('load-percent').innerText = pct + '%';
-                if(pct >= 100) {
-                    clearInterval(watchInt);
-                    document.getElementById('watchlist-loading').classList.add('hidden');
-                    document.getElementById('watchlist-content').classList.remove('hidden');
-                    
-                    const res = document.getElementById('results');
+                const pill = document.getElementById('top-pill');
+                pill.classList.remove('opacity-0', '-translate-y-4');
+                
+                document.getElementById('stat-total').innerText = "487";
+                document.getElementById('stat-avg').innerText = "4.09";
+                document.getElementById('roast-title').innerText = "O Caçador de Sonhos";
+                document.getElementById('roast-desc').innerHTML = "Você devora Matrix e Pulp Fiction no café da manhã e julga quem vê Marvel. 💅<br><br>Um gosto refinado com um ego do tamanho de um roteiro do Nolan.";
+                
+                setTimeout(() => {
+                    document.getElementById('oracle-loading').classList.add('hidden');
+                    const grid = document.getElementById('oracle-grid');
+                    grid.classList.remove('hidden');
                     for(let i=0; i<4; i++) {
-                        res.innerHTML += `
-                            <li class="fluent-glass p-4 border-l-4 border-l-[#ff8000] flex justify-between items-center cursor-pointer hover:bg-[#1c2228]/50">
-                                <div>
-                                    <span class="text-white font-bold text-sm block">Clube da Luta</span>
-                                    <span class="text-[#8c9bab] text-[10px]">1999</span>
+                        grid.innerHTML += `
+                            <div class="fluent-glass movie-card p-2 flex flex-col cursor-pointer hover:border-[#40bcf4] border-transparent border-2 relative group overflow-hidden">
+                                <img src="https://image.tmdb.org/t/p/w500/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg" class="rounded w-full h-full object-cover absolute inset-0 z-0">
+                                <div class="absolute inset-0 bg-gradient-to-t from-[#0f1115] via-[#0f1115]/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity z-10 flex flex-col justify-end p-3 text-center">
+                                    <span class="text-[#40bcf4] text-[8px] font-bold uppercase mb-1 drop-shadow-md">Ficção Científica</span>
+                                    <p class="text-white text-[10px] font-bold drop-shadow-md">Interstellar</p>
                                 </div>
-                                <span class="bg-[#14181c] border border-[#2c3440] text-[#8c9bab] text-[9px] px-2 py-1 rounded font-black uppercase">Max</span>
-                            </li>
+                            </div>
                         `;
                     }
-                    pill.classList.add('opacity-0', '-translate-y-4');
-                }
-            }, 800);
+                }, 3000);
 
-        }, 600);
+                let pct = 0;
+                const watchInt = setInterval(() => {
+                    pct += 25;
+                    document.getElementById('load-percent').innerText = pct + '%';
+                    if(pct >= 100) {
+                        clearInterval(watchInt);
+                        document.getElementById('watchlist-loading').classList.add('hidden');
+                        document.getElementById('watchlist-content').classList.remove('hidden');
+                        
+                        const res = document.getElementById('results');
+                        for(let i=0; i<4; i++) {
+                            res.innerHTML += `
+                                <li class="fluent-glass p-4 border-l-4 border-l-[#ff8000] flex flex-col gap-2">
+                                    <div><span class="text-white font-bold text-sm block">Clube da Luta</span><span class="text-[#8c9bab] text-[10px]">1999</span></div>
+                                    <div class="flex gap-1 overflow-x-auto no-scrollbar"><span class="bg-[#0f1115]/50 border border-[#ff8000]/30 text-[#ff8000] text-[8px] px-2 py-1 rounded font-black uppercase shadow-sm">Max</span></div>
+                                </li>
+                            `;
+                        }
+                        pill.classList.add('opacity-0', '-translate-y-4');
+                    }
+                }, 800);
+            }, 50);
+        }, 700);
     }
 </script>
 </body>
