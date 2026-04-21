@@ -27,12 +27,13 @@
 
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: rgba(15, 17, 21, 0.5); }
-        ::-webkit-scrollbar-thumb { background: rgba(64, 188, 244, 0.2); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(64, 188, 244, 0.5); }
+        ::-webkit-scrollbar-thumb { background: rgba(64, 188, 244, 0.3); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(64, 188, 244, 0.6); }
 
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
+        /* O GLASSMORPHISM PREMIUM (Acrílico Nível Tidal / Windows 11) */
         .fluent-glass {
             background: rgba(24, 28, 33, 0.55) !important; 
             backdrop-filter: blur(24px) saturate(150%) !important; 
@@ -44,6 +45,11 @@
             transition: all 0.3s ease;
         }
 
+        .fluent-glass:hover {
+            border-color: rgba(64, 188, 244, 0.4) !important;
+        }
+
+        /* As 3 Bolinhas Minimalistas do Rodapé (Sem caixa no fundo) */
         .bottom-nav-dot {
             width: 14px; height: 14px;
             border-radius: 50%;
@@ -80,7 +86,7 @@
 
 <!-- Fundo Rotativo Dinâmico -->
 <div id="hero-bg-container" class="fixed inset-0 w-full h-full z-0 bg-[#0f1115] pointer-events-none transition-opacity duration-1000">
-    <img id="hero-backdrop-img" src="" class="w-full h-full object-cover opacity-0 transition-opacity duration-1000 grayscale-[20%]">
+    <img id="hero-backdrop-img" src="https://image.tmdb.org/t/p/original/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg" class="w-full h-full object-cover opacity-0 transition-opacity duration-1000 grayscale-[20%]">
     <div class="absolute inset-0 bg-gradient-to-b from-[#0f1115]/70 via-[#0f1115]/40 to-[#0f1115] pointer-events-none"></div>
 </div>
 
@@ -112,7 +118,7 @@
         <h2 id="slide-title" class="text-sm md:text-lg font-black text-white tracking-tighter drop-shadow-md leading-tight mb-0.5 max-w-[250px] truncate space-font">...</h2>
         <div class="flex items-center gap-2">
             <span id="slide-year" class="text-gray-300 font-bold text-[10px]"></span>
-            <span id="slide-rating" class="text-[#00e054] text-[10px] tracking-widest drop-shadow-md"></span>
+            <span id="slide-rating" class="text-[#00e054] text-[10px] tracking-widest drop-shadow-md hidden"></span>
         </div>
     </div>
 </header>
@@ -134,8 +140,8 @@
         </div>
 
         <div class="space-y-4 relative z-30">
-            <!-- Passo 1: O Glassmorphism Azul Limpo -->
-            <a href="https://letterboxd.com/data/export/" target="_blank" class="fluent-glass flex items-center gap-4 px-6 py-4 w-full group transition-all hover:border-[#40bcf4]/50 cursor-pointer">
+            <!-- Passo 1: O Glassmorphism Azul/Branco Limpo -->
+            <a href="https://letterboxd.com/data/export/" target="_blank" class="fluent-glass flex items-center gap-4 px-6 py-4 w-full group transition-all cursor-pointer">
                 <span class="bg-[#40bcf4]/20 text-[#40bcf4] w-7 h-7 rounded-full flex items-center justify-center text-xs font-black shrink-0 group-hover:bg-[#40bcf4] group-hover:text-[#14181c] transition-colors">1</span>
                 <div class="text-left">
                     <span class="font-bold text-sm tracking-wide block text-white drop-shadow-sm">Baixar arquivo .ZIP oficial</span>
@@ -144,10 +150,11 @@
                 <svg class="w-5 h-5 text-[#40bcf4] ml-auto opacity-70 group-hover:opacity-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
             </a>
 
-            <!-- Passo 2: O Glassmorphism Azul Limpo (Sólido, sem tracejado) -->
-            <div class="fluent-glass p-8 text-center border-2 border-transparent hover:border-[#40bcf4]/50 transition-all group cursor-pointer relative overflow-hidden pointer-events-auto">
+            <!-- Passo 2: O Glassmorphism Azul Limpo -->
+            <div class="fluent-glass p-8 text-center transition-all group cursor-pointer relative overflow-hidden pointer-events-auto">
                 <label for="csv-file" id="dropzone-label" class="cursor-pointer block w-full h-full">
                     <div class="w-16 h-16 bg-[#40bcf4]/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform border border-[#40bcf4]/20 shadow-inner">
+                        <!-- Flecha Heroicons Oficial (Simétrica) -->
                         <svg class="w-8 h-8 text-[#40bcf4]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z"></path></svg>
                     </div>
                     <p class="text-xl md:text-2xl font-bold text-white mb-1 drop-shadow-sm space-font">Arraste seu arquivo <span class="text-[#40bcf4]">.zip</span> aqui</p>
@@ -190,7 +197,7 @@
             <div class="max-w-2xl w-full space-y-6">
                 <div class="fluent-glass p-8 relative flex flex-col items-center text-center">
                     
-                    <!-- FOTO DO PERFIL BLINDADA (NÃO EXPLODE MAIS) -->
+                    <!-- FOTO DO PERFIL BLINDADA NA MOLDURA -->
                     <div class="w-24 h-24 rounded-full border-2 border-[#00e054] bg-[#0f1115] mb-6 mx-auto flex items-center justify-center overflow-hidden shadow-[0_0_20px_rgba(0,224,84,0.3)] shrink-0 relative">
                         <svg id="profile-avatar-icon" class="w-10 h-10 text-[#2c3440]" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
                         <img id="profile-avatar-img" class="w-full h-full object-cover hidden absolute inset-0 z-10" src="">
@@ -280,7 +287,7 @@
         </div>
     </div>
 
-    <!-- Bolinhas Minimalistas Flutuantes (Rodapé) -->
+    <!-- Bolinhas Minimalistas Flutuantes (Rodapé) - Sem cápsula -->
     <div class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex items-center justify-center gap-4">
         <div class="bottom-nav-dot dot-green active" onclick="slideTo(0)" title="Perfil"></div>
         <div class="bottom-nav-dot dot-blue" id="tab-oracle" onclick="slideTo(1)" title="Oráculo"></div>
@@ -333,14 +340,14 @@
     
     let oraculoBuffer = [];
 
-    // Fundo Rotativo Dinâmico
+    // O Segredo: Não tem Rating (estrelas fakes) na lista inicial!
+    let currentBgList = [
+        { Name: "Interstellar", Year: 2014, backdrop: "https://image.tmdb.org/t/p/original/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg" },
+        { Name: "The Matrix", Year: 1999, backdrop: "https://image.tmdb.org/t/p/original/ncEsesgOJDNrTUED89hYbA117wo.jpg" },
+        { Name: "Pulp Fiction", Year: 1994, backdrop: "https://image.tmdb.org/t/p/original/suaEOtk1N1sgg2MTM7oZd2cfVp3.jpg" }
+    ];
     let currentBgIdx = 0;
     let bgInterval;
-    let currentBgList = [
-        { Name: "Interstellar", Year: 2014, Rating: 5, backdrop: "https://image.tmdb.org/t/p/original/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg" },
-        { Name: "The Matrix", Year: 1999, Rating: 5, backdrop: "https://image.tmdb.org/t/p/original/ncEsesgOJDNrTUED89hYbA117wo.jpg" },
-        { Name: "Pulp Fiction", Year: 1994, Rating: 5, backdrop: "https://image.tmdb.org/t/p/original/suaEOtk1N1sgg2MTM7oZd2cfVp3.jpg" }
-    ];
 
     function startBgSlideshow() {
         const heroImg = document.getElementById('hero-backdrop-img');
@@ -361,12 +368,20 @@
                 
                 if(st) st.innerText = movie.Name;
                 if(sy) sy.innerText = movie.Year || '';
+                
+                // Mágica das Estrelas Reais: Só mostra se a "Rating" existir de verdade no objeto!
                 if(sr) {
-                    let stars = '';
-                    let r = movie.Rating || 0;
-                    for(let i=0; i<Math.floor(r); i++) stars += '★';
-                    if(r % 1 !== 0) stars += '½';
-                    sr.innerText = stars;
+                    if(movie.Rating) {
+                        let stars = '';
+                        let r = movie.Rating || 0;
+                        for(let i=0; i<Math.floor(r); i++) stars += '★';
+                        if(r % 1 !== 0) stars += '½';
+                        sr.innerText = stars;
+                        sr.classList.remove('hidden'); // Revela as estrelinhas
+                    } else {
+                        sr.innerText = '';
+                        sr.classList.add('hidden'); // Esconde as estrelinhas (na tela inicial)
+                    }
                 }
 
                 heroImg.style.opacity = '0.4';
@@ -380,13 +395,18 @@
         if(bgInterval) clearInterval(bgInterval);
         bgInterval = setInterval(updateBg, 6000);
     }
+    
+    // Inicia a vitrine logo de cara com a lista fake sem estrelas
     document.addEventListener('DOMContentLoaded', startBgSlideshow);
 
-    // Carrega o Top 5 do usuário pro fundo
+    // Quando o ZIP chega, nós sequestramos a vitrine e botamos os seus favoritos!
     async function loadUserBackgrounds() {
         if(!statsData || !statsData.favoritos || statsData.favoritos.length === 0) return;
-        const favs = statsData.favoritos.slice(0, 5);
+        
+        // Pega os 15 maiores favoritos para a roleta não ficar repetitiva
+        const favs = statsData.favoritos.slice(0, 15);
         let newBgList = [];
+        
         for(let f of favs) {
             try {
                 let res = await fetch(`/api/tmdb/search?query=${encodeURIComponent(f.Name)}`);
@@ -395,16 +415,22 @@
                     newBgList.push({
                         Name: f.Name,
                         Year: f.Year,
-                        Rating: f.Rating,
+                        Rating: f.Rating, // A SUA NOTA VERDADEIRA VEIO JUNTO!
                         backdrop: `https://image.tmdb.org/t/p/original${d.results[0].backdrop_path}`
                     });
                 }
             } catch(e) {}
         }
+        
         if(newBgList.length > 0) {
-            currentBgList = newBgList;
+            // A Regra de Ouro: Os 4 Primeiros na ordem exata de favoritismo, os outros embaralhados!
+            let top4 = newBgList.slice(0, 4);
+            let rest = newBgList.slice(4).sort(() => Math.random() - 0.5);
+            
+            currentBgList = [...top4, ...rest];
             currentBgIdx = 0;
-            startBgSlideshow();
+            
+            startBgSlideshow(); // Reinicia o show, agora com as suas estrelas!
             document.getElementById('slideshow-info').classList.remove('hidden');
             document.getElementById('slideshow-info').classList.add('flex');
         }
@@ -526,7 +552,7 @@
             document.getElementById('stat-total').innerText = statsData.total_avaliados || 0;
             document.getElementById('stat-avg').innerText = (statsData.media_notas || 0).toFixed(2);
 
-            loadUserBackgrounds();
+            loadUserBackgrounds(); // Puxa os favoritos do cara pro fundo
             iniciarCicloDeFrases();
             gerarPerfilIA();
             iniciarFluxoWatchlist();
@@ -534,7 +560,6 @@
         }, 700);
     }
 
-    // Busca imagem na Wikipedia (Modo Caçador de Personagens)
     async function fetchWikiImage(query) {
         try {
             let res = await fetch(`https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(query)}&prop=pageimages&format=json&pithumbsize=500&origin=*`);
@@ -547,7 +572,6 @@
         return null;
     }
 
-    // A FUNÇÃO BLINDADA: Nunca vai explodir a caixa
     async function fetchPosterFallback(title, year, id, isAvatar = false) {
         let imgUrl = null;
         try {
@@ -581,7 +605,6 @@
                 }
             }
         } else {
-            // Se não achou NADA no TMDB, faz o Pôster Tipográfico minimalista
             if (!isAvatar) {
                 const card = document.getElementById(id);
                 if (card) {
@@ -601,6 +624,25 @@
                     if(tt) tt.innerHTML = data.titulo; 
                     if(td) td.innerHTML = data.descricao.replace(/\n/g, '<br><br>'); 
                     
+                    if(data.ator_referencia) {
+                        // Tenta achar o ator no TMDB primeiro
+                        try {
+                            let r = await fetch(`/api/tmdb/person?query=${encodeURIComponent(data.ator_referencia)}`);
+                            let d = await r.json();
+                            if (d.profile_path) {
+                                const imgEl = document.getElementById('profile-avatar-img');
+                                const iconEl = document.getElementById('profile-avatar-icon');
+                                imgEl.src = `https://image.tmdb.org/t/p/w500${d.profile_path}`;
+                                imgEl.onload = () => {
+                                    imgEl.classList.remove('hidden');
+                                    if(iconEl) iconEl.classList.add('hidden');
+                                }
+                                return; // Sucesso, vaza
+                            }
+                        } catch(e) {}
+                    }
+                    
+                    // Fallbacks se não achou ator ou se falhou
                     if(data.personagem_referencia) {
                         let imgUrl = await fetchWikiImage(data.personagem_referencia);
                         if(!imgUrl && data.filme_referencia) imgUrl = await fetchWikiImage(data.filme_referencia); 
@@ -681,6 +723,12 @@
                 return;
             }
 
+            if(data.terror_mode) {
+                const trophy = document.getElementById('ps-trophy');
+                if (trophy) { trophy.classList.add('show'); setTimeout(() => trophy.classList.remove('show'), 5000); }
+                document.getElementById('btn-descobrir-mais').classList.add('hidden');
+            }
+
             oraculoBuffer = data.recomendacoes;
             let renderizarAgora = oraculoBuffer.splice(0, 4);
             oraculoRecomendacoesGlobais.push(...renderizarAgora);
@@ -714,16 +762,25 @@
             });
             const data = await res.json();
             
+            if(data.erro === "RATE_LIMIT") {
+                 mostrarErro("Servidores Sobrecarregados. Aguarde um pouco!");
+                 document.getElementById('load-more-spinner').classList.add('hidden');
+                 document.getElementById('load-more-icon').classList.remove('hidden');
+                 return;
+            }
+
+            if(data.terror_mode) {
+                const trophy = document.getElementById('ps-trophy');
+                if (trophy) { trophy.classList.add('show'); setTimeout(() => trophy.classList.remove('show'), 5000); }
+                document.getElementById('btn-descobrir-mais').classList.add('hidden');
+            }
+
             if(data.recomendacoes && data.recomendacoes.length > 0) {
                 oraculoBuffer = data.recomendacoes; 
                 let renderizarAgora = oraculoBuffer.splice(0, 4);
                 let s = oraculoRecomendacoesGlobais.length;
                 oraculoRecomendacoesGlobais.push(...renderizarAgora);
                 renderizarOraculoCards(renderizarAgora, s);
-            } else {
-                const trophy = document.getElementById('ps-trophy');
-                if (trophy) { trophy.classList.add('show'); setTimeout(() => trophy.classList.remove('show'), 5000); }
-                document.getElementById('btn-descobrir-mais').classList.add('hidden');
             }
         } catch(e) {
             mostrarErro("Erro ao buscar mais recomendações.");
