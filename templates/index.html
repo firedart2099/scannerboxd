@@ -142,21 +142,10 @@
             from { opacity: 0; transform: scale(0.95); }
             to { opacity: 1; transform: scale(1); }
         }
-
-        @keyframes stripes {
-            0% { background-position: 0 0; }
-            100% { background-position: 40px 40px; }
-        }
-        .animate-stripes { animation: stripes 2s linear infinite; }
         
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
-        .filter-btn-active {
-            border-color: var(--lb-blue) !important; 
-            background-color: rgba(64, 188, 244, 0.1) !important;
-        }
-
         .ps-trophy {
             position: fixed;
             top: 24px;
@@ -429,13 +418,12 @@
 
     <div id="analyzer-panel" class="hidden space-y-8 animate-fade-in mt-40 md:mt-80 relative z-20">
         
-        <!-- NOVO BANNER NO TOPO PARA DISTRAIR O USUÁRIO DURANTE O LOAD LENTO -->
-        <div id="top-loading-banner" class="bg-[#1c2228]/80 backdrop-blur-sm border border-[#40bcf4]/40 rounded-xl p-4 md:p-5 mb-8 text-center shadow-[0_5px_20px_rgba(64,188,244,0.1)] transition-all duration-500 max-w-2xl mx-auto">
-            <div class="flex items-center justify-center gap-2 mb-1.5">
-                <svg class="animate-spin w-4 h-4 text-[#40bcf4]" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                <p id="funny-text" class="text-[#40bcf4] font-black uppercase text-[10px] md:text-xs tracking-widest transition-opacity duration-500 drop-shadow-md m-0">Iniciando análise profunda...</p>
+        <!-- Pílula do Oráculo High-Tech com as frases disfarçadas -->
+        <div id="oracle-status-pill" class="flex justify-center transition-opacity duration-500 mb-2">
+            <div class="inline-flex items-center gap-2.5 bg-[#1c2228]/80 backdrop-blur-md border border-[#40bcf4]/30 px-4 py-2 rounded-full shadow-lg">
+                <svg class="animate-spin w-3.5 h-3.5 text-[#40bcf4]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                <p id="funny-text" class="text-[#40bcf4] font-bold uppercase text-[9px] md:text-[10px] tracking-widest m-0 transition-opacity duration-500">Invocando o Oráculo...</p>
             </div>
-            <p class="text-[#8c9bab] text-[8px] md:text-[9px] uppercase tracking-widest font-bold opacity-80">* As IAs estão trabalhando. Esse processo pode demorar um pouco. Relaxe e leia seu perfil enquanto isso.</p>
         </div>
 
         <div class="text-center flex justify-center items-center gap-2">
@@ -452,8 +440,8 @@
             <div class="flex-1 space-y-2 md:space-y-3 min-w-0 mt-4 md:mt-0">
                 <div class="flex items-center gap-2 flex-wrap justify-center md:justify-start">
                     <h3 id="roast-title" class="text-lg sm:text-2xl md:text-3xl font-black text-white tracking-tighter flex items-center gap-2 text-center md:text-left leading-tight">
-                        Analisando o gosto... 
-                        <svg class="animate-spin w-4 h-4 text-[#40bcf4] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                        Analisando gosto... 
+                        <svg class="animate-spin w-4 h-4 text-[#40bcf4] shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                     </h3>
                 </div>
                 <p id="roast-desc" class="text-gray-300 text-xs md:text-sm leading-relaxed font-light whitespace-pre-line">Processando avaliações...</p>
@@ -493,15 +481,9 @@
                 </button>
             </div>
             
-            <div id="oracle-warning" class="hidden mb-4 bg-[#ff8000]/10 border border-[#ff8000]/30 p-3 rounded-xl text-center mx-1">
-                <p class="text-[#ff8000] text-[10px] sm:text-xs font-bold leading-relaxed">
-                    🚨 Sua lista é GIGANTE! O Oráculo está improvisando clássicos obscuros.
-                </p>
-            </div>
-
             <div id="oracle-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6 px-1 md:px-2 mb-6">
                 <div class="movie-card border-[#2c3440] border-2 aspect-[2/3]">
-                   <div class="h-full w-full bg-[#1c2228] flex items-center justify-center animate-pulse"><span class="text-[#8c9bab] text-[10px] font-bold uppercase tracking-widest text-center">Aguardando IA...</span></div>
+                   <div class="h-full w-full bg-[#1c2228] flex items-center justify-center animate-pulse"><span class="text-[#8c9bab] text-[10px] font-bold uppercase tracking-widest text-center">Consultando...</span></div>
                 </div>
                 <div class="movie-card border-[#2c3440] border-2 aspect-[2/3]">
                    <div class="h-full w-full bg-[#1c2228] flex items-center justify-center animate-pulse"><span class="text-[#8c9bab] text-[10px] font-bold uppercase tracking-widest text-center">Buscando...</span></div>
@@ -516,7 +498,7 @@
 
             <div class="flex flex-col items-center gap-3 px-1">
                 <button id="btn-load-more" onclick="carregarMaisSugestoes()" class="w-full md:w-auto px-6 py-3.5 md:py-3 bg-[#1c2228] text-[#40bcf4] border border-[#2c3440] rounded-xl font-black text-[10px] sm:text-xs uppercase tracking-widest transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50">
-                    <svg id="load-more-spinner" class="w-4 h-4 animate-spin hidden shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                    <svg id="load-more-spinner" class="w-4 h-4 animate-spin hidden shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                     <svg id="load-more-icon" class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                     <span>Descobrir Mais</span>
                 </button>
@@ -531,8 +513,6 @@
             <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#40bcf4] via-[#00e054] to-[#40bcf4] bg-[length:200%_200%] animate-gradient-x"></div>
             
             <div class="text-center mb-6">
-                <!-- A FRASE ANTIGA FOI REMOVIDA DAQUI E SUBIU PARA O TOPO DA TELA -->
-                
                 <h3 class="text-xl md:text-3xl font-black text-white uppercase tracking-tighter mb-2">Buscando Plataformas</h3>
                 
                 <p class="text-[#8c9bab] text-[10px] sm:text-xs max-w-lg mx-auto leading-relaxed mb-4 px-2">
@@ -625,7 +605,7 @@
 
     let statsData = {};
     let rawDatabase = {};
-    let frasesAleatorias = [];
+    let frasesAleatorias = ["Analisando suas avaliações obscuras...", "Buscando clássicos que você ignorou...", "Preparando a bronca do Oráculo...", "Julgando seu gosto peculiar...", "Vasculhando o Letterboxd..."];
     let oraculoRecomendacoesGlobais = []; 
     let filmesSelecionados = new Set(); 
     const posterCache = {}; 
@@ -641,11 +621,7 @@
         { Name: "The Dark Knight", Year: 2008, backdrop: "https://image.tmdb.org/t/p/original/nMKdUUepR0i5zn0y1T4CsSB5chy.jpg" },
         { Name: "Spirited Away", Year: 2001, backdrop: "https://image.tmdb.org/t/p/original/2w11gS27aB60hZ1yDk8nO8J1O1O.jpg" },
         { Name: "Pulp Fiction", Year: 1994, backdrop: "https://image.tmdb.org/t/p/original/suaEOtk1N1sgg2MTM7oZd2cfVp3.jpg" },
-        { Name: "Everything Everywhere All at Once", Year: 2022, backdrop: "https://image.tmdb.org/t/p/original/wPU78OPN4BYEgWYdXy7wMqwqFDb.jpg" },
-        { Name: "The Matrix", Year: 1999, backdrop: "https://image.tmdb.org/t/p/original/ncEsesgOJDNrTUED89hYbA117wo.jpg" },
-        { Name: "Blade Runner 2049", Year: 2017, backdrop: "https://image.tmdb.org/t/p/original/ilRyazdndIGMqWhH2tYdK0mHihM.jpg" },
-        { Name: "Goodfellas", Year: 1990, backdrop: "https://image.tmdb.org/t/p/original/sw7mordbZxgITU877yTpZCud90M.jpg" },
-        { Name: "Inception", Year: 2010, backdrop: "https://image.tmdb.org/t/p/original/8ZTVqvKDQ8emSGUEMjsS4yHAwrp.jpg" }
+        { Name: "Everything Everywhere All at Once", Year: 2022, backdrop: "https://image.tmdb.org/t/p/original/wPU78OPN4BYEgWYdXy7wMqwqFDb.jpg" }
     ];
 
     let currentIconicIdx = Math.floor(Math.random() * iconicMovies.length);
@@ -736,8 +712,6 @@
     function abrirMercadoPago() { window.open("https://mpago.la/15FPHv4", '_blank'); fecharDoacao(); recarregarGratis(); }
     async function recarregarGratis() { try { for(let i=0;i<5;i++) await fetch('/api/adicionar_credito', { method: 'POST' }); } catch (e) {} }
 
-    const platformPrices = { "Netflix": 39.90, "Prime Video": 19.90, "Max": 39.90, "MUBI": 34.90, "Disney+": 43.90, "Globoplay": 24.90, "Apple TV+": 21.90, "Telecine": 29.90, "Paramount+": 19.90, "Claro TV+": 34.90, "MGM+": 14.90, "Looke": 16.90, "Pluto TV": 0.00, "Crunchyroll": 14.90, "Star+": 43.90, "Belas Artes": 14.90, "Oldflix": 16.90, "Mercado Play": 0.00, "Plex": 0.00, "NetMovies": 0.00, "Libreflix": 0.00 };
-
     function normalizePlatformName(name) {
         let c = name.replace(/ Amazon Channel/gi, '').replace(/ Channels/gi, '').replace(/ Plus/gi, '+').trim().toLowerCase();
         if (c.includes('netflix')) return 'Netflix'; if (c.includes('max') || c.includes('hbo')) return 'Max';
@@ -771,17 +745,29 @@
 
     function iniciarCicloDeFrases() {
         const t = document.getElementById('funny-text');
+        const pill = document.getElementById('oracle-status-pill');
         if(!t) return;
+        
+        if (pill) pill.classList.remove('hidden');
         if(frasesAleatorias.length > 0) t.innerText = frasesAleatorias[0];
+        
         if(fraseTimerInterval) clearInterval(fraseTimerInterval);
         fraseTimerInterval = setInterval(() => {
             if(frasesAleatorias.length > 0) {
                 t.style.opacity = '0';
-                setTimeout(() => { t.innerText = frasesAleatorias[Math.floor(Math.random() * frasesAleatorias.length)]; t.style.opacity = '1'; }, 500);
+                setTimeout(() => { 
+                    t.innerText = frasesAleatorias[Math.floor(Math.random() * frasesAleatorias.length)]; 
+                    t.style.opacity = '1'; 
+                }, 500);
             }
-        }, 6000);
+        }, 4000);
     }
-    function pararCicloDeFrases() { if(fraseTimerInterval) clearInterval(fraseTimerInterval); }
+    
+    function pararCicloDeFrases() { 
+        if(fraseTimerInterval) clearInterval(fraseTimerInterval); 
+        const pill = document.getElementById('oracle-status-pill');
+        if (pill) pill.classList.add('hidden');
+    }
 
     function countdown(msg, cb) {
         const o = document.getElementById('countdown-overlay'); const t = document.getElementById('countdown-text');
@@ -792,13 +778,7 @@
             if(c>0) { if(t) t.innerText=c; }
             else if(c===0) { 
                 if(t){ 
-                    if(msg.includes("LAURA")) {
-                        t.style.fontSize='2.5rem';
-                        t.style.lineHeight='1.2';
-                        t.style.whiteSpace='pre-line';
-                    } else {
-                        t.style.fontSize='3rem';
-                    }
+                    t.style.fontSize='3rem';
                     t.className='text-white font-black uppercase tracking-widest px-4'; 
                     t.innerText=msg; 
                 } 
@@ -849,33 +829,27 @@
         
         try {
             const res = await fetch('/upload_profile', { method: 'POST', body: fd });
-            if (!res.ok) throw new Error("Falha na rede ou bloqueio corporativo");
+            if (!res.ok) throw new Error("Falha na rede");
             statsData = (await res.json()).stats;
             await consumirCredito();
             
-            let msgFinal = "INICIANDO ANÁLISE...";
-            if (statsData.is_laura_birthday) {
-                msgFinal = "OPA LAURA,\nFELIZ ANIVERSÁRIO! 🎂";
-            }
-            
-            countdown(msgFinal, () => {
+            countdown("INICIANDO ANÁLISE...", () => {
                 document.getElementById('main-content')?.classList.add('hidden');
                 
-                // STAGGERING: Separar as chamadas para não engasgar o servidor
+                exibirRaioX(); // Mostra tudo na tela
+                iniciarCicloDeFrases(); // Liga a pílula de loading lá no topo
                 
-                // 1. Inicia o Perfil (Rápido, consome IA)
-                exibirRaioX(); 
+                gerarPerfilIA(); // Dispara logo a primeira IA (Perfil)
+                iniciarFluxoWatchlist(); // Dispara o scanner de streaming no fundo
                 
-                // 2. Inicia o TMDB no fundo (Lento, mas não consome IA nem trava)
-                iniciarFluxoWatchlist(); 
-                
-                // 3. Aguarda 6 segundos para chamar o Oráculo, dando tempo da IA respirar
+                // ATRASO MÁGICO: Espera 6 segundos para chamar o Oráculo
                 setTimeout(() => {
                     carregarOraculo();
                 }, 6000); 
+                
             });
         } catch(e) { 
-            mostrarErro("Erro de conexão. A rede bloqueou o envio do .zip!"); 
+            mostrarErro("Erro de conexão com o servidor. Envio falhou."); 
             btn.disabled = false;
             btnSpinner.classList.add('hidden');
             btnText.innerText = "Iniciar Análise";
@@ -892,8 +866,6 @@
             greeting.innerHTML = `E aí, <span class="text-white">${statsData.username}</span>! O Seu Perfil de Crítico:`;
         }
         
-        gerarPerfilIA();
-
         if (initialBackdropInterval) clearInterval(initialBackdropInterval);
         if (backdropInterval) clearInterval(backdropInterval);
 
@@ -966,7 +938,7 @@
         if (retryBtn) retryBtn.classList.add('hidden');
               
         ti?.classList.add('hidden'); pl?.classList.remove('hidden');
-        if(tt) tt.innerHTML = `Analisando gosto... <svg class="animate-spin w-4 h-4 ml-1 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>`;
+        if(tt) tt.innerHTML = `Analisando gosto... <svg class="animate-spin w-4 h-4 ml-1 inline" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>`;
         
         try {
             const res = await fetch('/gerar_perfil', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({stats: statsData}) });
@@ -974,9 +946,9 @@
                 const data = await res.json();
                 
                 if(data.erro === "RATE_LIMIT" || data.titulo?.includes("Algoritmo em Choque")) {
-                    if(!isRetry) mostrarErro("As APIs estão superlotadas. Mostrando perfil genérico.");
-                    if(tt) tt.innerHTML = "Algoritmo em Choque 💀";
-                    if(td) td.innerText = "As IAs bateram no limite de velocidade! Aguarde o tempo e tente refazer a análise. 💅";
+                    if(!isRetry) mostrarErro("O Oráculo está sobrecarregado. Mostrando perfil genérico.");
+                    if(tt) tt.innerHTML = "Oráculo em Choque 💀";
+                    if(td) td.innerText = "O Oráculo bateu no limite de velocidade cósmica! Aguarde um minuto e tente refazer a análise. 💅";
                     if(tv) tv.innerText = "Patrick Bateman";
                     fetch(`/api/tmdb/search?query=American%20Psycho`).then(r=>r.json()).then(d=>{
                         if(d.results?.[0]?.poster_path){ ti.src=`https://image.tmdb.org/t/p/w500${d.results[0].poster_path}`; ti.classList.remove('hidden'); pl.classList.add('hidden'); }
@@ -1052,11 +1024,13 @@
                 </div>
             `;
         }
+        // Desliga a pílula de frases quando o Oráculo termina de carregar.
+        pararCicloDeFrases();
     }
 
     async function buscarAteQuatroIneditos() {
         let f = [], t = 0;
-        while(f.length < 4 && t < 4) {
+        while(f.length < 4 && t < 2) {
             if(t >= 1) { 
                 const trophy = document.getElementById('ps-trophy');
                 if (trophy && !trophy.classList.contains('show')) {
@@ -1071,7 +1045,7 @@
                 const r = await res.json();
                 
                 if (r.erro === "RATE_LIMIT") {
-                    mostrarErro("Limite de velocidade do Oráculo atingido. Aguarde 1 minuto!");
+                    mostrarErro("O Oráculo precisa de um minuto para respirar!");
                     break; 
                 }
 
@@ -1162,7 +1136,6 @@
 
     async function iniciarFluxoWatchlist() {
         document.getElementById('loading-container').classList.remove('hidden');
-        iniciarCicloDeFrases(); 
         
         try {
             await fetch('/process_watchlist', { 
@@ -1197,7 +1170,6 @@
                         stuckCount++;
                         if (stuckCount > 20) { 
                             clearInterval(m);
-                            pararCicloDeFrases();
                             mostrarErro("A rede da empresa pode ter cortado a conexão. Tente no 4G.");
                             p.finalizado = true;
                         }
@@ -1231,14 +1203,7 @@
                     
                     if(p.finalizado) {
                         clearInterval(m); 
-                        pararCicloDeFrases(); 
-                        
                         document.getElementById('loading-container').classList.add('hidden');
-                        
-                        // Esconde o aviso amarelo do topo que entretinha o usuário
-                        const banner = document.getElementById('top-loading-banner');
-                        if (banner) banner.classList.add('hidden');
-                        
                         try {
                             const dadosRes = await fetch(`/dados?session_id=${sessionId}`);
                             if(dadosRes.ok) {
