@@ -26,9 +26,9 @@
         h1, h2, h3, .space-font { font-family: 'Space Grotesk', sans-serif !important; }
 
         ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #0f1115; }
-        ::-webkit-scrollbar-thumb { background: rgba(64, 188, 244, 0.3); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(64, 188, 244, 0.6); }
+        ::-webkit-scrollbar-track { background: rgba(15, 17, 21, 0.5); }
+        ::-webkit-scrollbar-thumb { background: rgba(64, 188, 244, 0.2); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(64, 188, 244, 0.5); }
 
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -45,7 +45,7 @@
         }
 
         .bottom-nav-dot {
-            width: 12px; height: 12px;
+            width: 14px; height: 14px;
             border-radius: 50%;
             cursor: pointer;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -53,7 +53,7 @@
             user-select: none;
             -webkit-user-select: none;
         }
-        .bottom-nav-dot.active { transform: scale(1.6); z-index: 10; box-shadow: 0 0 12px currentColor; }
+        .bottom-nav-dot.active { transform: scale(1.6); z-index: 10; box-shadow: 0 0 15px currentColor; }
         .dot-green { background-color: #00e054; color: #00e054; }
         .dot-blue { background-color: #40bcf4; color: #40bcf4; }
         .dot-orange { background-color: #ff8000; color: #ff8000; }
@@ -76,7 +76,13 @@
         .custom-checkbox { transition: all 0.2s; }
     </style>
 </head>
-<body class="text-white relative w-screen h-screen overflow-x-hidden">
+<body class="text-white relative w-screen h-screen overflow-x-hidden overflow-y-auto">
+
+<!-- Fundo Rotativo Dinâmico -->
+<div id="hero-bg-container" class="fixed inset-0 w-full h-full z-0 bg-[#0f1115] pointer-events-none transition-opacity duration-1000">
+    <img id="hero-backdrop-img" src="" class="w-full h-full object-cover opacity-0 transition-opacity duration-1000 grayscale-[20%]">
+    <div class="absolute inset-0 bg-gradient-to-b from-[#0f1115]/70 via-[#0f1115]/40 to-[#0f1115] pointer-events-none"></div>
+</div>
 
 <div id="ps-trophy" class="ps-trophy">
     <div class="w-12 h-12 rounded-full border-2 border-[#40bcf4] shadow-[0_0_15px_rgba(64,188,244,0.5)] flex items-center justify-center shrink-0 animate-pulse text-2xl">🏆</div>
@@ -87,20 +93,27 @@
     </div>
 </div>
 
-<div id="hero-bg-container" class="fixed inset-0 w-full h-full z-0 bg-[#0f1115] pointer-events-none transition-opacity duration-1000">
-    <img id="hero-backdrop-img" src="https://image.tmdb.org/t/p/original/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg" class="w-full h-full object-cover opacity-40 transition-opacity duration-1000 grayscale-[40%]">
-    <div class="absolute inset-0 bg-gradient-to-b from-[#0f1115]/60 via-[#0f1115]/30 to-[#0f1115] pointer-events-none"></div>
-</div>
-
-<header class="absolute top-6 left-6 md:top-8 md:left-8 flex items-center gap-3 z-40 pointer-events-auto">
-    <div class="flex items-center gap-1.5 cursor-pointer hover:scale-105 transition-transform" onclick="location.reload()">
-        <div class="w-3 h-3 rounded-full bg-[#00e054]"></div>
-        <div class="w-3 h-3 rounded-full bg-[#40bcf4]"></div>
-        <div class="w-3 h-3 rounded-full bg-[#ff8000]"></div>
+<!-- Header (Logo + Filmes Info) -->
+<header class="absolute top-6 left-6 right-6 md:top-8 md:left-8 md:right-8 flex items-start justify-between z-40 pointer-events-auto">
+    <div class="flex items-center gap-3">
+        <div class="flex items-center gap-1.5 cursor-pointer hover:scale-105 transition-transform" onclick="location.reload()">
+            <div class="w-3 h-3 rounded-full bg-[#00e054]"></div>
+            <div class="w-3 h-3 rounded-full bg-[#40bcf4]"></div>
+            <div class="w-3 h-3 rounded-full bg-[#ff8000]"></div>
+        </div>
+        <div class="flex flex-col">
+            <h1 class="text-xl font-bold tracking-widest text-white uppercase leading-none shadow-black drop-shadow-md space-font">Scanner<span class="text-[#40bcf4]">boxd</span></h1>
+            <p class="text-[8px] text-[#8c9bab] font-bold tracking-[0.3em] uppercase drop-shadow-md mt-1">v1.0.0 Oficial</p>
+        </div>
     </div>
-    <div class="flex flex-col">
-        <h1 class="text-xl font-bold tracking-widest text-white uppercase leading-none shadow-black drop-shadow-md space-font">Scanner<span class="text-[#40bcf4]">boxd</span></h1>
-        <p class="text-[8px] text-[#8c9bab] font-bold tracking-[0.3em] uppercase drop-shadow-md mt-1">v1.0.0 Oficial</p>
+
+    <!-- Informações do Pôster de Fundo -->
+    <div id="slideshow-info" class="transition-opacity duration-500 opacity-0 flex flex-col items-end text-right hidden sm:flex">
+        <h2 id="slide-title" class="text-sm md:text-lg font-black text-white tracking-tighter drop-shadow-md leading-tight mb-0.5 max-w-[250px] truncate space-font">...</h2>
+        <div class="flex items-center gap-2">
+            <span id="slide-year" class="text-gray-300 font-bold text-[10px]"></span>
+            <span id="slide-rating" class="text-[#00e054] text-[10px] tracking-widest drop-shadow-md"></span>
+        </div>
     </div>
 </header>
 
@@ -109,7 +122,7 @@
     <p id="funny-text" class="text-white font-bold uppercase text-[9px] md:text-[10px] tracking-widest text-center drop-shadow-md">Iniciando processos...</p>
 </div>
 
-<div id="main-content" class="absolute inset-0 w-full z-20 flex flex-col pt-[30vh] px-4 md:px-8 overflow-y-auto pb-32 transition-transform duration-700 ease-in-out pointer-events-auto">
+<div id="main-content" class="absolute inset-0 w-full z-20 flex flex-col pt-[30vh] px-4 md:px-8 pb-32 transition-transform duration-700 ease-in-out pointer-events-auto">
     <div class="max-w-2xl mx-auto w-full">
         
         <div class="text-center space-y-2 mb-12">
@@ -121,8 +134,9 @@
         </div>
 
         <div class="space-y-4 relative z-30">
-            <a href="https://letterboxd.com/data/export/" target="_blank" class="fluent-glass flex items-center gap-4 px-6 py-4 w-full group hover:border-[#40bcf4]/50 pointer-events-auto cursor-pointer">
-                <span class="bg-[#40bcf4]/20 text-[#40bcf4] w-7 h-7 rounded-full flex items-center justify-center text-xs font-black shrink-0 group-hover:bg-[#40bcf4] group-hover:text-[#0f1115] transition-colors">1</span>
+            <!-- Passo 1: O Glassmorphism Azul Limpo -->
+            <a href="https://letterboxd.com/data/export/" target="_blank" class="fluent-glass flex items-center gap-4 px-6 py-4 w-full group transition-all hover:border-[#40bcf4]/50 cursor-pointer">
+                <span class="bg-[#40bcf4]/20 text-[#40bcf4] w-7 h-7 rounded-full flex items-center justify-center text-xs font-black shrink-0 group-hover:bg-[#40bcf4] group-hover:text-[#14181c] transition-colors">1</span>
                 <div class="text-left">
                     <span class="font-bold text-sm tracking-wide block text-white drop-shadow-sm">Baixar arquivo .ZIP oficial</span>
                     <span class="text-[9px] uppercase tracking-widest text-[#8c9bab] group-hover:text-[#40bcf4] transition-colors">Abre o Letterboxd em nova aba</span>
@@ -130,9 +144,10 @@
                 <svg class="w-5 h-5 text-[#40bcf4] ml-auto opacity-70 group-hover:opacity-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
             </a>
 
-            <div class="fluent-glass p-8 text-center border-dashed border-2 border-[#40bcf4]/30 hover:border-[#40bcf4]/60 transition-all group relative overflow-hidden pointer-events-auto">
+            <!-- Passo 2: O Glassmorphism Azul Limpo (Sólido, sem tracejado) -->
+            <div class="fluent-glass p-8 text-center border-2 border-transparent hover:border-[#40bcf4]/50 transition-all group cursor-pointer relative overflow-hidden pointer-events-auto">
                 <label for="csv-file" id="dropzone-label" class="cursor-pointer block w-full h-full">
-                    <div class="w-16 h-16 bg-[#40bcf4]/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-all border border-[#40bcf4]/30 shadow-inner">
+                    <div class="w-16 h-16 bg-[#40bcf4]/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform border border-[#40bcf4]/20 shadow-inner">
                         <svg class="w-8 h-8 text-[#40bcf4]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z"></path></svg>
                     </div>
                     <p class="text-xl md:text-2xl font-bold text-white mb-1 drop-shadow-sm space-font">Arraste seu arquivo <span class="text-[#40bcf4]">.zip</span> aqui</p>
@@ -145,7 +160,7 @@
                         <svg class="w-4 h-4 text-[#40bcf4]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                         <p id="file-name-display" class="text-[#40bcf4] font-mono text-sm truncate max-w-[250px] drop-shadow-md"></p>
                     </div>
-                    <button id="btn-iniciar-real" onclick="handleFileUpload()" class="w-full bg-[#40bcf4] text-[#0f1115] font-black py-4 rounded-xl uppercase tracking-widest transition-all shadow-[0_0_20px_rgba(64,188,244,0.3)] hover:shadow-[0_0_35px_rgba(64,188,244,0.6)] flex items-center justify-center gap-2 hover:scale-[1.02]">
+                    <button id="btn-iniciar-real" onclick="handleFileUpload()" class="w-full bg-[#00e054] text-[#0f1115] font-black py-4 rounded-xl uppercase tracking-widest transition-all shadow-[0_0_20px_rgba(0,224,84,0.3)] hover:shadow-[0_0_35px_rgba(0,224,84,0.6)] flex items-center justify-center gap-2 hover:scale-[1.02]">
                         <span id="btn-text-real">Iniciar Análise</span>
                     </button>
                     <button onclick="resetUpload()" class="text-[10px] text-[#8c9bab] hover:text-white uppercase tracking-widest underline decoration-dashed">Escolher outro arquivo</button>
@@ -174,8 +189,11 @@
         <div class="w-[100vw] h-full overflow-y-auto pb-32 pt-28 px-4 sm:px-8 flex flex-col items-center">
             <div class="max-w-2xl w-full space-y-6">
                 <div class="fluent-glass p-8 relative flex flex-col items-center text-center">
-                    <div id="profile-avatar" class="w-20 h-20 rounded-full border-2 border-[#00e054] bg-[#0f1115] mb-6 flex items-center justify-center overflow-hidden shadow-[0_0_20px_rgba(0,224,84,0.3)] shrink-0">
-                        <svg class="w-8 h-8 text-[#2c3440]" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                    
+                    <!-- FOTO DO PERFIL BLINDADA (NÃO EXPLODE MAIS) -->
+                    <div class="w-24 h-24 rounded-full border-2 border-[#00e054] bg-[#0f1115] mb-6 mx-auto flex items-center justify-center overflow-hidden shadow-[0_0_20px_rgba(0,224,84,0.3)] shrink-0 relative">
+                        <svg id="profile-avatar-icon" class="w-10 h-10 text-[#2c3440]" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        <img id="profile-avatar-img" class="w-full h-full object-cover hidden absolute inset-0 z-10" src="">
                     </div>
                     
                     <h2 class="text-2xl md:text-3xl font-black text-white tracking-tighter mb-4 leading-tight space-font" id="roast-title">
@@ -262,8 +280,8 @@
         </div>
     </div>
 
-    <!-- Bolinhas Minimalistas (Rodapé) -->
-    <div class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex items-center justify-center gap-3">
+    <!-- Bolinhas Minimalistas Flutuantes (Rodapé) -->
+    <div class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex items-center justify-center gap-4">
         <div class="bottom-nav-dot dot-green active" onclick="slideTo(0)" title="Perfil"></div>
         <div class="bottom-nav-dot dot-blue" id="tab-oracle" onclick="slideTo(1)" title="Oráculo"></div>
         <div class="bottom-nav-dot dot-orange" id="tab-watch" onclick="slideTo(2)" title="Watchlist"></div>
@@ -313,27 +331,84 @@
     let fraseTimerInterval;
     let frasesAleatorias = [];
     
-    // O BUFFER INVISÍVEL DO ORÁCULO A JATO
     let oraculoBuffer = [];
 
-    const iconicMovies = [
-        "https://image.tmdb.org/t/p/original/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg",
-        "https://image.tmdb.org/t/p/original/nMKdUUepR0i5zn0y1T4CsSB5chy.jpg", 
-        "https://image.tmdb.org/t/p/original/suaEOtk1N1sgg2MTM7oZd2cfVp3.jpg"  
-    ];
+    // Fundo Rotativo Dinâmico
     let currentBgIdx = 0;
     let bgInterval;
+    let currentBgList = [
+        { Name: "Interstellar", Year: 2014, Rating: 5, backdrop: "https://image.tmdb.org/t/p/original/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg" },
+        { Name: "The Matrix", Year: 1999, Rating: 5, backdrop: "https://image.tmdb.org/t/p/original/ncEsesgOJDNrTUED89hYbA117wo.jpg" },
+        { Name: "Pulp Fiction", Year: 1994, Rating: 5, backdrop: "https://image.tmdb.org/t/p/original/suaEOtk1N1sgg2MTM7oZd2cfVp3.jpg" }
+    ];
 
     function startBgSlideshow() {
         const heroImg = document.getElementById('hero-backdrop-img');
+        const slideInfo = document.getElementById('slideshow-info');
         if (!heroImg) return;
-        bgInterval = setInterval(() => {
-            currentBgIdx = (currentBgIdx + 1) % iconicMovies.length;
-            heroImg.style.opacity = '0'; 
-            setTimeout(() => { heroImg.src = iconicMovies[currentBgIdx]; heroImg.style.opacity = '0.4'; }, 1000);
-        }, 6000);
+
+        const updateBg = () => {
+            heroImg.style.opacity = '0';
+            if(slideInfo) slideInfo.style.opacity = '0';
+            
+            setTimeout(() => {
+                const movie = currentBgList[currentBgIdx];
+                heroImg.src = movie.backdrop;
+                
+                const st = document.getElementById('slide-title');
+                const sy = document.getElementById('slide-year');
+                const sr = document.getElementById('slide-rating');
+                
+                if(st) st.innerText = movie.Name;
+                if(sy) sy.innerText = movie.Year || '';
+                if(sr) {
+                    let stars = '';
+                    let r = movie.Rating || 0;
+                    for(let i=0; i<Math.floor(r); i++) stars += '★';
+                    if(r % 1 !== 0) stars += '½';
+                    sr.innerText = stars;
+                }
+
+                heroImg.style.opacity = '0.4';
+                if(slideInfo) slideInfo.style.opacity = '1';
+                
+                currentBgIdx = (currentBgIdx + 1) % currentBgList.length;
+            }, 800);
+        };
+        
+        updateBg();
+        if(bgInterval) clearInterval(bgInterval);
+        bgInterval = setInterval(updateBg, 6000);
     }
     document.addEventListener('DOMContentLoaded', startBgSlideshow);
+
+    // Carrega o Top 5 do usuário pro fundo
+    async function loadUserBackgrounds() {
+        if(!statsData || !statsData.favoritos || statsData.favoritos.length === 0) return;
+        const favs = statsData.favoritos.slice(0, 5);
+        let newBgList = [];
+        for(let f of favs) {
+            try {
+                let res = await fetch(`/api/tmdb/search?query=${encodeURIComponent(f.Name)}`);
+                let d = await res.json();
+                if(d.results && d.results.length > 0 && d.results[0].backdrop_path) {
+                    newBgList.push({
+                        Name: f.Name,
+                        Year: f.Year,
+                        Rating: f.Rating,
+                        backdrop: `https://image.tmdb.org/t/p/original${d.results[0].backdrop_path}`
+                    });
+                }
+            } catch(e) {}
+        }
+        if(newBgList.length > 0) {
+            currentBgList = newBgList;
+            currentBgIdx = 0;
+            startBgSlideshow();
+            document.getElementById('slideshow-info').classList.remove('hidden');
+            document.getElementById('slideshow-info').classList.add('flex');
+        }
+    }
 
     fetch('/frases').then(res => res.json()).then(data => { if(data.length>0) frasesAleatorias = data; }).catch(e => {});
 
@@ -439,8 +514,6 @@
     }
 
     function iniciarAppReal() {
-        clearInterval(bgInterval);
-        document.getElementById('hero-bg-container').classList.add('opacity-0');
         document.getElementById('main-content').style.transform = 'translateY(-100vh)';
         
         setTimeout(() => {
@@ -453,6 +526,7 @@
             document.getElementById('stat-total').innerText = statsData.total_avaliados || 0;
             document.getElementById('stat-avg').innerText = (statsData.media_notas || 0).toFixed(2);
 
+            loadUserBackgrounds();
             iniciarCicloDeFrases();
             gerarPerfilIA();
             iniciarFluxoWatchlist();
@@ -460,12 +534,12 @@
         }, 700);
     }
 
-    async function buscarRostoPersonagem(charName) {
-        if(!charName) return null;
+    // Busca imagem na Wikipedia (Modo Caçador de Personagens)
+    async function fetchWikiImage(query) {
         try {
-            const res = await fetch(`https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(charName)}&prop=pageimages&format=json&pithumbsize=500&origin=*`);
-            const data = await res.json();
-            const pages = data.query.pages;
+            let res = await fetch(`https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(query)}&prop=pageimages&format=json&pithumbsize=500&origin=*`);
+            let data = await res.json();
+            let pages = data.query.pages;
             for (let p in pages) {
                 if (pages[p].thumbnail) return pages[p].thumbnail.source;
             }
@@ -473,7 +547,9 @@
         return null;
     }
 
-    async function fetchPosterFallback(title, year, id) {
+    // A FUNÇÃO BLINDADA: Nunca vai explodir a caixa
+    async function fetchPosterFallback(title, year, id, isAvatar = false) {
+        let imgUrl = null;
         try {
             let res = await fetch(`/api/tmdb/search?query=${encodeURIComponent(title)}&year=${year}`);
             let d = await res.json();
@@ -482,29 +558,37 @@
                 d = await res.json();
             }
 
-            let imgUrl = null;
             if(d.results?.[0]?.poster_path) {
                 imgUrl = `https://image.tmdb.org/t/p/w500${d.results[0].poster_path}`;
-            } else {
-                try {
-                    let wRes = await fetch(`https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(title + ' (film)')}|${encodeURIComponent(title)}&prop=pageimages&format=json&pithumbsize=500&origin=*`);
-                    let wData = await wRes.json();
-                    let pages = wData.query.pages;
-                    for (let p in pages) {
-                        if (pages[p].thumbnail) { imgUrl = pages[p].thumbnail.source; break; }
-                    }
-                } catch(e) {}
-            }
-
-            const card = document.getElementById(id);
-            if(card) {
-                if (imgUrl) {
-                    card.insertAdjacentHTML('beforeend', `<img class="fav-poster absolute inset-0 w-full h-full object-cover z-10 transition-opacity duration-700 opacity-0" src="${imgUrl}" onload="this.style.opacity='1'">`);
-                } else {
-                    card.insertAdjacentHTML('beforeend', `<div class="absolute inset-0 w-full h-full bg-[#14181c] z-10 flex items-center justify-center p-4 text-center border-2 border-[#2c3440]"><h3 class="text-[#8c9bab] font-black uppercase tracking-widest text-sm space-font">${title}</h3></div>`);
-                }
             }
         } catch(e) {}
+
+        if (imgUrl) {
+            if (isAvatar) {
+                const imgEl = document.getElementById('profile-avatar-img');
+                const iconEl = document.getElementById('profile-avatar-icon');
+                if (imgEl && iconEl) {
+                    imgEl.src = imgUrl;
+                    imgEl.onload = () => {
+                        imgEl.classList.remove('hidden');
+                        iconEl.classList.add('hidden');
+                    };
+                }
+            } else {
+                const card = document.getElementById(id);
+                if (card) {
+                    card.insertAdjacentHTML('beforeend', `<img class="fav-poster absolute inset-0 w-full h-full object-cover z-10 transition-opacity duration-700 opacity-0" src="${imgUrl}" onload="this.style.opacity='1'">`);
+                }
+            }
+        } else {
+            // Se não achou NADA no TMDB, faz o Pôster Tipográfico minimalista
+            if (!isAvatar) {
+                const card = document.getElementById(id);
+                if (card) {
+                    card.insertAdjacentHTML('beforeend', `<div class="absolute inset-0 w-full h-full bg-[#14181c] z-10 flex items-center justify-center p-4 text-center border border-[#2c3440]"><h3 class="text-[#8c9bab] font-black uppercase tracking-widest text-sm space-font">${title}</h3></div>`);
+                }
+            }
+        }
     }
 
     async function gerarPerfilIA() {
@@ -518,12 +602,21 @@
                     if(td) td.innerHTML = data.descricao.replace(/\n/g, '<br><br>'); 
                     
                     if(data.personagem_referencia) {
-                        let imgWiki = await buscarRostoPersonagem(data.personagem_referencia);
-                        if(!imgWiki) imgWiki = await buscarRostoPersonagem(data.filme_referencia); 
-                        if(imgWiki) {
-                            document.getElementById('profile-avatar').innerHTML = `<img src="${imgWiki}" class="w-full h-full object-cover">`;
+                        let imgUrl = await fetchWikiImage(data.personagem_referencia);
+                        if(!imgUrl && data.filme_referencia) imgUrl = await fetchWikiImage(data.filme_referencia); 
+                        
+                        if(imgUrl) {
+                            const imgEl = document.getElementById('profile-avatar-img');
+                            const iconEl = document.getElementById('profile-avatar-icon');
+                            if(imgEl) {
+                                imgEl.src = imgUrl;
+                                imgEl.onload = () => {
+                                    imgEl.classList.remove('hidden');
+                                    if(iconEl) iconEl.classList.add('hidden');
+                                }
+                            }
                         } else {
-                            fetchPosterFallback(data.filme_referencia, "", 'profile-avatar');
+                            fetchPosterFallback(data.filme_referencia || "Fight Club", "", 'profile-avatar', true);
                         }
                     }
                     return;
@@ -531,8 +624,8 @@
             } throw new Error();
         } catch(e) {
             if(tt) tt.innerHTML = "O Explorador Silencioso"; 
-            if(td) td.innerHTML = "O Oráculo está Meditando... 🧘‍♂️<br><br>Opa desculpa pae! As IAs do servidor derreteram com tanto acesso hoje e não conseguiram decifrar seu gosto peculiar.<br><br>Mas ó, aproveite pra ver onde assistir sua Watchlist na aba ao lado!";
-            fetchPosterFallback("Drive", "2011", 'profile-avatar');
+            if(td) td.innerHTML = "O Oráculo está Meditando... 🧘‍♂️<br><br>Opa desculpa pae! As IAs do servidor derreteram com tanto acesso hoje e não conseguiram decifrar seu gosto peculiar.<br><br>Mas ó, aproveite pra ver onde assistir sua Watchlist ali na aba do lado! 🍿";
+            fetchPosterFallback("Drive", "2011", 'profile-avatar', true);
         }
     }
 
@@ -588,7 +681,6 @@
                 return;
             }
 
-            // MÁGICA DO BUFFER! Guarda os 12, mas exibe só 4.
             oraculoBuffer = data.recomendacoes;
             let renderizarAgora = oraculoBuffer.splice(0, 4);
             oraculoRecomendacoesGlobais.push(...renderizarAgora);
@@ -603,9 +695,8 @@
         document.getElementById('load-more-spinner').classList.remove('hidden');
         document.getElementById('load-more-icon').classList.add('hidden');
 
-        // SE O BUFFER TIVER FILMES, CARREGA NA HORA! (A jato)
         if(oraculoBuffer.length >= 4) {
-            await new Promise(r => setTimeout(r, 600)); // Pequeno delay pra dar sensação de processamento
+            await new Promise(r => setTimeout(r, 600)); 
             let renderizarAgora = oraculoBuffer.splice(0, 4);
             let s = oraculoRecomendacoesGlobais.length;
             oraculoRecomendacoesGlobais.push(...renderizarAgora);
@@ -616,7 +707,6 @@
             return;
         }
 
-        // SE O BUFFER ESVAZIOU, PEDE MAIS PRA IA
         try {
             const excl = oraculoRecomendacoesGlobais.map(x => x.rec);
             const res = await fetch(`/oraculo?session_id=${sessionId}`, { 
@@ -625,13 +715,12 @@
             const data = await res.json();
             
             if(data.recomendacoes && data.recomendacoes.length > 0) {
-                oraculoBuffer = data.recomendacoes; // Enche o buffer de novo
+                oraculoBuffer = data.recomendacoes; 
                 let renderizarAgora = oraculoBuffer.splice(0, 4);
                 let s = oraculoRecomendacoesGlobais.length;
                 oraculoRecomendacoesGlobais.push(...renderizarAgora);
                 renderizarOraculoCards(renderizarAgora, s);
             } else {
-                // VITÓRIA DO USUÁRIO! Troféu na tela.
                 const trophy = document.getElementById('ps-trophy');
                 if (trophy) { trophy.classList.add('show'); setTimeout(() => trophy.classList.remove('show'), 5000); }
                 document.getElementById('btn-descobrir-mais').classList.add('hidden');
@@ -779,7 +868,7 @@
     }
 
     function iniciarMockupTeste() {
-        clearInterval(bgInterval); document.getElementById('hero-bg-container').classList.add('opacity-0'); document.getElementById('main-content').style.transform = 'translateY(-100vh)';
+        document.getElementById('main-content').style.transform = 'translateY(-100vh)';
         setTimeout(() => {
             document.getElementById('main-content').classList.add('hidden');
             const appView = document.getElementById('app-view'); appView.classList.remove('hidden'); void appView.offsetWidth; appView.classList.remove('opacity-0');
