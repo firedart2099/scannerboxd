@@ -12,7 +12,6 @@ import platform
 import webbrowser
 import sqlite3
 import concurrent.futures
-import unicodedata
 from contextlib import closing
 from flask import Flask, render_template, request, jsonify, Response
 from urllib.parse import quote
@@ -29,7 +28,6 @@ NVIDIA_API_KEY = os.getenv("NVIDIA_API_KEY", "").replace('"', '').replace("'", "
 TMDB_API_KEY = os.getenv("TMDB_API_KEY", "").replace('"', '').replace("'", "").strip()
 
 DB_NAME = "oraculo.db"
-
 db_lock = threading.Lock()
 
 # ==========================================
@@ -44,7 +42,9 @@ def check_db_health():
                 result = cursor.fetchone()
                 if result and str(result[0]).lower() != 'ok':
                     os.remove(DB_NAME)
-        except Exception: pass
+        except Exception: 
+            try: os.remove(DB_NAME)
+            except Exception: pass
 
 def get_db():
     conn = sqlite3.connect(DB_NAME, timeout=20, check_same_thread=False)
@@ -101,7 +101,7 @@ def limpar_e_parsear_json(content):
                         rec[k] = v.replace('"', '').replace('*', '').strip()
     return dados
 
-def gerar_resposta_ia(prompt, max_tokens=1000):
+def gerar_resposta_ia(prompt, max_tokens=1000, timeout_nv=28):
     if NVIDIA_API_KEY:
         try:
             url_nv = "https://integrate.api.nvidia.com/v1/chat/completions"
@@ -113,7 +113,7 @@ def gerar_resposta_ia(prompt, max_tokens=1000):
                 "max_tokens": max_tokens,
                 "response_format": {"type": "json_object"} 
             }
-            res_nv = requests.post(url_nv, headers=headers_nv, json=payload_nv, timeout=25)
+            res_nv = requests.post(url_nv, headers=headers_nv, json=payload_nv, timeout=timeout_nv)
             if res_nv.status_code == 200: return limpar_e_parsear_json(res_nv.json()['choices'][0]['message']['content'])
             else: print(f"⚠️ NVIDIA falhou (Status {res_nv.status_code})")
         except Exception as e: print(f"Erro NVIDIA: {e}")
@@ -248,16 +248,6 @@ def tmdb_search():
         return jsonify(res.json()) if res.status_code == 200 else jsonify({"results": []})
     except Exception: return jsonify({"results": []}), 200
 
-@app.route('/api/tmdb/person', methods=['GET'])
-def tmdb_person():
-    q = request.args.get('query', '')
-    if not TMDB_API_KEY or not q: return jsonify({"results": []}), 200
-    url = f'https://api.themoviedb.org/3/search/person?api_key={TMDB_API_KEY}&query={quote(q)}&language=pt-BR'
-    try:
-        res = requests.get(url, timeout=10)
-        return jsonify(res.json()) if res.status_code == 200 else jsonify({"results": []})
-    except Exception: return jsonify({"results": []}), 200
-
 @app.route('/')
 def index(): return render_template('index.html')
 
@@ -335,34 +325,44 @@ def gerar_perfil():
     
     emojis_permitidos = "🙈🤓😼🥺😿😻💋🫦🔥💅👍☠️💀😢😭😞😓😔🤤🙄"
 
-    prompt = f"""Atue como um psicanalista de cinema que é cínico e sarcástico, mas de forma amigável, inteligente e MUITO coesa. Analise o gosto de: {username}.
-    Bio do usuário: "{bio}". Filmes que ama: {', '.join(filmes_amados)}. Odiou: {', '.join(odiados_recentes)}. Média de Notas: {stats.get('media_notas', 0)}.
+    prompt = f"""Atue como um psicanalista de cinema brilhante, irônico e que fala com o usuário como um amigo ácido.
+    NÃO SEJA PUXA-SACO. É PROIBIDO elogiar demais ou usar palavras como "fascinante", "refinado" ou "sofisticado". Seja debochado e aponte as hipocrisias no gosto da pessoa, mas de forma carismática e engenhosa.
     
-    REGRAS RÍGIDAS DE OURO (SIGA OU O CÓDIGO FALHA):
-    1. LEITURA DINÂMICA E FLUIDA: É EXPRESSAMENTE PROIBIDO criar frases infinitas com várias vírgulas. Você DEVE usar pontos finais (.) constantemente para fechar ideias. Crie frases curtas, diretas e que se conectem com fluidez. Pareça um comediante contando uma piada, não um robô quebrando regras.
-    2. NÃO SEJA PUXA-SACO: Não use palavras elogiosas demais (fascinante, refinado, incrível). Seja irônico e mostre as contradições do gosto dele.
-    3. COTA DE EMOJIS: Use EXATAMENTE entre 6 e 10 emojis espalhados no meio do texto para dar o tom caótico. USE EXCLUSIVAMENTE OS EMOJIS DESTA LISTA E NENHUM OUTRO: {emojis_permitidos}. É PROIBIDO criar uma lista explicando os emojis no final do texto.
-    4. ZERO REPETIÇÃO: No segundo parágrafo, explique o personagem de forma genial em NO MÁXIMO duas frases curtas. Vá direto ao ponto, não fique enrolando sobre a complexidade humana.
-    5. REFERÊNCIA FOTOGRÁFICA (ATOR): O banco de imagens não reconhece personagens fictícios. Portanto, você deve me devolver o nome do Ator REAL que interpretou o personagem para puxarmos a foto dele.
+    DADOS DO USUÁRIO:
+    Nome: {username}
+    Bio: "{bio}"
+    Ama: {', '.join(filmes_amados)}.
+    Odiou: {', '.join(odiados_recentes)}.
+    Média de Notas: {stats.get('media_notas', 0)}. Total de Filmes: {stats.get('total_avaliados', 0)}.
     
-    Responda OBRIGATORIAMENTE em JSON estrito:
+    REGRAS DE FORMATAÇÃO ESTRITAS:
+    1. LEITURA DINÂMICA: É ESTRITAMENTE PROIBIDO fazer frases infinitas. Use pontos finais constantemente. Cada parágrafo DEVE ter no máximo 4 frases curtas e matadoras.
+    2. EMOJIS: Use exatamente entre 6 a 10 emojis espalhados pelo texto. USE EXCLUSIVAMENTE ESTES: {emojis_permitidos}. É PROIBIDO criar uma lista explicando os emojis.
+    3. ZERO REPETIÇÃO: Vá direto ao ponto. Não fique listando os filmes repetidamente. Fale da "vibe" deles.
+    4. O PERSONAGEM: Escolha um personagem fictício que o represente. É PROIBIDO escolher Tyler Durden, Coringa ou Patrick Bateman. Escolha um personagem genial e justifique com ironia na última frase do texto.
+    5. ORTOGRAFIA: Não invente nomes de filmes ou engula letras.
+    
+    Responda EXCLUSIVAMENTE no formato JSON:
     {{ 
         "titulo": "Rótulo Sarcástico (Ex: O Caçador de Contradições)", 
-        "ator_referencia": "Nome do Ator Real (Ex: Marlon Brando)",
-        "personagem_referencia": "Nome do Personagem (Ex: Coronel Kurtz)", 
-        "descricao": ["Parágrafo 1 (frases curtas e pontos finais, zoando a bio e filmes).", "Parágrafo 2 (frases curtas, conectando o ódio dele a outros filmes e dando o xeque-mate genial de duas frases sobre o ator/personagem que o representa)."] 
+        "personagem_referencia": "Nome do Personagem Fictício (JAMAIS USE O NOME DO ATOR)", 
+        "filme_referencia": "Nome do Filme Original do Personagem (Em Inglês)", 
+        "descricao": [
+            "Parágrafo 1 curto (frases com ponto final, zoando a bio e os contrastes do gosto da pessoa).", 
+            "Parágrafo 2 curto (zombando das notas e dando o xeque-mate genial justificando o personagem escolhido)."
+        ] 
     }}"""
     
     try: 
-        dados = gerar_resposta_ia(prompt, max_tokens=1000)
+        dados = gerar_resposta_ia(prompt, max_tokens=1000, timeout_nv=20)
         if not dados or "titulo" not in dados: raise Exception("Falha JSON")
         if isinstance(dados.get("descricao"), list): dados["descricao"] = "\n\n".join(dados["descricao"])
         return jsonify(dados)
     except Exception as e: 
         return jsonify({
             "titulo": "O Explorador Silencioso", 
-            "ator_referencia": "Ryan Gosling",
             "personagem_referencia": "Driver",
+            "filme_referencia": "Drive",
             "descricao": "O Oráculo está Meditando... 🧘‍♂️\n\nOpa desculpa pae! As IAs do servidor derreteram com tanto acesso hoje e não conseguiram decifrar seu gosto peculiar.\n\nMas ó, aproveite pra ver onde assistir sua Watchlist ali na aba do lado! 🍿"
         })
 
@@ -372,11 +372,10 @@ def oraculo():
     sessao = carregar_sessao(sid)
     if not sessao: return jsonify({"erro": "Sessão não encontrada"}), 400
     
-    # Função Exterminadora de Títulos! Arranca "The", acentos, espaços e padroniza "Se7en".
+    # Função Exterminadora de Duplicatas! Arranca pontuação e padroniza títulos
     def normalize_title(title):
         if not isinstance(title, str): return ""
         t = title.lower().strip()
-        t = ''.join(c for c in unicodedata.normalize('NFD', t) if unicodedata.category(c) != 'Mn')
         t = re.sub(r'^(the |a |an |o |os |a |as )', '', t)
         t = t.replace('seven', 'se7en')
         return re.sub(r'[^a-z0-9]', '', t)
@@ -394,20 +393,17 @@ def oraculo():
         
         recs_finais = []
         tentativas_ia = 0
-        is_real_terror = False
-
-        while len(recs_finais) < 10 and tentativas_ia < 2:
+        
+        while len(recs_finais) < 12 and tentativas_ia < 2:
             favoritos = request.json.get('favorites', [])
             
-            # Pede 12 filmes para alimentar o Buffer e diminuir a lentidão
             prompt = f"""Atue como curador profissional. Favoritos do usuário: {favoritos}.
-            Recomende EXATAMENTE 12 filmes de estilo similar mas que sejam ABSOLUTAMENTE INÉDITOS para ele.
-            NÃO recomende blockbusters genéricos. Vá fundo no catálogo de filmes Cult e Lado B.
-            NÃO USE asteriscos (*) nos nomes.
+            Recomende EXATAMENTE 15 filmes cults ou obscuros ABSOLUTAMENTE INÉDITOS para ele.
+            NÃO recomende blockbusters genéricos. Vá fundo no catálogo Lado B.
             Responda OBRIGATORIAMENTE em JSON:
             {{ "recomendacoes": [ {{"rec_original": "TITLE", "rec": "TITLE", "ano": 2000, "base": "GENERO", "desc": "Pequena sinopse."}} ] }}"""
 
-            dados_json = gerar_resposta_ia(prompt, max_tokens=1500)
+            dados_json = gerar_resposta_ia(prompt, max_tokens=1000, timeout_nv=28)
             recs_ia = dados_json.get("recomendacoes", []) if dados_json else []
             
             for r in recs_ia:
@@ -417,26 +413,29 @@ def oraculo():
                 norm_nome = normalize_title(nome)
                 norm_orig = normalize_title(orig)
                 
-                # Se o filme não tá na Blacklist normalizada, tá liberado!
+                # Só passa se o cara NUNCA viu esse filme e se não for um clone disfarçado na própria lista
                 if norm_nome not in blacklist_norm and norm_orig not in blacklist_norm:
-                    # Checa se a IA não gerou a mesma coisa nessa exata resposta (clones)
-                    if norm_nome not in [normalize_title(rf['rec']) for rf in recs_finais]:
+                    clone = False
+                    for rf in recs_finais:
+                        rf_nome = normalize_title(rf.get('rec', ''))
+                        rf_orig = normalize_title(rf.get('rec_original', ''))
+                        if norm_nome in [rf_nome, rf_orig] or norm_orig in [rf_nome, rf_orig]:
+                            clone = True
+                            break
+                    if not clone:
                         recs_finais.append(r)
             
             tentativas_ia += 1
-            if len(recs_finais) < 10: time.sleep(0.5)
-
-        # Se a IA espremeu tudo que sabia, tentou 2 vezes e não achou nem 4 filmes novos: Você zerou o cinema!
-        if len(recs_finais) < 4:
-            is_real_terror = True
 
         res_payload = {"recomendacoes": recs_finais}
         
-        if is_real_terror:
+        # Se a IA espremeu tudo que sabia, e mesmo assim os filmes que ela achou obscuros o cara JÁ TINHA VISTO TUDO!
+        if len(recs_finais) == 0:
             res_payload["terror_mode"] = True
-            if len(recs_finais) > 0:
-                res_payload["recomendacoes"][0]["base"] = "O REAL TERROR"
-                res_payload["recomendacoes"][0]["desc"] = "A Inteligência Artificial vasculhou a internet e percebeu que você já assistiu a quase tudo. Ela suou sangue para achar isso. Você venceu a máquina. 💀💅"
+            res_payload["recomendacoes"] = [{
+                "rec": "O Terror do Letterboxd", "rec_original": "O Terror do Letterboxd", "ano": 2026, "base": "O REAL TERROR",
+                "desc": "A Inteligência Artificial vasculhou a internet e percebeu que você já assistiu a quase tudo. Ela suou sangue para achar isso. Você venceu a máquina. 💀💅"
+            }]
 
         return jsonify(res_payload)
     except Exception as e:
@@ -478,7 +477,7 @@ def processar_em_segundo_plano(watchlist_data, sid):
         return chave, streamings
     
     try:
-        # POTÊNCIA MÁXIMA DA WATCHLIST!
+        # Aumentei o motor pra 15 requisições por vez (Watchlist Turbo!)
         with concurrent.futures.ThreadPoolExecutor(max_workers=15) as executor:
             futures = {executor.submit(fetch_movie, row): row for row in watchlist_data}
             for future in concurrent.futures.as_completed(futures):
