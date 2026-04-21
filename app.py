@@ -22,15 +22,18 @@ load_dotenv()
 app = Flask(__name__)
 ARQUIVO_FRASES = "frases.txt" 
 
-NVIDIA_API_KEY = os.getenv("NVIDIA_API_KEY", "").replace('"', '').replace("'", "").strip()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "").replace('"', '').replace("'", "").strip()
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").replace('"', '').replace("'", "").strip()
+NVIDIA_API_KEY = os.getenv("NVIDIA_API_KEY", "").replace('"', '').replace("'", "").strip()
 TMDB_API_KEY = os.getenv("TMDB_API_KEY", "").replace('"', '').replace("'", "").strip()
 
 DB_NAME = "oraculo.db"
 
 db_lock = threading.Lock()
 
+# ==========================================
+# CONFIGURAÇÃO DO BANCO DE DADOS SQLITE
+# ==========================================
 def check_db_health():
     if os.path.exists(DB_NAME):
         try:
@@ -42,13 +45,13 @@ def check_db_health():
                     os.remove(DB_NAME)
         except Exception as e:
             try: os.remove(DB_NAME)
-            except Exception as ex: pass
+            except Exception: pass
 
 def get_db():
     conn = sqlite3.connect(DB_NAME, timeout=20, check_same_thread=False)
     conn.row_factory = sqlite3.Row
     try: conn.execute('PRAGMA journal_mode=WAL')
-    except Exception as e: pass
+    except Exception: pass
     return conn
 
 def init_db():
@@ -63,7 +66,7 @@ def init_db():
                     c.execute('''CREATE TABLE IF NOT EXISTS credits (ip TEXT PRIMARY KEY, creditos INTEGER)''')
                     c.execute('''CREATE TABLE IF NOT EXISTS global_cache (chave TEXT PRIMARY KEY, streamings TEXT)''')
                     c.execute('''CREATE TABLE IF NOT EXISTS dados_finais (session_id TEXT PRIMARY KEY, dados TEXT)''')
-        except Exception as e: pass
+        except Exception: pass
 
 init_db()
 
@@ -71,32 +74,32 @@ init_db()
 def handle_exception(e):
     return jsonify({"erro": f"Erro interno do servidor: {str(e)}"}), 500
 
+# ==========================================
+# MOTOR DE INTELIGÊNCIA ARTIFICIAL (NVIDIA -> GROQ -> GEMINI)
+# ==========================================
 def limpar_e_parsear_json(content):
     content = re.sub(r'^```json\s*', '', content, flags=re.MULTILINE|re.IGNORECASE)
     content = re.sub(r'^```\s*', '', content, flags=re.MULTILINE).strip()
     
     dados = None
     match = re.search(r'\{.*\}', content, re.DOTALL)
-    
     if match:
         try: dados = json.loads(match.group(0), strict=False)
-        except Exception as e: pass
+        except Exception: pass
             
     if not dados:
         try: dados = json.loads(content, strict=False)
-        except Exception as e: return {}
+        except Exception: return {}
 
     if isinstance(dados, dict):
         for key, value in dados.items():
             if isinstance(value, str):
                 dados[key] = value.replace('"', '').replace('*', '').strip()
-        
         if "recomendacoes" in dados and isinstance(dados["recomendacoes"], list):
             for rec in dados["recomendacoes"]:
                 for k, v in rec.items():
                     if isinstance(v, str):
                         rec[k] = v.replace('"', '').replace('*', '').strip()
-                        
     return dados
 
 def gerar_resposta_ia(prompt, max_tokens=1000):
@@ -112,8 +115,7 @@ def gerar_resposta_ia(prompt, max_tokens=1000):
                 "response_format": {"type": "json_object"} 
             }
             res_nv = requests.post(url_nv, headers=headers_nv, json=payload_nv, timeout=25)
-            if res_nv.status_code == 200:
-                return limpar_e_parsear_json(res_nv.json()['choices'][0]['message']['content'])
+            if res_nv.status_code == 200: return limpar_e_parsear_json(res_nv.json()['choices'][0]['message']['content'])
             else: print(f"⚠️ NVIDIA falhou (Status {res_nv.status_code})")
         except Exception as e: print(f"Erro NVIDIA: {e}")
 
@@ -129,9 +131,8 @@ def gerar_resposta_ia(prompt, max_tokens=1000):
                 "response_format": {"type": "json_object"} 
             }
             res_groq = requests.post(url_groq, headers=headers_groq, json=payload_groq, timeout=12)
-            if res_groq.status_code == 200:
-                return limpar_e_parsear_json(res_groq.json()['choices'][0]['message']['content'])
-            else: print(f"⚠️ Groq falhou (Status {res_groq.status_code}): {res_groq.text[:300]}")
+            if res_groq.status_code == 200: return limpar_e_parsear_json(res_groq.json()['choices'][0]['message']['content'])
+            else: print(f"⚠️ Groq falhou (Status {res_groq.status_code})")
         except Exception as e: print(f"Erro de conexão com Groq: {e}")
 
     if GEMINI_API_KEY:
@@ -142,26 +143,28 @@ def gerar_resposta_ia(prompt, max_tokens=1000):
                 "generationConfig": {"responseMimeType": "application/json", "maxOutputTokens": max_tokens}
             }
             res_gemini = requests.post(url_gemini, json=payload_gemini, timeout=15) 
-            if res_gemini.status_code == 200:
-                return limpar_e_parsear_json(res_gemini.json()['candidates'][0]['content']['parts'][0]['text'])
+            if res_gemini.status_code == 200: return limpar_e_parsear_json(res_gemini.json()['candidates'][0]['content']['parts'][0]['text'])
             else: print(f"⚠️ Gemini falhou (Status {res_gemini.status_code})")
         except Exception as e: print(f"Erro de conexão com Gemini: {e}")
     
     raise Exception("RATE_LIMIT")
 
+# ==========================================
+# FUNÇÕES DE ESTADO
+# ==========================================
 def set_progresso(session_id, atual, total, finalizado, filme_atual):
     with db_lock:
         try:
             with closing(get_db()) as conn:
                 with conn: conn.execute('''INSERT OR REPLACE INTO progress (session_id, atual, total, finalizado, filme_atual) VALUES (?, ?, ?, ?, ?)''', (session_id, atual, total, int(finalizado), filme_atual))
-        except Exception as e: pass
+        except Exception: pass
 
 def get_progresso(session_id):
     try:
         with closing(get_db()) as conn:
             row = conn.execute('SELECT * FROM progress WHERE session_id = ?', (session_id,)).fetchone()
             if row: return {"atual": row['atual'], "total": row['total'], "finalizado": bool(row['finalizado']), "filme_atual": row['filme_atual']}
-    except Exception as e: pass
+    except Exception: pass
     return {"atual": 0, "total": 0, "finalizado": False, "filme_atual": "Aguardando..."}
 
 def salvar_sessao(session_id, vistos, amados, odiados, watchlist):
@@ -169,14 +172,14 @@ def salvar_sessao(session_id, vistos, amados, odiados, watchlist):
         try:
             with closing(get_db()) as conn:
                 with conn: conn.execute('''INSERT OR REPLACE INTO sessions (session_id, vistos, amados, odiados, watchlist) VALUES (?, ?, ?, ?, ?)''', (session_id, json.dumps(vistos), json.dumps(amados), json.dumps(odiados), json.dumps(watchlist)))
-        except Exception as e: pass
+        except Exception: pass
 
 def carregar_sessao(session_id):
     try:
         with closing(get_db()) as conn:
             row = conn.execute('SELECT * FROM sessions WHERE session_id = ?', (session_id,)).fetchone()
             if row: return {'vistos': json.loads(row['vistos']), 'amados': json.loads(row['amados']), 'odiados': json.loads(row['odiados']), 'watchlist': json.loads(row['watchlist'])}
-    except Exception as e: pass
+    except Exception: pass
     return None
 
 def get_cache_streamings(chave):
@@ -184,7 +187,7 @@ def get_cache_streamings(chave):
         with closing(get_db()) as conn:
             row = conn.execute('SELECT streamings FROM global_cache WHERE chave = ?', (chave,)).fetchone()
             if row: return json.loads(row['streamings'])
-    except Exception as e: pass
+    except Exception: pass
     return None
 
 def set_cache_streamings(chave, streamings):
@@ -192,21 +195,21 @@ def set_cache_streamings(chave, streamings):
         try:
             with closing(get_db()) as conn:
                 with conn: conn.execute('INSERT OR REPLACE INTO global_cache (chave, streamings) VALUES (?, ?)', (chave, json.dumps(streamings)))
-        except Exception as e: pass
+        except Exception: pass
 
 def salvar_dados_finais(session_id, dados):
     with db_lock:
         try:
             with closing(get_db()) as conn:
                 with conn: conn.execute('INSERT OR REPLACE INTO dados_finais (session_id, dados) VALUES (?, ?)', (session_id, json.dumps(dados)))
-        except Exception as e: pass
+        except Exception: pass
 
 def get_dados_finais(session_id):
     try:
         with closing(get_db()) as conn:
             row = conn.execute('SELECT dados FROM dados_finais WHERE session_id = ?', (session_id,)).fetchone()
             if row: return json.loads(row['dados'])
-    except Exception as e: pass
+    except Exception: pass
     return {"stats": {}, "watchlist": {}}
 
 def resolve_boxd_links(links_str):
@@ -221,9 +224,12 @@ def resolve_boxd_links(links_str):
                 slug = partes[partes.index('film') + 1]
                 slug = re.sub(r'-\d{4}$', '', slug)
                 filmes.append(slug.replace('-', ' ').title())
-        except Exception as e: pass
+        except Exception: pass
     return filmes
 
+# ==========================================
+# ROTAS DA API
+# ==========================================
 @app.route('/api/creditos', methods=['GET'])
 def check_creditos(): return jsonify({"creditos": 999})
 @app.route('/api/consumir_credito', methods=['POST'])
@@ -241,17 +247,7 @@ def tmdb_search():
     try: 
         res = requests.get(url, timeout=10)
         return jsonify(res.json()) if res.status_code == 200 else jsonify({"results": []})
-    except Exception as e: return jsonify({"results": []}), 200
-
-@app.route('/api/tmdb/person', methods=['GET'])
-def tmdb_person():
-    q = request.args.get('query', '')
-    if not TMDB_API_KEY: return jsonify({"results": []}), 200
-    url = f'https://api.themoviedb.org/3/search/person?api_key={TMDB_API_KEY}&query={quote(q)}&language=pt-BR'
-    try: 
-        res = requests.get(url, timeout=10)
-        return jsonify(res.json()) if res.status_code == 200 else jsonify({"results": []})
-    except Exception as e: return jsonify({"results": []}), 200
+    except Exception: return jsonify({"results": []}), 200
 
 @app.route('/')
 def index(): return render_template('index.html')
@@ -261,7 +257,7 @@ def get_frases():
     try:
         with open(ARQUIVO_FRASES, 'r', encoding='utf-8') as f:
             return jsonify([linha.strip() for linha in f.readlines() if linha.strip()])
-    except Exception as e: return jsonify(["Analisando a sua curadoria..."])
+    except Exception: return jsonify(["Analisando a sua curadoria..."])
 
 @app.route('/progress', methods=['GET'])
 def route_get_progress(): return jsonify(get_progresso(request.args.get('session_id', 'default')))
@@ -324,34 +320,31 @@ def gerar_perfil():
     username = stats.get('username', 'Usuário')
     bio = stats.get('bio', '')
     
-    profile_favs = stats.get('profile_favorites', [])
-    favoritos_calc = [f['Name'] for f in stats.get('favoritos', [])[:5]]
-    filmes_amados = profile_favs if profile_favs else favoritos_calc
-    
+    filmes_amados = stats.get('profile_favorites', []) if stats.get('profile_favorites') else [f['Name'] for f in stats.get('favoritos', [])[:5]]
     amados_recentes = stats.get('amados_recentes', [])
     odiados_recentes = stats.get('odiados_recentes', [])
     
-    prompt = f"""Atue como um comediante de stand-up que é muito cinéfilo. Você está analisando o perfil de {username}.
-    Bio: "{bio}". Favoritos: {', '.join(filmes_amados) if filmes_amados else 'Nenhum'}. Odiados: {', '.join(odiados_recentes) if odiados_recentes else 'Nenhum'}. Média: {stats.get('media_notas', 0)}.
+    emojis_permitidos = "🙈🤓😼🥺😿😻💋🫦🔥💅👍☠️💀😢😭😞😓😔🤤🙄"
+
+    prompt = f"""Atue como um psicanalista de cinema que é muito cínico e sarcástico. Você está analisando o gosto de {username}.
+    Bio: "{bio}". Favoritos: {', '.join(filmes_amados) if filmes_amados else 'Nenhum'}. Odiou (nota baixa): {', '.join(odiados_recentes) if odiados_recentes else 'Nenhum'}. Média: {stats.get('media_notas', 0)}.
     
-    REGRAS OBRIGATÓRIAS:
-    1. LEITURA DINÂMICA: É ESTRITAMENTE PROIBIDO escrever frases longas com muitas vírgulas. Use pontos finais! Máximo de 4 frases curtas e diretas por parágrafo.
-    2. TOM: Seja 100% sincero, irônico e engraçado. Zombe das contradições do gosto dele, MAS NÃO SEJA UM CUZÃO TÓXICO. Nada de ofender a moral. É uma zoeira de amigos. NÃO ELOGIE, NÃO PUXE O SACO, não diga que o gosto é "refinado", "fascinante", "sofisticado" ou "peculiar". Seja cínico.
-    3. PERSONAGEM: Escolha um personagem famoso de cinema que represente a "vibe" dessa pessoa. É PROIBIDO escolher Tyler Durden, Patrick Bateman, Coringa, ou protagonistas óbvios dos filmes favoritos dele. Escolha com inteligência. A IA é livre para escolher personagens de animação, CGI ou mascarados se quiser.
-    4. JUSTIFICATIVA: No FINAL do texto, justifique a escolha do personagem em APENAS UMA OU DUAS frases geniais. ZERO REPETIÇÃO de ideias.
-    5. EMOJIS: Use entre 6 e 10 emojis no meio do texto. VOCÊ SÓ PODE USAR ESTES EMOJIS E NENHUM OUTRO: 🙈🤓😼🥺😿😻💋🫦🔥💅👍☠️💀😢😭😞😓😔🤤🙄. NUNCA crie listas explicando o significado dos emojis no final.
-    6. ORTOGRAFIA PERFEITA: Mantenha os nomes originais dos filmes em inglês.
+    REGRAS DE OURO (Siga ou o código quebra):
+    1. ELOQUÊNCIA E FLUIDEZ: NUNCA escreva frases robóticas ou fragmentadas do tipo "Você gosta de The Matrix. Você odeia Star Wars." Escreva um texto coeso, inteligente e fluido, como uma fofoca ácida ou uma crônica sarcástica, ligando os pontos do gosto dele. Use pontos finais adequadamente para não cansar a leitura.
+    2. SINCERIDADE (SEM PUXA-SACO): Zombe das contradições do gosto dele. Seja afiado. É PROIBIDO usar palavras babonas como "refinado", "fascinante", "incrível", "digno de nota".
+    3. EMOJIS (TRAVA RÍGIDA): Use EXATAMENTE entre 3 e 5 emojis espalhados no meio do texto. Você SÓ PODE usar emojis desta lista: {emojis_permitidos}. NUNCA crie uma lista explicando o que cada emoji significa.
+    4. PERSONAGEM REFERÊNCIA: Escolha um personagem FAMOSO do cinema que represente a "vibe" dessa pessoa. É ESTRITAMENTE PROIBIDO escolher Tyler Durden, Patrick Bateman ou o Coringa. Escolha personagens complexos, mas conhecidos, e justifique a escolha numa única frase de encerramento sem repetir ideias anteriores.
     
-    Responda EXATAMENTE neste JSON:
+    Responda OBRIGATORIAMENTE em JSON estrito:
     {{ 
-        "titulo": "Rótulo Sarcástico (Ex: O Crítico de Sofá)", 
+        "titulo": "Rótulo Sarcástico (Ex: O Caçador de Contradições)", 
         "personagem_referencia": "Nome do Personagem Fictício", 
         "filme_referencia": "Nome do Filme Deste Personagem", 
-        "descricao": ["Parágrafo 1 direto.", "Parágrafo 2 direto finalizando com a justificativa do personagem."] 
+        "descricao": ["Parágrafo 1 fluido focado na bio e filmes que ele ama.", "Parágrafo 2 fluido detonando o que ele odeia e concluindo brilhantemente com a revelação do personagem."] 
     }}"""
     
     try: 
-        dados = gerar_resposta_ia(prompt, max_tokens=800)
+        dados = gerar_resposta_ia(prompt, max_tokens=1000)
         if not dados or "titulo" not in dados: raise Exception("Falha JSON")
         if isinstance(dados.get("descricao"), list): dados["descricao"] = "\n\n".join(dados["descricao"])
         return jsonify(dados)
@@ -360,7 +353,7 @@ def gerar_perfil():
             "titulo": "O Explorador Silencioso", 
             "personagem_referencia": "Driver",
             "filme_referencia": "Drive", 
-            "descricao": "O Oráculo está Meditando... 🧘‍♂️\n\nOpa desculpa pae! As IAs do servidor derreteram com tanto acesso hoje e não conseguiram traduzir seu gosto peculiar.\n\nMas ó, aproveite pra ver onde assistir sua Watchlist na aba ao lado!"
+            "descricao": "O Oráculo está Meditando... 🧘‍♂️\n\nOpa desculpa pae! As IAs do servidor derreteram com tanto acesso hoje e não conseguiram decifrar seu gosto peculiar.\n\nMas ó, aproveite pra ver onde assistir sua Watchlist ali na aba do lado! 🍿"
         })
 
 @app.route('/oraculo', methods=['GET', 'POST'])
@@ -377,36 +370,37 @@ def oraculo():
         
         recs_finais = []
         tentativas_ia = 0
-        
-        blacklist_amostra = random.sample(list(blacklist_total), min(25, len(blacklist_total)))
 
-        prompt = f"""Atue como curador obscuro. Favoritos do usuário: {request.json.get('favorites', [])}.
-        Recomende EXATAMENTE 15 filmes Lado B, Cults, estrangeiros ou de festivais que sejam ABSOLUTAMENTE INÉDITOS para ele.
-        
-        ESQUEÇA ESTES FILMES: {', '.join(blacklist_amostra)}
-        
-        NÃO USE asteriscos (*) nos nomes.
-        Responda APENAS em formato JSON estrito:
-        {{ "recomendacoes": [ {{"rec_original": "TITLE", "rec": "TITLE", "ano": 2000, "base": "GENERO", "desc": "Pequena sinopse."}} ] }}"""
+        while len(recs_finais) < 10 and tentativas_ia < 2:
+            favoritos = request.json.get('favorites', [])
+            blacklist_amostra = random.sample(list(blacklist_total), min(25, len(blacklist_total)))
 
-        try:
-            dados_json = gerar_resposta_ia(prompt, max_tokens=1000)
-            if dados_json and "recomendacoes" in dados_json:
-                for r in dados_json["recomendacoes"]:
-                    nome = r.get('rec', '').strip().lower()
-                    orig = r.get('rec_original', '').strip().lower()
-                    if nome not in blacklist_total and orig not in blacklist_total:
-                        if nome not in [rf['rec'].lower() for rf in recs_finais]:
-                            recs_finais.append(r)
-        except Exception as e: pass
+            # Pede 12 filmes de uma vez para o buffer do frontend!
+            prompt = f"""Atue como curador profissional. Favoritos do usuário: {favoritos}.
+            Recomende EXATAMENTE 12 filmes de estilo similar mas que sejam ABSOLUTAMENTE INÉDITOS para ele.
+            ESQUEÇA ESTES FILMES: {', '.join(blacklist_amostra)}. 
+            NÃO USE asteriscos (*) nos nomes.
+            Responda OBRIGATORIAMENTE em JSON:
+            {{ "recomendacoes": [ {{"rec_original": "TITLE", "rec": "TITLE", "ano": 2000, "base": "GENERO", "desc": "Pequena sinopse."}} ] }}"""
 
-        res_payload = {"recomendacoes": recs_finais[:4]} 
-        if len(recs_finais) == 0:
-            res_payload["terror_mode"] = True
+            dados_json = gerar_resposta_ia(prompt, max_tokens=1500)
+            recs_ia = dados_json.get("recomendacoes", []) if dados_json else []
             
-        return jsonify(res_payload)
+            for r in recs_ia:
+                nome = r.get('rec', '').strip().lower()
+                orig = r.get('rec_original', '').strip().lower()
+                if nome not in blacklist_total and orig not in blacklist_total:
+                    if nome not in [rf['rec'].lower() for rf in recs_finais]:
+                        recs_finais.append(r)
+            
+            tentativas_ia += 1
+            if len(recs_finais) < 10: time.sleep(0.5)
+
+        # RETORNA A LISTA CHEIA PRO FRONTEND ARMAZENAR NO BUFFER!
+        return jsonify({"recomendacoes": recs_finais})
     except Exception as e:
-        return jsonify({"erro": "RATE_LIMIT", "recomendacoes": []})
+        if "RATE_LIMIT" in str(e): return jsonify({"erro": "RATE_LIMIT", "recomendacoes": []})
+        return jsonify({"erro": "Falha", "recomendacoes": []})
 
 def processar_em_segundo_plano(watchlist_data, sid):
     dados_filmes = {}
@@ -422,10 +416,8 @@ def processar_em_segundo_plano(watchlist_data, sid):
             
         streamings = []
         try:
-            time.sleep(0.1) 
             url = f"https://api.themoviedb.org/3/search/movie?api_key={TMDB_API_KEY}&query={quote(filme)}&language=pt-BR"
             if ano and str(ano).isdigit(): url += f"&year={int(float(ano))}"
-            
             res = requests.get(url, timeout=10)
             if res.status_code == 200 and res.json().get('results'):
                 mid = res.json()['results'][0]['id']
@@ -437,14 +429,15 @@ def processar_em_segundo_plano(watchlist_data, sid):
                         if cat in br:
                             for p in br[cat]:
                                 if p['provider_name'] not in streamings: streamings.append(p['provider_name'])
-        except Exception as e: pass
+        except Exception: pass
             
         if not streamings: streamings.append("Não disponível")
         set_cache_streamings(chave, streamings)
         return chave, streamings
     
     try:
-        with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
+        # AUMENTADO PARA 15 MOTORES SIMULTÂNEOS! Watchlist turbo.
+        with concurrent.futures.ThreadPoolExecutor(max_workers=15) as executor:
             futures = {executor.submit(fetch_movie, row): row for row in watchlist_data}
             for future in concurrent.futures.as_completed(futures):
                 try:
@@ -452,9 +445,9 @@ def processar_em_segundo_plano(watchlist_data, sid):
                     dados_filmes[chave] = st
                     atual += 1
                     set_progresso(sid, atual, total, False, chave)
-                except Exception as ex: pass
+                except Exception: pass
         salvar_dados_finais(sid, {"stats": {}, "watchlist": dados_filmes})
-    except Exception as e: salvar_dados_finais(sid, {"stats": {}, "watchlist": dados_filmes})
+    except Exception: salvar_dados_finais(sid, {"stats": {}, "watchlist": dados_filmes})
     finally: set_progresso(sid, total, total, True, "Finalizado!")
 
 @app.route('/process_watchlist', methods=['POST'])
@@ -476,7 +469,7 @@ def liberar_porta(porta):
             res = subprocess.run(f'lsof -t -i:{porta}', shell=True, capture_output=True, text=True)
             for p in res.stdout.strip().split('\n'):
                 if p: os.system(f'kill -9 {p}')
-    except Exception as e: pass
+    except Exception: pass
 
 if __name__ == '__main__':
     PORTA = 5000
