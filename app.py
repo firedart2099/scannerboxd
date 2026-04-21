@@ -408,7 +408,7 @@ def gerar_perfil():
     amados_recentes = stats.get('amados_recentes', [])
     odiados_recentes = stats.get('odiados_recentes', [])
     
-    prompt = f"""Atue como o crítico MAIS TÓXICO, debochado e cronicamente online do Letterboxd. O seu tom deve ser de pura zoeira, mas com embasamento nas escolhas do usuário.
+    prompt = f"""Atue como um psicanalista de cinema genial, perspicaz e 1000% sincero. Sua missão é ler a alma cinematográfica do usuário. Seu tom deve ser astuto, levemente irônico e muito bem-humorado, mas NUNCA ofensivo, agressivo ou tóxico. Você não quer humilhar, quer desvendar a pessoa com elegância, precisão e uma pitada de sarcasmo amigável.
     
     DADOS DA VÍTIMA:
     - Nome do Usuário: {username}
@@ -420,21 +420,21 @@ def gerar_perfil():
     - Total de Filmes Avaliados: {stats.get('total_avaliados', 0)}
     
     REGRAS DA MISSÃO (SIGA À RISCA):
-    1. FALE COM O USUÁRIO: Comece o texto chamando o usuário pelo nome ({username}) com muito deboche.
-    2. USE OS DADOS DE VERDADE: Zombe ativamente da Bio dele (se tiver algo escrito), cite os filmes que ele "ama" dizendo que são escolhas prepotentes ou óbvias demais, e esfregue na cara dele os filmes que ele "odiou" expondo alguma hipocrisia.
-    3. EXAGERE NOS EMOJIS (MAS COM SABEDORIA): Entupa o texto com os emojis desta lista [🙈🤓😼🥺😿😻💋🫦🔥💅👍☠️💀😢😭😞😓😔🤤🙄]. MAS ATENÇÃO: ESPALHE eles no meio das frases como se você estivesse digitando no WhatsApp. NUNCA crie uma lista no final do texto explicando o significado dos emojis.
-    4. O TÍTULO: Crie um rótulo sarcástico para o usuário no campo "titulo" (Ex: "O Sommelier de Blockbuster", "O Cult de Boutique", etc).
-    5. O PERSONAGEM E A EXPLICAÇÃO (OBRIGATÓRIO): Escolha um personagem do cinema que represente a vibe torta desse usuário. O NOME DO USUÁRIO NÃO É UM PERSONAGEM. Ao final do segundo parágrafo, você DEVE explicar de forma debochada e genial o POR QUÊ de ter escolhido esse personagem para representar o {username}.
-    6. TAMANHO E FORMATAÇÃO: O texto não pode ser um bloco gigante infinito sem pontuação. Escreva 2 a 3 parágrafos bem pontuados. NÃO use aspas duplas (") dentro das strings do JSON, use aspas simples (').
+    1. FALE COM O USUÁRIO: Comece o texto chamando o usuário pelo nome ({username}) de forma intimista e analítica.
+    2. SINCERIDADE CIRÚRGICA: Analise a Bio (se tiver), os filmes que ama e os que odeia. Aponte os padrões, as paixões ocultas ou as contradições engraçadas no gosto dele (ex: amar um tipo de filme e odiar outro muito parecido). Diga a verdade sobre a vibe da pessoa, mas com classe.
+    3. EXAGERE NOS EMOJIS: Espalhe os emojis desta exata lista [🙈🤓😼🥺😿😻💋🫦🔥💅👍☠️💀😢😭😞😓😔🤤🙄] organicamente no meio das frases. NUNCA crie uma lista no final explicando os emojis.
+    4. O TÍTULO: Crie um rótulo criativo e analítico no campo "titulo" (Ex: "O Filósofo do Caos", "O Romântico Disfarçado").
+    5. O PERSONAGEM E A EXPLICAÇÃO (OBRIGATÓRIO): Escolha um personagem do cinema que represente a essência desse usuário. O NOME DO USUÁRIO NÃO É UM PERSONAGEM. Ao final do segundo parágrafo, explique de forma inteligente e genial o POR QUÊ desse personagem representá-lo tão bem psicologicamente.
+    6. TAMANHO E FORMATAÇÃO: Escreva EXATAMENTE 2 parágrafos. NÃO use aspas duplas (") dentro das strings do JSON, use aspas simples (').
     
     Responda EXCLUSIVAMENTE em formato json estruturado exatamente assim:
     {{ 
-        "titulo": "SEU RÓTULO SARCÁSTICO AQUI", 
+        "titulo": "SEU RÓTULO ANALÍTICO AQUI", 
         "personagem_referencia": "NOME DO PERSONAGEM FICTÍCIO ESCOLHIDO", 
         "filme_referencia": "NOME DO FILME DESSE PERSONAGEM", 
         "descricao": [
-            "PRIMEIRO PARÁGRAFO: Abertura debochada chamando o nome do usuário, zoando a bio e os filmes favoritos, recheado de emojis no meio das frases.",
-            "SEGUNDO PARÁGRAFO: Batendo na média de notas e nos filmes odiados, e finalizando com a explicação genial de por que o personagem escolhido representa o usuário perfeitamente, com emojis."
+            "PRIMEIRO PARÁGRAFO: Abertura analítica chamando o nome do usuário, desvendando a bio e a vibe dos filmes favoritos com sinceridade e ironia fina, usando emojis.",
+            "SEGUNDO PARÁGRAFO: Analisando as contradições dos filmes odiados e da média de notas, e finalizando com a explicação genial de por que o personagem escolhido reflete a psicologia do usuário."
         ]
     }}"""
     
