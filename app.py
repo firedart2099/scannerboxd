@@ -30,7 +30,7 @@ TMDB_API_KEY = os.getenv("TMDB_API_KEY", "").replace('"', '').replace("'", "").s
 DB_NAME = "oraculo.db"
 
 db_lock = threading.Lock()
-ia_lock = threading.Lock() # Fila indiana para as IAs (mantida, mas o Front-end agora dá um tempo de respiro)
+# A trava de IA foi removida daqui! O Flask vai rodar tudo em paralelo real.
 
 # ==========================================
 # CONFIGURAÇÃO DO BANCO DE DADOS SQLITE
@@ -95,21 +95,19 @@ def limpar_e_parsear_json(content):
     content = re.sub(r'^```\s*', '', content, flags=re.MULTILINE).strip()
     
     dados = None
-    match = re.search(r'\{.*\}', content, re.DOTALL)
-    
-    if match:
+    try:
+        match = re.search(r'\{.*\}', content, re.DOTALL)
+        bloco = match.group(0) if match else content
+        dados = json.loads(bloco, strict=False)
+    except Exception as e:
+        print(f"Erro no parse JSON primário: {e}")
+        # Fallback brutal: remove quebras de linha e aspas malucas no meio do texto
         try:
-            # strict=False permite que o Python leia "enters" literais (newlines) dentro das strings sem crachar
-            dados = json.loads(match.group(0), strict=False)
-        except Exception as e: 
-            print(f"Erro ao fazer parse do regex JSON: {e}")
-            
-    if not dados:
-        try:
-            dados = json.loads(content, strict=False)
-        except Exception as e:
-            print(f"Erro no fallback do parse JSON: {e}")
-            return {}
+            bloco_limpo = bloco.replace('\n', ' ').replace('\r', '').replace('\t', ' ')
+            dados = json.loads(bloco_limpo, strict=False)
+        except Exception as ex:
+            print(f"Erro crítico no fallback JSON: {ex}")
+            return {} # Retorna vazio para forçar o loop a tentar de novo
 
     # Limpeza agressiva de aspas extras e asteriscos gerados pela IA nos textos
     if isinstance(dados, dict):
@@ -126,8 +124,10 @@ def limpar_e_parsear_json(content):
                         
     return dados
 
-def gerar_resposta_ia(prompt):
-    with ia_lock: 
+def gerar_resposta_ia(prompt, max_tentativas=2):
+    # SISTEMA DE TEIMOSIA: Tenta até 2x antes de desistir
+    for tentativa in range(max_tentativas):
+        # 1. TENTA GEMINI PRIMEIRO
         if GEMINI_API_KEY:
             try:
                 url_gemini = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={GEMINI_API_KEY}"
@@ -136,7 +136,7 @@ def gerar_resposta_ia(prompt):
                     "contents": [{"parts": [{"text": prompt}]}],
                     "generationConfig": {
                         "responseMimeType": "application/json",
-                        "maxOutputTokens": 2500 # Aumentado para NUNCA cortar o JSON antes do fim
+                        "maxOutputTokens": 2500 
                     },
                     "safetySettings": [
                         {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
@@ -149,12 +149,14 @@ def gerar_resposta_ia(prompt):
                 
                 if res_gemini.status_code == 200:
                     content = res_gemini.json()['candidates'][0]['content']['parts'][0]['text']
-                    return limpar_e_parsear_json(content)
+                    dados = limpar_e_parsear_json(content)
+                    if dados: return dados # Se extraiu bonitinho, devolve
                 else:
-                    print(f"⚠️ Gemini falhou (Status {res_gemini.status_code}): {res_gemini.text[:300]}")
+                    print(f"⚠️ Gemini falhou (Status {res_gemini.status_code})")
             except Exception as e: 
                 print(f"Erro de conexão com Gemini: {e}")
 
+        # 2. TENTA GROQ COMO PLANO B
         if GROQ_API_KEY:
             try:
                 url_groq = "https://api.groq.com/openai/v1/chat/completions"
@@ -163,20 +165,26 @@ def gerar_resposta_ia(prompt):
                     "model": "llama-3.3-70b-versatile",
                     "messages": [{"role": "user", "content": prompt}],
                     "temperature": 0.85,
-                    "max_tokens": 2500, # Aumentado para garantir que a Groq consiga fechar o JSON
+                    "max_tokens": 2500, 
                     "response_format": {"type": "json_object"} 
                 }
-                res_groq = requests.post(url_groq, headers=headers_groq, json=payload_groq, timeout=12)
+                res_groq = requests.post(url_groq, headers=headers_groq, json=payload_groq, timeout=15)
                 
                 if res_groq.status_code == 200:
                     content = res_groq.json()['choices'][0]['message']['content']
-                    return limpar_e_parsear_json(content)
+                    dados = limpar_e_parsear_json(content)
+                    if dados: return dados # Se extraiu bonitinho, devolve
                 else:
-                    print(f"⚠️ Groq falhou (Status {res_groq.status_code}): {res_groq.text[:300]}")
+                    print(f"⚠️ Groq falhou (Status {res_groq.status_code})")
             except Exception as e: 
                 print(f"Erro de conexão com Groq: {e}")
         
-        raise Exception("RATE_LIMIT")
+        # Se as IAs falharem (Rate Limit ou JSON corrompido), dá um tempo de 1.5s e tenta de novo!
+        if tentativa < max_tentativas - 1:
+            print("⚠️ IAs engarrafadas ou JSON quebrado. Tentando novamente...")
+            time.sleep(1.5)
+            
+    raise Exception("RATE_LIMIT_OU_JSON_CORROMPIDO")
 
 # ==========================================
 # FUNÇÕES DE ESTADO (BANCO DE DADOS)
@@ -428,6 +436,7 @@ def gerar_perfil():
     5. "personagem_referencia": ESCOLHA COM INTELIGÊNCIA! Escolha um personagem de cinema que represente a "vibe" dessa pessoa. É PROIBIDO usar o nome do próprio usuário como personagem.
     6. EXPLICAÇÃO DO PERSONAGEM: No FINAL do seu segundo parágrafo, explique de forma envolvente o porquê de ter escolhido esse personagem para representar a personalidade cinematográfica do usuário.
     7. ZERO asteriscos (*) ou formatação Markdown.
+    8. REGRA VITAL DE FORMATAÇÃO JSON: DENTRO das strings da resposta, NUNCA use quebras de linha (enter). NUNCA use aspas duplas (use apenas aspas simples ' ').
     
     Responda OBRIGATORIAMENTE em formato json estruturado exatamente assim:
     {{ 
@@ -435,8 +444,8 @@ def gerar_perfil():
         "personagem_referencia": "NOME DO PERSONAGEM", 
         "filme_referencia": "NOME DO FILME", 
         "descricao": [
-            "PRIMEIRO PARÁGRAFO",
-            "SEGUNDO PARÁGRAFO COM A EXPLICAÇÃO DO PERSONAGEM"
+            "PRIMEIRO PARÁGRAFO AQUI",
+            "SEGUNDO PARÁGRAFO COM A EXPLICAÇÃO DO PERSONAGEM AQUI"
         ]
     }}"""
     
