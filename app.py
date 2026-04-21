@@ -22,6 +22,7 @@ load_dotenv()
 app = Flask(__name__)
 ARQUIVO_FRASES = "frases.txt" 
 
+# Limpeza agressiva das chaves para evitar erros de aspas invisíveis no Render
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "").replace('"', '').replace("'", "").strip()
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").replace('"', '').replace("'", "").strip()
 NVIDIA_API_KEY = os.getenv("NVIDIA_API_KEY", "").replace('"', '').replace("'", "").strip()
@@ -103,6 +104,8 @@ def limpar_e_parsear_json(content):
     return dados
 
 def gerar_resposta_ia(prompt, max_tokens=1000):
+    timeout_nv = 28 # Respiração da Nvidia aumentada para não crachar o Render
+    
     if NVIDIA_API_KEY:
         try:
             url_nv = "https://integrate.api.nvidia.com/v1/chat/completions"
@@ -114,9 +117,9 @@ def gerar_resposta_ia(prompt, max_tokens=1000):
                 "max_tokens": max_tokens,
                 "response_format": {"type": "json_object"} 
             }
-            res_nv = requests.post(url_nv, headers=headers_nv, json=payload_nv, timeout=25)
+            res_nv = requests.post(url_nv, headers=headers_nv, json=payload_nv, timeout=timeout_nv)
             if res_nv.status_code == 200: return limpar_e_parsear_json(res_nv.json()['choices'][0]['message']['content'])
-        except Exception: pass
+        except Exception as e: print(f"Erro NVIDIA: {e}")
 
     if GROQ_API_KEY:
         try:
@@ -131,7 +134,8 @@ def gerar_resposta_ia(prompt, max_tokens=1000):
             }
             res_groq = requests.post(url_groq, headers=headers_groq, json=payload_groq, timeout=12)
             if res_groq.status_code == 200: return limpar_e_parsear_json(res_groq.json()['choices'][0]['message']['content'])
-        except Exception: pass
+            else: print(f"⚠️ Groq falhou (Status {res_groq.status_code})")
+        except Exception as e: print(f"Erro GROQ: {e}")
 
     if GEMINI_API_KEY:
         try:
@@ -142,7 +146,8 @@ def gerar_resposta_ia(prompt, max_tokens=1000):
             }
             res_gemini = requests.post(url_gemini, json=payload_gemini, timeout=15) 
             if res_gemini.status_code == 200: return limpar_e_parsear_json(res_gemini.json()['candidates'][0]['content']['parts'][0]['text'])
-        except Exception: pass
+            else: print(f"⚠️ Gemini falhou (Status {res_gemini.status_code})")
+        except Exception as e: print(f"Erro GEMINI: {e}")
     
     raise Exception("RATE_LIMIT")
 
@@ -224,11 +229,13 @@ def resolve_boxd_links(links_str):
         except Exception: pass
     return filmes
 
+# Função Exterminadora de Duplicatas e Letras perdidas
 def normalize_title(title):
     if not isinstance(title, str): return ""
     t = title.lower().strip()
     t = re.sub(r'^(the |a |an |o |os |a |as )', '', t)
     t = re.sub(r'[^a-z0-9]', '', t)
+    # Regras manuais pesadas para evitar falsos inéditos
     if 'thirteenthfloor' in t or '13andar' in t: return '13thfloor'
     if 'seven' in t or 'se7en' in t: return 'se7en'
     return t
@@ -300,7 +307,7 @@ def get_character_image():
                 if img.get('media', {}).get('id') == movie_id:
                     return jsonify({"url": f"https://image.tmdb.org/t/p/w500{img['file_path']}"})
         
-        # Fallback: Se não tem cena (filme indie/velho), joga o poster do filme mesmo.
+        # Fallback de Ouro: Se não tem cena (filme indie/velho), joga o poster do filme cortado
         if movie_poster:
             return jsonify({"url": f"https://image.tmdb.org/t/p/w500{movie_poster}"})
 
@@ -384,31 +391,32 @@ def gerar_perfil():
     
     emojis_permitidos = "🙈🤓😼🥺😿😻💋🫦🔥💅👍☠️💀😢😭😞😓😔🤤🙄"
 
-    prompt = f"""Atue como um psicanalista de cinema brilhante, irônico e que fala com o usuário como um amigo ácido.
-    NÃO SEJA PUXA-SACO. É PROIBIDO elogiar demais ou usar palavras como "fascinante", "refinado" ou "sofisticado". Seja debochado e aponte as hipocrisias no gosto da pessoa, mas de forma carismática e engenhosa.
+    prompt = f"""Atue como um psicanalista de cinema brilhante, sarcástico e cínico do Letterboxd. 
+    NÃO SEJA PUXA-SACO. É proibido elogiar demais ou usar palavras como "refinado", "sofisticado" ou "fascinante". 
+    Você deve fazer uma fofoca debochada sobre as contradições do gosto da pessoa, mas com elegância, sendo 100% sincero e analítico.
     
-    DADOS DO USUÁRIO:
-    Nome: {username}
-    Bio: "{bio}"
-    Ama: {', '.join(filmes_amados)}.
-    Odiou: {', '.join(odiados_recentes)}.
-    Média de Notas: {stats.get('media_notas', 0)}. Total de Filmes: {stats.get('total_avaliados', 0)}.
+    DADOS DA VÍTIMA:
+    - Nome: {username}
+    - Bio do Perfil: "{bio}"
+    - Filmes que mais ama: {', '.join(filmes_amados) if filmes_amados else 'Nenhum'}
+    - Outros favoritos (5 estrelas): {', '.join(amados_recentes) if amados_recentes else 'Nenhum'}
+    - Filmes que odiou (Nota baixa): {', '.join(odiados_recentes) if odiados_recentes else 'Nenhum'}
+    - Média de Notas: {stats.get('media_notas', 0)}
     
-    REGRAS DE FORMATAÇÃO ESTRITAS:
-    1. LEITURA DINÂMICA: É ESTRITAMENTE PROIBIDO fazer frases infinitas. Use pontos finais constantemente. Cada parágrafo DEVE ter no máximo 4 frases curtas e matadoras.
-    2. EMOJIS: Use exatamente entre 6 a 10 emojis espalhados pelo texto. USE EXCLUSIVAMENTE ESTES: {emojis_permitidos}. É PROIBIDO criar uma lista explicando os emojis.
-    3. ZERO REPETIÇÃO: Vá direto ao ponto. Não fique listando os filmes repetidamente. Fale da "vibe" deles.
-    4. O PERSONAGEM: Escolha um personagem fictício que o represente. É PROIBIDO escolher Tyler Durden, Coringa ou Patrick Bateman. Escolha um personagem genial e justifique com ironia na última frase do texto.
-    5. ORTOGRAFIA: Não invente nomes de filmes ou engula letras.
+    REGRAS DA MISSÃO:
+    1. ORTOGRAFIA E LEITURA DINÂMICA: É ESTRITAMENTE PROIBIDO fazer frases longas ou infinitas. Use pontos finais constantemente. No máximo 4 frases curtas e diretas por parágrafo. ORTOGRAFIA PERFEITA É OBRIGATÓRIA.
+    2. COTA DE EMOJIS: Você DEVE usar exatamente entre 6 e 10 emojis espalhados pelo texto. USE ÚNICA E EXCLUSIVAMENTE ESTES EMOJIS: {emojis_permitidos}. É PROIBIDO criar listas explicando os emojis.
+    3. ZERO REPETIÇÃO: Seja criativo! NUNCA inicie com 'O Caçador de Contradições'. Crie um título original. E justifique o personagem em no MÁXIMO duas frases curtas no final do texto.
+    4. O PERSONAGEM (REGRA DE OURO ABSOLUTA): Escolha um personagem de um FILME DE CINEMA LIVE-ACTION (Com Atores Reais). É ESTRITAMENTE PROIBIDO escolher personagens de livros ou literatura (como Holden Caulfield ou Dom Casmurro), nem de animações, CGI ou séries de TV. Escolha um personagem humano, com rosto real, de um filme de verdade. E fuja de clichês como Tyler Durden ou Coringa.
     
-    Responda EXCLUSIVAMENTE no formato JSON:
+    Responda OBRIGATORIAMENTE em JSON:
     {{ 
-        "titulo": "Rótulo Sarcástico (Ex: O Caçador de Contradições)", 
-        "personagem_referencia": "Nome do Personagem Fictício (JAMAIS USE O NOME DO ATOR)", 
-        "filme_referencia": "Nome do Filme Original do Personagem (Em Inglês)", 
+        "titulo": "Rótulo Sarcástico Original", 
+        "personagem_referencia": "Nome do Personagem Fictício (Live-Action)", 
+        "filme_referencia": "Nome do Filme Original (Em Inglês)", 
         "descricao": [
-            "Parágrafo 1 curto (frases com ponto final, zoando a bio e os contrastes do gosto da pessoa).", 
-            "Parágrafo 2 curto (zombando das notas e dando o xeque-mate genial justificando o personagem escolhido)."
+            "Parágrafo 1 curto (zoando a bio e a relação de amor e ódio com os filmes).", 
+            "Parágrafo 2 curto (zombando das notas e dando o xeque-mate genial justificando o personagem escolhido em 2 frases)."
         ] 
     }}"""
     
@@ -418,6 +426,7 @@ def gerar_perfil():
         if isinstance(dados.get("descricao"), list): dados["descricao"] = "\n\n".join(dados["descricao"])
         return jsonify(dados)
     except Exception as e: 
+        print(f"Erro Perfil: {e}")
         return jsonify({
             "titulo": "O Explorador Silencioso", 
             "personagem_referencia": "Driver",
@@ -425,7 +434,7 @@ def gerar_perfil():
             "descricao": "O Oráculo está Meditando... 🧘‍♂️\n\nOpa desculpa pae! As IAs do servidor derreteram com tanto acesso hoje e não conseguiram decifrar seu gosto peculiar.\n\nMas ó, aproveite pra ver onde assistir sua Watchlist ali na aba do lado! 🍿"
         })
 
-@app.route('/oraculo', methods=['GET', 'POST'])
+@app.route('/oraculo', methods=['POST'])
 def oraculo():
     sid = request.args.get('session_id', 'default')
     sessao = carregar_sessao(sid)
@@ -433,24 +442,27 @@ def oraculo():
     
     try:
         vistos = set(sessao.get('vistos', []))
-        watchlist_names = set(f.get('Name', '') for f in sessao.get('watchlist', []))
-        excl_sessao = set(request.json.get('exclude', []) if request.is_json else [])
+        watchlist_names = set(f.get('Name', '').lower().strip() for f in sessao.get('watchlist', []))
+        excl_sessao = set(f.lower().strip() for f in (request.json.get('exclude', []) if request.is_json else []))
+        blacklist_total = vistos.union(watchlist_names).union(excl_sessao)
         
-        blacklist_raw = vistos.union(watchlist_names).union(excl_sessao)
-        blacklist_norm = {normalize_title(f) for f in blacklist_raw if f}
-        
-        for f in request.json.get('favorites', []):
-            blacklist_norm.add(normalize_title(f))
+        # Filtro de Normalização no Python (Impede o Se7en de passar)
+        blacklist_norm = {normalize_title(f) for f in blacklist_total if f}
         
         recs_finais = []
         tentativas_ia = 0
-        
+
+        # Pede 12 filmes de uma vez pra preencher o buffer rápido!
         while len(recs_finais) < 12 and tentativas_ia < 2:
             favoritos = request.json.get('favorites', [])
-            
+            blacklist_amostra = random.sample(list(blacklist_total), min(25, len(blacklist_total)))
+
             prompt = f"""Atue como curador profissional. Favoritos do usuário: {favoritos}.
             Recomende EXATAMENTE 15 filmes cults ou obscuros ABSOLUTAMENTE INÉDITOS para ele.
             NÃO recomende blockbusters genéricos. Vá fundo no catálogo Lado B.
+            
+            ESQUEÇA ESTES FILMES: {', '.join(blacklist_amostra)}
+            
             Responda OBRIGATORIAMENTE em JSON:
             {{ "recomendacoes": [ {{"rec_original": "TITLE", "rec": "TITLE", "ano": 2000, "base": "GENERO", "desc": "Pequena sinopse."}} ] }}"""
 
@@ -464,6 +476,7 @@ def oraculo():
                 norm_nome = normalize_title(nome)
                 norm_orig = normalize_title(orig)
                 
+                # Barreira Anti-Clone Mestre
                 if norm_nome not in blacklist_norm and norm_orig not in blacklist_norm:
                     clone = False
                     for rf in recs_finais:
@@ -479,6 +492,7 @@ def oraculo():
 
         res_payload = {"recomendacoes": recs_finais}
         
+        # O Terror do Letterboxd: Só é ativado SE a IA funcionou, mas NENHUM filme inédito sobrou
         if len(recs_finais) == 0:
             res_payload["terror_mode"] = True
             res_payload["recomendacoes"] = [{
@@ -526,7 +540,8 @@ def processar_em_segundo_plano(watchlist_data, sid):
         return chave, streamings
     
     try:
-        with concurrent.futures.ThreadPoolExecutor(max_workers=15) as executor:
+        # WATCHLIST TURBO V8: 20 Workers simultâneos pra voar
+        with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
             futures = {executor.submit(fetch_movie, row): row for row in watchlist_data}
             for future in concurrent.futures.as_completed(futures):
                 try:
