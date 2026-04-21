@@ -143,10 +143,10 @@
     </div>
 </div>
 
-<!-- Imagem de Fundo Rotativa -->
+<!-- Imagem de Fundo Rotativa (MAIS CLARA E VIVA) -->
 <div class="fixed inset-0 w-full h-full z-0 bg-[#0f1115] pointer-events-none">
-    <img id="hero-backdrop-img" src="" class="w-full h-full object-cover opacity-0 transition-opacity duration-1000 grayscale-[30%]" style="-webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 40%, rgba(0,0,0,0) 100%); mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 40%, rgba(0,0,0,0) 100%);">
-    <div class="absolute inset-0 bg-gradient-to-b from-[#0f1115]/40 via-[#0f1115]/20 to-[#0f1115] pointer-events-none"></div>
+    <img id="hero-backdrop-img" src="" class="w-full h-full object-cover opacity-0 transition-opacity duration-1000 grayscale-[10%]" style="-webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 50%, rgba(0,0,0,0) 100%); mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 50%, rgba(0,0,0,0) 100%);">
+    <div class="absolute inset-0 bg-gradient-to-b from-transparent via-[#0f1115]/10 to-[#0f1115] pointer-events-none"></div>
 </div>
 
 <!-- Header (Logo) -->
@@ -455,7 +455,7 @@
             if(document.getElementById('slide-year')) document.getElementById('slide-year').innerText = startMovie.Year;
             
             heroImg.onload = () => {
-                heroImg.style.opacity = '0.3'; // Mais escuro que os filmes do usuario pra não gritar
+                heroImg.style.opacity = '0.6'; // Ajuste de opacidade pra tela inicial (Mais vivo)
                 if(slideInfo) slideInfo.style.opacity = '1';
             };
 
@@ -471,7 +471,7 @@
                             heroImg.src = nextMovie.backdrop;
                             if(document.getElementById('slide-title')) document.getElementById('slide-title').innerText = nextMovie.Name;
                             if(document.getElementById('slide-year')) document.getElementById('slide-year').innerText = nextMovie.Year;
-                            heroImg.style.opacity = '0.3';
+                            heroImg.style.opacity = '0.6'; // Mantém o brilho vivo na troca
                             if(slideInfo) slideInfo.style.opacity = '1';
                         }, 500);
                     };
@@ -646,7 +646,7 @@
                 }
 
                 heroImg.onload = () => {
-                    heroImg.style.opacity = '0.4'; // Um pouco mais brilhante pq é o filme do cara
+                    heroImg.style.opacity = '0.7'; // Ainda mais brilhante pros favoritos do user
                     if(slideInfo) slideInfo.style.opacity = '1';
                 }
             }, 300);
@@ -674,7 +674,7 @@
                             slideRating.classList.add('hidden');
                         }
 
-                        heroImg.style.opacity = '0.4';
+                        heroImg.style.opacity = '0.7'; // Mantém o brilho extra vivo
                         if(slideInfo) slideInfo.style.opacity = '1';
                     }, 500);
                 };
@@ -707,34 +707,37 @@
         }, 700);
     }
 
-    // CAÇADOR DE PERSONAGENS (WIKIPEDIA + POSTER TIPOGRÁFICO)
-    async function fetchPersonagemImg(characterName, movieName) {
-        // Tenta a Wikipedia pra pegar foto de personagem de cara limpa ou máscara famosa
+    // API DA WIKIPEDIA / MEDIAWIKI
+    async function fetchCharacterImage(charName, movieName) {
+        // Tenta buscar a foto da "Entidade Personagem" na Wikipedia em inglês primeiro (A mais completa)
         try {
-            const res = await fetch(`https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(characterName)}&prop=pageimages&format=json&pithumbsize=500&origin=*`);
+            const query = `${charName} (${movieName})`; // Ex: Tyler Durden (Fight Club)
+            const url = `https://en.wikipedia.org/w/api.php?action=query&prop=pageimages&format=json&piprop=original&titles=${encodeURIComponent(query)}&origin=*`;
+            
+            const res = await fetch(url);
             const data = await res.json();
             const pages = data.query.pages;
             const pageId = Object.keys(pages)[0];
-            if (pageId !== "-1" && pages[pageId].thumbnail) {
-                return pages[pageId].thumbnail.source;
+            
+            if (pageId !== "-1" && pages[pageId].original) {
+                return pages[pageId].original.source; // Achou a foto real do personagem!
             }
-        } catch(e) {}
-        
-        // Se a Wikipedia falhar, puxa o Pôster do filme pra dentro do círculo (Fica lindo tbm)
+        } catch (e) {}
+
+        // Tenta só o nome do personagem (se for muito famoso, ex: Darth Vader)
         try {
-            const resTmdb = await fetch(`/api/tmdb/search?query=${encodeURIComponent(movieName)}`);
-            const d = await resTmdb.json();
-            if(d.results && d.results.length > 0 && d.results[0].poster_path) {
-                return `https://image.tmdb.org/t/p/w500${d.results[0].poster_path}`;
+            const url = `https://en.wikipedia.org/w/api.php?action=query&prop=pageimages&format=json&piprop=original&titles=${encodeURIComponent(charName)}&origin=*`;
+            const res = await fetch(url);
+            const data = await res.json();
+            const pages = data.query.pages;
+            const pageId = Object.keys(pages)[0];
+            
+            if (pageId !== "-1" && pages[pageId].original) {
+                return pages[pageId].original.source; 
             }
         } catch(e) {}
 
         return null;
-    }
-
-    // GERADOR DE POSTER TIPOGRÁFICO DE EMERGÊNCIA (CULT FILMS)
-    function criarPosterTipografico(title, baseColor) {
-        return `data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='600' viewBox='0 0 400 600'%3E%3Crect width='100%25' height='100%25' fill='%23111417'/%3E%3Ctext x='50%25' y='50%25' fill='%238c9bab' font-family='sans-serif' font-size='24' font-weight='bold' text-anchor='middle' dominant-baseline='middle' opacity='0.5'%3E${encodeURIComponent(title)}%3C/text%3E%3C/svg%3E`;
     }
 
     async function gerarPerfilIA() {
@@ -748,15 +751,27 @@
                 document.getElementById('roast-title').innerHTML = data.titulo;
                 document.getElementById('roast-desc').innerHTML = data.descricao.replace(/\n/g, '<br><br>');
                 
-                // CAÇA A FOTO DO PERSONAGEM (SEM EXPLODIR A CAIXA!)
                 if(data.personagem_referencia) {
-                    let charUrl = await fetchPersonagemImg(data.personagem_referencia, data.filme_referencia);
                     const av = document.getElementById('profile-avatar');
                     const fb = document.getElementById('profile-avatar-fallback');
-                    if(charUrl) {
+                    
+                    // 1. TENTA A WIKIPEDIA PARA ACHAR A FOTO DO PERSONAGEM EXATO
+                    let charImgUrl = await fetchCharacterImage(data.personagem_referencia, data.filme_referencia);
+                    
+                    if(charImgUrl) {
                         fb.classList.add('hidden');
-                        // Tag <img> perfeitamente travada no w-full h-full object-cover
-                        av.innerHTML = `<img src="${charUrl}" class="w-full h-full object-cover absolute inset-0 rounded-full">`;
+                        av.innerHTML = `<img src="${charImgUrl}" class="w-full h-full object-cover absolute inset-0 rounded-full">`;
+                    } else {
+                        // 2. FALLBACK CHIQUE: O PÔSTER DO FILME CORTADO REDONDO
+                        try {
+                            const resTmdb = await fetch(`/api/tmdb/search?query=${encodeURIComponent(data.filme_referencia)}`);
+                            const tmdbData = await resTmdb.json();
+                            if(tmdbData.results && tmdbData.results.length > 0 && tmdbData.results[0].poster_path) {
+                                const posterUrl = `https://image.tmdb.org/t/p/w500${tmdbData.results[0].poster_path}`;
+                                fb.classList.add('hidden');
+                                av.innerHTML = `<img src="${posterUrl}" class="w-full h-full object-cover absolute inset-0 rounded-full" style="object-position: top;">`;
+                            }
+                        } catch(e) {}
                     }
                 }
             } else {
@@ -764,7 +779,7 @@
             }
         } catch(e) {
             document.getElementById('roast-title').innerHTML = "O Explorador Silencioso 🧘‍♂️";
-            document.getElementById('roast-desc').innerHTML = "Opa, desculpa pae! As APIs do servidor derreteram com tanto acesso hoje e não conseguiram decifrar seu gosto peculiar.<br><br>Mas ó, deslize pra aba do lado e aproveite pra ver onde assistir sua Watchlist ali na última aba! 🍿";
+            document.getElementById('roast-desc').innerHTML = "Opa, desculpa pae! As IAs do servidor derreteram com tanto acesso hoje e não conseguiram decifrar seu gosto peculiar.<br><br>Mas ó, deslize pra aba do lado e aproveite pra ver onde assistir sua Watchlist ali na última aba! 🍿";
         }
     }
 
@@ -800,7 +815,6 @@
             document.getElementById('oracle-actions').classList.add('flex');
 
             if(data.terror_mode) {
-                // CONQUISTA REAL! SÓ APARECE SE A IA FALHAR EM ACHAR FILME INÉDITO.
                 document.getElementById('oracle-grid').insertAdjacentHTML('beforebegin', `
                     <div class="mb-8 fluent-glass border border-[#ff8000]/50 p-6 rounded-xl text-center mx-2 shadow-[0_0_20px_rgba(255,128,0,0.15)] animate-pulse">
                         <div class="text-4xl mb-3">🏆</div>
@@ -812,8 +826,8 @@
             }
 
             if(data.recomendacoes && data.recomendacoes.length > 0) {
-                oraculoBuffer = data.recomendacoes; // A IA cospe 12 filmes. A gente esconde no buffer!
-                let batch = oraculoBuffer.splice(0, 4); // E manda só 4 pra tela.
+                oraculoBuffer = data.recomendacoes; 
+                let batch = oraculoBuffer.splice(0, 4); 
                 renderizarOraculoCards(batch, 0);
             }
         } catch(e) {}
@@ -823,7 +837,6 @@
         const btnSpinner = document.getElementById('load-more-spinner');
         const btnText = document.getElementById('btn-descobrir-mais');
         
-        // ORÁCULO A JATO: Tem filme no bolso? Cospe na tela na hora! Zero espera.
         if(oraculoBuffer.length > 0) {
             let batch = oraculoBuffer.splice(0, 4);
             const startIdx = document.querySelectorAll('.movie-card').length;
@@ -831,7 +844,6 @@
             return;
         }
 
-        // Acabou o estoque? Manda a IA pensar mais 12.
         btnSpinner.classList.remove('hidden');
         btnText.disabled = true;
         
@@ -850,13 +862,12 @@
                 const startIdx = document.querySelectorAll('.movie-card').length;
                 renderizarOraculoCards(batch, startIdx);
             } else if (data.terror_mode) {
-                // Se a IA bater na trave agora, dá a conquista!
                 const trophy = document.getElementById('ps-trophy');
                 if (trophy) {
                     trophy.classList.add('show');
                     setTimeout(() => trophy.classList.remove('show'), 6000); 
                 }
-                btnText.classList.add('hidden'); // Mata o botão, o cara zerou o site.
+                btnText.classList.add('hidden'); 
             }
         } catch(e) {}
         
@@ -864,51 +875,19 @@
         btnText.disabled = false;
     }
 
-    function renderizarOraculoCards(recs, startIdx) {
-        const grid = document.getElementById('oracle-grid');
-        recs.forEach((r, i) => {
-            const idx = startIdx + i;
-            const id = `oracle-card-${idx}`;
-            
-            grid.insertAdjacentHTML('beforeend', `
-                <div id="${id}" class="fluent-glass movie-card group cursor-pointer relative overflow-hidden transition-all duration-300 hover:scale-[1.02] border-2 border-transparent" onclick="toggleSelecao(${idx}, '${r.rec.replace(/'/g, "\\'")}', ${r.ano})">
-                    <div id="check-${idx}" class="absolute top-2 right-2 z-50 bg-[#40bcf4] text-[#14181c] rounded-full p-1 transition-all scale-0 shadow-[0_4px_10px_rgba(0,0,0,0.8)]">
-                        <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
-                    </div>
-                    
-                    <!-- Pôster Blindado: Base64 transparente evita ícone de imagem quebrada -->
-                    <img class="fav-poster absolute inset-0 w-full h-full object-cover z-10 opacity-0 transition-opacity duration-700" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="Poster">
-                    
-                    <div class="absolute bottom-0 left-0 w-full p-4 z-20 text-center bg-gradient-to-t from-[#0f1115] via-[#0f1115]/80 to-transparent pointer-events-none">
-                        <span class="text-[#40bcf4] text-[8px] font-black uppercase border border-[#40bcf4]/30 px-1.5 py-0.5 rounded bg-[#14181c]/90 drop-shadow">${r.base}</span>
-                        <h5 class="text-white font-bold text-[11px] sm:text-xs line-clamp-2 mt-1.5 drop-shadow-lg leading-tight">${r.rec}</h5>
-                    </div>
-
-                    <!-- Overlap Text - Clique passa direto (pointer-events-none) -->
-                    <div class="absolute inset-0 bg-[#14181c]/95 z-30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col p-5 text-center justify-center items-center pointer-events-none"> 
-                        <p class="text-[10px] sm:text-[11px] text-gray-300 line-clamp-6 leading-relaxed font-light">"${r.desc}"</p>
-                        <span class="text-[8px] text-[#40bcf4] font-black mt-auto drop-shadow-md">CLIQUE P/ SELECIONAR</span> 
-                    </div>
-                </div>
-            `);
-            
-            // Dispara a busca inteligente de Pôster
-            buscarPosterInteligente(r.rec, r.ano, id);
-        });
+    function criarPosterTipografico(title) {
+        return `data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='600' viewBox='0 0 400 600'%3E%3Crect width='100%25' height='100%25' fill='%23111417'/%3E%3Ctext x='50%25' y='50%25' fill='%238c9bab' font-family='sans-serif' font-size='24' font-weight='bold' text-anchor='middle' dominant-baseline='middle' opacity='0.5'%3E${encodeURIComponent(title)}%3C/text%3E%3C/svg%3E`;
     }
 
-    // BUSCA DE POSTER 2.0 (COM FALLBACK TRIPLO)
     async function buscarPosterInteligente(title, year, cardId) {
         let imgUrl = null;
         try {
-            // Tentativa 1: Com o Ano exato (Mata os remakes errados)
             let res = await fetch(`/api/tmdb/search?query=${encodeURIComponent(title)}&year=${year}`);
             let d = await res.json();
             
             if(d.results && d.results.length > 0 && d.results[0].poster_path) {
                 imgUrl = `https://image.tmdb.org/t/p/w500${d.results[0].poster_path}`;
             } else {
-                // Tentativa 2: O TMDB polonês/russo não sabe o ano? Tenta sem o ano.
                 let res2 = await fetch(`/api/tmdb/search?query=${encodeURIComponent(title)}`);
                 let d2 = await res2.json();
                 if(d2.results && d2.results.length > 0 && d2.results[0].poster_path) {
@@ -925,10 +904,39 @@
             imgEl.src = imgUrl;
             imgEl.onload = () => imgEl.style.opacity = '1';
         } else {
-            // Tentativa 3: Pôster Tipográfico (Nunca deixa o card preto/vazio)
             imgEl.src = criarPosterTipografico(title);
             imgEl.style.opacity = '1';
         }
+    }
+
+    function renderizarOraculoCards(recs, startIdx) {
+        const grid = document.getElementById('oracle-grid');
+        recs.forEach((r, i) => {
+            const idx = startIdx + i;
+            const id = `oracle-card-${idx}`;
+            
+            grid.insertAdjacentHTML('beforeend', `
+                <div id="${id}" class="fluent-glass movie-card group cursor-pointer relative overflow-hidden transition-all duration-300 hover:scale-[1.02] border-2 border-transparent" onclick="toggleSelecao(${idx}, '${r.rec.replace(/'/g, "\\'")}', ${r.ano})">
+                    <div id="check-${idx}" class="absolute top-2 right-2 z-50 bg-[#40bcf4] text-[#14181c] rounded-full p-1 transition-all scale-0 shadow-[0_4px_10px_rgba(0,0,0,0.8)]">
+                        <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                    </div>
+                    
+                    <img class="fav-poster absolute inset-0 w-full h-full object-cover z-10 opacity-0 transition-opacity duration-700" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="Poster">
+                    
+                    <div class="absolute bottom-0 left-0 w-full p-4 z-20 text-center bg-gradient-to-t from-[#0f1115] via-[#0f1115]/80 to-transparent pointer-events-none">
+                        <span class="text-[#40bcf4] text-[8px] font-black uppercase border border-[#40bcf4]/30 px-1.5 py-0.5 rounded bg-[#14181c]/90 drop-shadow">${r.base}</span>
+                        <h5 class="text-white font-bold text-[11px] sm:text-xs line-clamp-2 mt-1.5 drop-shadow-lg leading-tight">${r.rec}</h5>
+                    </div>
+
+                    <div class="absolute inset-0 bg-[#14181c]/95 z-30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col p-5 text-center justify-center items-center pointer-events-none"> 
+                        <p class="text-[10px] sm:text-[11px] text-gray-300 line-clamp-6 leading-relaxed font-light">"${r.desc}"</p>
+                        <span class="text-[8px] text-[#40bcf4] font-black mt-auto drop-shadow-md">CLIQUE P/ SELECIONAR</span> 
+                    </div>
+                </div>
+            `);
+            
+            buscarPosterInteligente(r.rec, r.ano, id);
+        });
     }
 
     function toggleSelecao(idx, nome, ano) {
@@ -1012,7 +1020,6 @@
         document.getElementById('filter-dropdown').classList.toggle('hidden');
     }
 
-    // Fecha o dropdown se clicar fora
     document.addEventListener('click', function(event) {
         const dropdown = document.getElementById('filter-dropdown');
         const btn = dropdown.previousElementSibling;
@@ -1071,7 +1078,6 @@
             const titulo = match ? match[1] : filme;
             const ano = match ? match[2] : "";
 
-            // Lógica AND/OR Multi-seleção
             if (selectedPlatforms.size > 0 && !streamings.some(s => selectedPlatforms.has(s))) continue;
             if (q && !titulo.toLowerCase().includes(q)) continue;
             if (selectedPlatforms.size === 0 && !q && streamings[0] === "Não disponível") continue;
