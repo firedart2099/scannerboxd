@@ -22,20 +22,15 @@ load_dotenv()
 app = Flask(__name__)
 ARQUIVO_FRASES = "frases.txt" 
 
-# O Arsenal de IAs do Scannerboxd
+# Chaves das APIs (Agora com a Nvidia como motor principal!)
 NVIDIA_API_KEY = os.getenv("NVIDIA_API_KEY", "").replace('"', '').replace("'", "").strip()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "").replace('"', '').replace("'", "").strip()
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").replace('"', '').replace("'", "").strip()
 TMDB_API_KEY = os.getenv("TMDB_API_KEY", "").replace('"', '').replace("'", "").strip()
 
 DB_NAME = "oraculo.db"
-
 db_lock = threading.Lock()
-ia_lock = threading.Lock() 
 
-# ==========================================
-# CONFIGURAÇÃO DO BANCO DE DADOS SQLITE
-# ==========================================
 def check_db_health():
     if os.path.exists(DB_NAME):
         try:
@@ -77,9 +72,10 @@ def init_db():
 
 init_db()
 
-# ==========================================
-# MOTOR DE IAs (NVIDIA -> GROQ -> GEMINI)
-# ==========================================
+@app.errorhandler(Exception)
+def handle_exception(e):
+    return jsonify({"erro": f"Erro interno: {str(e)}"}), 500
+
 def limpar_e_parsear_json(content):
     content = re.sub(r'^```json\s*', '', content, flags=re.MULTILINE|re.IGNORECASE)
     content = re.sub(r'^```\s*', '', content, flags=re.MULTILINE).strip()
@@ -104,66 +100,56 @@ def limpar_e_parsear_json(content):
                     if isinstance(v, str): rec[k] = v.replace('"', '').replace('*', '').strip()
     return dados
 
-def gerar_resposta_ia(prompt):
-    with ia_lock: 
-        # 1. TENTA A NVIDIA (Limite Gigante)
-        if NVIDIA_API_KEY:
-            try:
-                url_nv = "https://integrate.api.nvidia.com/v1/chat/completions"
-                headers_nv = {"Authorization": f"Bearer {NVIDIA_API_KEY}", "Content-Type": "application/json"}
-                payload_nv = {
-                    "model": "meta/llama-3.3-70b-instruct",
-                    "messages": [{"role": "user", "content": prompt}],
-                    "temperature": 0.85,
-                    "max_tokens": 800,
-                    "response_format": {"type": "json_object"} 
-                }
-                res_nv = requests.post(url_nv, headers=headers_nv, json=payload_nv, timeout=12)
-                if res_nv.status_code == 200:
-                    content = res_nv.json()['choices'][0]['message']['content']
-                    return limpar_e_parsear_json(content)
-                else: print(f"⚠️ NVIDIA falhou (Status {res_nv.status_code})")
-            except Exception as e: print(f"Erro NVIDIA: {e}")
+def gerar_resposta_ia(prompt, max_tokens=1000, timeout_nv=25):
+    # 1. TENTA NVIDIA (Motor Principal de 70 Bilhões de Parâmetros)
+    if NVIDIA_API_KEY:
+        try:
+            url_nv = "https://integrate.api.nvidia.com/v1/chat/completions"
+            headers_nv = {"Authorization": f"Bearer {NVIDIA_API_KEY}", "Content-Type": "application/json"}
+            payload_nv = {
+                "model": "meta/llama-3.3-70b-instruct",
+                "messages": [{"role": "user", "content": prompt}],
+                "temperature": 0.85,
+                "max_tokens": max_tokens,
+                "response_format": {"type": "json_object"} 
+            }
+            res_nv = requests.post(url_nv, headers=headers_nv, json=payload_nv, timeout=timeout_nv)
+            if res_nv.status_code == 200:
+                return limpar_e_parsear_json(res_nv.json()['choices'][0]['message']['content'])
+        except Exception as e: print(f"Erro NVIDIA: {e}")
 
-        # 2. TENTA A GROQ (Limite Baixo)
-        if GROQ_API_KEY:
-            try:
-                url_groq = "https://api.groq.com/openai/v1/chat/completions"
-                headers_groq = {"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}
-                payload_groq = {
-                    "model": "llama-3.3-70b-versatile",
-                    "messages": [{"role": "user", "content": prompt}],
-                    "temperature": 0.85,
-                    "max_tokens": 800, 
-                    "response_format": {"type": "json_object"} 
-                }
-                res_groq = requests.post(url_groq, headers=headers_groq, json=payload_groq, timeout=12)
-                if res_groq.status_code == 200:
-                    content = res_groq.json()['choices'][0]['message']['content']
-                    return limpar_e_parsear_json(content)
-                else: print(f"⚠️ Groq falhou (Status {res_groq.status_code})")
-            except Exception as e: print(f"Erro Groq: {e}")
+    # 2. TENTA GROQ (Reserva 1)
+    if GROQ_API_KEY:
+        try:
+            url_groq = "https://api.groq.com/openai/v1/chat/completions"
+            headers_groq = {"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}
+            payload_groq = {
+                "model": "llama-3.3-70b-versatile",
+                "messages": [{"role": "user", "content": prompt}],
+                "temperature": 0.85,
+                "max_tokens": max_tokens, 
+                "response_format": {"type": "json_object"} 
+            }
+            res_groq = requests.post(url_groq, headers=headers_groq, json=payload_groq, timeout=12)
+            if res_groq.status_code == 200:
+                return limpar_e_parsear_json(res_groq.json()['choices'][0]['message']['content'])
+        except Exception as e: pass
 
-        # 3. TENTA O GEMINI 
-        if GEMINI_API_KEY:
-            try:
-                url_gemini = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={GEMINI_API_KEY}"
-                payload_gemini = {
-                    "contents": [{"parts": [{"text": prompt}]}],
-                    "generationConfig": {"responseMimeType": "application/json", "maxOutputTokens": 800}
-                }
-                res_gemini = requests.post(url_gemini, json=payload_gemini, timeout=15) 
-                if res_gemini.status_code == 200:
-                    content = res_gemini.json()['candidates'][0]['content']['parts'][0]['text']
-                    return limpar_e_parsear_json(content)
-                else: print(f"⚠️ Gemini falhou (Status {res_gemini.status_code})")
-            except Exception as e: print(f"Erro Gemini: {e}")
-        
-        raise Exception("RATE_LIMIT_ALL")
+    # 3. TENTA GEMINI (Reserva 2)
+    if GEMINI_API_KEY:
+        try:
+            url_gemini = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={GEMINI_API_KEY}"
+            payload_gemini = {
+                "contents": [{"parts": [{"text": prompt}]}],
+                "generationConfig": {"responseMimeType": "application/json", "maxOutputTokens": max_tokens}
+            }
+            res_gemini = requests.post(url_gemini, json=payload_gemini, timeout=15) 
+            if res_gemini.status_code == 200:
+                return limpar_e_parsear_json(res_gemini.json()['candidates'][0]['content']['parts'][0]['text'])
+        except Exception as e: pass
+    
+    raise Exception("RATE_LIMIT")
 
-# ==========================================
-# FUNÇÕES DE ESTADO (BANCO DE DADOS)
-# ==========================================
 def set_progresso(session_id, atual, total, finalizado, filme_atual):
     with db_lock:
         try:
@@ -171,14 +157,14 @@ def set_progresso(session_id, atual, total, finalizado, filme_atual):
                 with conn:
                     conn.execute('''INSERT OR REPLACE INTO progress (session_id, atual, total, finalizado, filme_atual)
                                     VALUES (?, ?, ?, ?, ?)''', (session_id, atual, total, int(finalizado), filme_atual))
-        except Exception as e: pass
+        except: pass
 
 def get_progresso(session_id):
     try:
         with closing(get_db()) as conn:
             row = conn.execute('SELECT * FROM progress WHERE session_id = ?', (session_id,)).fetchone()
             if row: return {"atual": row['atual'], "total": row['total'], "finalizado": bool(row['finalizado']), "filme_atual": row['filme_atual']}
-    except Exception as e: pass
+    except: pass
     return {"atual": 0, "total": 0, "finalizado": False, "filme_atual": "Aguardando..."}
 
 def salvar_sessao(session_id, vistos, amados, odiados, watchlist):
@@ -189,14 +175,14 @@ def salvar_sessao(session_id, vistos, amados, odiados, watchlist):
                     conn.execute('''INSERT OR REPLACE INTO sessions (session_id, vistos, amados, odiados, watchlist)
                                     VALUES (?, ?, ?, ?, ?)''', 
                                     (session_id, json.dumps(vistos), json.dumps(amados), json.dumps(odiados), json.dumps(watchlist)))
-        except Exception as e: pass
+        except: pass
 
 def carregar_sessao(session_id):
     try:
         with closing(get_db()) as conn:
             row = conn.execute('SELECT * FROM sessions WHERE session_id = ?', (session_id,)).fetchone()
             if row: return {'vistos': json.loads(row['vistos']), 'amados': json.loads(row['amados']), 'odiados': json.loads(row['odiados']), 'watchlist': json.loads(row['watchlist'])}
-    except Exception as e: pass
+    except: pass
     return None
 
 def get_cache_streamings(chave):
@@ -204,7 +190,7 @@ def get_cache_streamings(chave):
         with closing(get_db()) as conn:
             row = conn.execute('SELECT streamings FROM global_cache WHERE chave = ?', (chave,)).fetchone()
             if row: return json.loads(row['streamings'])
-    except Exception as e: pass
+    except: pass
     return None
 
 def set_cache_streamings(chave, streamings):
@@ -213,7 +199,7 @@ def set_cache_streamings(chave, streamings):
             with closing(get_db()) as conn:
                 with conn:
                     conn.execute('INSERT OR REPLACE INTO global_cache (chave, streamings) VALUES (?, ?)', (chave, json.dumps(streamings)))
-        except Exception as e: pass
+        except: pass
 
 def salvar_dados_finais(session_id, dados):
     with db_lock:
@@ -221,14 +207,14 @@ def salvar_dados_finais(session_id, dados):
             with closing(get_db()) as conn:
                 with conn:
                     conn.execute('INSERT OR REPLACE INTO dados_finais (session_id, dados) VALUES (?, ?)', (session_id, json.dumps(dados)))
-        except Exception as e: pass
+        except: pass
 
 def get_dados_finais(session_id):
     try:
         with closing(get_db()) as conn:
             row = conn.execute('SELECT dados FROM dados_finais WHERE session_id = ?', (session_id,)).fetchone()
             if row: return json.loads(row['dados'])
-    except Exception as e: pass
+    except: pass
     return {"stats": {}, "watchlist": {}}
 
 def resolve_boxd_links(links_str):
@@ -243,16 +229,15 @@ def resolve_boxd_links(links_str):
                 slug = partes[partes.index('film') + 1]
                 slug = re.sub(r'-\d{4}$', '', slug)
                 filmes.append(slug.replace('-', ' ').title())
-        except Exception as e: pass
+        except: pass
     return filmes
 
-# ==========================================
-# ROTAS DA API
-# ==========================================
 @app.route('/api/creditos', methods=['GET'])
 def check_creditos(): return jsonify({"creditos": 999})
+
 @app.route('/api/consumir_credito', methods=['POST'])
 def consume_credito(): return jsonify({"sucesso": True, "creditos": 999})
+
 @app.route('/api/adicionar_credito', methods=['POST'])
 def add_credito(): return jsonify({"sucesso": True, "creditos": 999})
 
@@ -266,7 +251,7 @@ def tmdb_search():
     try: 
         res = requests.get(url, timeout=10)
         return jsonify(res.json()) if res.status_code == 200 else jsonify({"results": []})
-    except Exception as e: return jsonify({"results": []}), 200
+    except: return jsonify({"results": []}), 200
 
 @app.route('/')
 def index(): return render_template('index.html')
@@ -276,7 +261,7 @@ def get_frases():
     try:
         with open(ARQUIVO_FRASES, 'r', encoding='utf-8') as f:
             return jsonify([linha.strip() for linha in f.readlines() if linha.strip()])
-    except Exception as e: return jsonify(["Analisando a sua curadoria..."])
+    except: return jsonify(["Analisando a sua curadoria..."])
 
 @app.route('/progress', methods=['GET'])
 def route_get_progress(): return jsonify(get_progresso(request.args.get('session_id', 'default')))
@@ -308,8 +293,7 @@ def upload_profile():
                     elif name.lower().endswith('watched.csv'):
                         with z.open(name) as f: 
                             df_watched = pd.read_csv(f)
-                            vistas_list = df_watched['Name'].fillna("").str.lower().tolist()
-                            vistos.update(vistas_list)
+                            vistos.update(df_watched['Name'].fillna("").str.lower().tolist())
                     elif name.lower().endswith('ratings.csv'):
                         with z.open(name) as f:
                             df = pd.read_csv(f)
@@ -332,9 +316,7 @@ def upload_profile():
         salvar_sessao(sid, list(vistos), amados, [], watchlist)
         set_progresso(sid, 0, 0, False, "Aguardando...")
         return jsonify({'stats': stats})
-    except Exception as e: 
-        print(f"Erro ao processar arquivo ZIP: {e}")
-        return jsonify({'erro': str(e)}), 500
+    except Exception as e: return jsonify({'erro': str(e)}), 500
 
 @app.route('/gerar_perfil', methods=['POST'])
 def gerar_perfil():
@@ -342,58 +324,46 @@ def gerar_perfil():
     username = stats.get('username', 'Usuário')
     bio = stats.get('bio', '')
     
-    profile_favs = stats.get('profile_favorites', [])
-    favoritos_calc = [f['Name'] for f in stats.get('favoritos', [])[:5]]
-    filmes_amados = profile_favs if profile_favs else favoritos_calc
-    
+    filmes_amados = stats.get('profile_favorites', []) or [f['Name'] for f in stats.get('favoritos', [])[:5]]
     amados_recentes = stats.get('amados_recentes', [])
     odiados_recentes = stats.get('odiados_recentes', [])
     
-    prompt = f"""Atue como um analista de cinema irônico, extremamente sincero e com um humor seco. 
-    Faça uma leitura cômica do gosto de: {username}.
-    Bio: "{bio}". 
-    Filmes que ama: {', '.join(filmes_amados) if filmes_amados else 'Nenhum'}. 
-    Outros favoritos: {', '.join(amados_recentes) if amados_recentes else 'Nenhum'}. 
-    Filmes que odiou (nota baixa): {', '.join(odiados_recentes) if odiados_recentes else 'Nenhum'}. 
-    Média geral: {stats.get('media_notas', 0)}.
+    prompt = f"""Atue como um psicanalista de cinema genial, sincero e bem-humorado (estilo stand-up).
+    Sua vítima é: {username}.
+    Bio do Perfil: "{bio}".
+    Filmes que ama: {', '.join(filmes_amados)}.
+    Outros que deu nota alta: {', '.join(amados_recentes)}.
+    Filmes que odeia (nota baixa): {', '.join(odiados_recentes)}.
+    Média: {stats.get('media_notas', 0)}. Total de Filmes Avaliados: {stats.get('total_avaliados', 0)}.
     
-    REGRAS DE OURO DA REDAÇÃO (CUMPRA OU SERÁ PUNIDO):
-    1. ZERO PUXA-SAQUISMO: IAs têm a mania insuportável de bajular o usuário chamando o gosto dele de "refinado", "fascinante" ou "sofisticado". É PROIBIDO ELOGIAR. O gosto dele é cheio de furos e ironias. Aponte isso com humor seco.
-    2. NÃO SEJA UM BABACA: Não ofenda a pessoa com agressividade. O tom é de uma observação sarcástica e divertida, como um comediante de stand-up analisando um hábito esquisito de um amigo.
-    3. LEITURA DINÂMICA: É ESTRITAMENTE PROIBIDO usar "frases infinitas". USE PONTOS FINAIS SEMPRE. Faça no máximo 3 a 4 frases curtas e diretas por parágrafo.
-    4. COTA DE EMOJIS: Use entre 4 e 8 emojis espalhados organicamente pelo texto. USE EXCLUSIVA E UNICAMENTE EMOJIS DESTA LISTA: 🙈🤓😼🥺😿😻💋🫦🔥💅👍☠️💀😢😭😞😓😔🤤🙄.
-    5. ORTOGRAFIA PERFEITA: Revise os nomes dos filmes. NUNCA escreva erros bizarros como "Laranza".
-    6. NADA DE CLICHÊS: É PROIBIDO escolher Tyler Durden, Patrick Bateman ou Coringa. Escolha um personagem fora do óbvio que combine com as contradições do gosto dele.
-    7. EXPLICAÇÃO DO PERSONAGEM: A última frase deve explicar, de forma inteligente e irônica, o porquê da escolha do personagem.
+    REGRAS VITAIS (SIGA OU SERÁ PUNIDO):
+    1. LEITURA DINÂMICA: É ESTRITAMENTE PROIBIDO usar "frases infinitas" cheias de vírgulas. USE PONTOS FINAIS SEMPRE. Faça frases curtas, diretas e que soem como um comediante falando. Pare de listar os filmes, critique a "vibe" das escolhas.
+    2. PROIBIDO PUXAR O SACO: É PROIBIDO usar palavras como "refinado", "fascinante", "complexo" ou "elegante". Seja 100% sincero e aponte as ironias no gosto da pessoa, mas sem ser um "cuzão". Zombe da bio dela se for engraçada.
+    3. PERSONAGEM REFERÊNCIA: Escolha um personagem que represente a "vibe" da pessoa. REGRA: É PROIBIDO ESCOLHER PERSONAGENS DE SÉRIES DE TV. Escolha APENAS de filmes de cinema. É PROIBIDO escolher Tyler Durden, Patrick Bateman ou Coringa.
+    4. EMOJIS: Use EXCLUSIVAMENTE estes emojis espalhados pelo texto: 🙈🤓😼🥺😿😻💋🫦🔥💅👍☠️💀😢😭😞😓😔🤤🙄. NUNCA faça uma lista explicando os emojis no final.
+    5. EXPLICAÇÃO: A última frase deve justificar de forma inteligente por que o personagem de cinema escolhido representa a pessoa.
+    6. ORTOGRAFIA: Mantenha os nomes dos filmes em inglês se não souber a tradução oficial. Não invente palavras.
     
-    Responda OBRIGATORIAMENTE no formato JSON abaixo:
+    Responda EXATAMENTE neste JSON:
     {{ 
-        "titulo": "Rótulo Sarcástico do Usuário (Ex: O Crítico Confuso)", 
-        "personagem_referencia": "Nome do Personagem Exato", 
-        "filme_referencia": "Nome do Filme Desse Personagem", 
-        "descricao": ["Primeiro parágrafo curto e irônico aqui, usando pontos finais.", "Segundo parágrafo finalizando com a explicação sarcástica do personagem escolhido."] 
+        "titulo": "Rótulo Sarcástico do Usuário", 
+        "personagem_referencia": "Nome do Personagem Famoso (Apenas de FILMES)", 
+        "filme_referencia": "Nome do Filme de Cinema", 
+        "descricao": ["Primeiro parágrafo de análise usando os dados com pontos finais.", "Segundo parágrafo finalizando a análise e justificando o personagem em frases curtas."] 
     }}"""
     
     try: 
-        dados = gerar_resposta_ia(prompt)
-        
-        if not dados or "titulo" not in dados:
-            raise Exception("IA falhou ou retornou JSON invalido")
-            
-        if isinstance(dados.get("descricao"), list):
-            dados["descricao"] = "\n\n".join(dados["descricao"])
-            
+        dados = gerar_resposta_ia(prompt, max_tokens=1000)
+        if not dados or "titulo" not in dados: raise Exception("IA falhou")
+        if isinstance(dados.get("descricao"), list): dados["descricao"] = "\n\n".join(dados["descricao"])
         return jsonify(dados)
     except Exception as e: 
-        print(f"Erro ao gerar perfil IA: {e}")
-        if "RATE_LIMIT" in str(e):
-            return jsonify({"erro": "RATE_LIMIT"})
-            
+        if "RATE_LIMIT" in str(e): return jsonify({"erro": "RATE_LIMIT"})
         return jsonify({
-            "titulo": "O Explorador Silencioso", 
+            "titulo": "O Inclassificável", 
             "personagem_referencia": "Driver", 
             "filme_referencia": "Drive", 
-            "descricao": "O Oráculo está Meditando... 🧘‍♂️\n\nOpa, desculpa pae! As IAs do servidor derreteram com tanto acesso hoje. 💅\n\nEnquanto a gente esfria os motores, deslize para o lado e aproveite pra ver onde assistir a sua Watchlist! 🙄🍿"
+            "descricao": "O Oráculo está Meditando... 🧘‍♂️\n\nOpa desculpa pae! As IAs do servidor derreteram com tanto acesso hoje e não conseguiram traduzir seu gosto peculiar.\n\nMas ó, aproveite pra ver onde assistir sua Watchlist deslizando a tela!"
         })
 
 @app.route('/oraculo', methods=['GET', 'POST'])
@@ -411,40 +381,68 @@ def oraculo():
         recs_finais = []
         tentativas_ia = 0
         is_real_terror = False
+        api_falhou = False
 
         while len(recs_finais) < 4 and tentativas_ia < 2:
             favoritos = request.json.get('favorites', [])
             blacklist_amostra = random.sample(list(blacklist_total), min(25, len(blacklist_total)))
 
             prompt = f"""Atue como curador profissional. Favoritos do usuário: {favoritos}.
-            Recomende EXATAMENTE 25 filmes de estilo similar mas que sejam ABSOLUTAMENTE INÉDITOS para ele.
-            ESQUEÇA ESTES FILMES: {', '.join(blacklist_amostra)}
-            DICA: O usuário é um CINEFILO HARDCORE. PROÍBA blockbusters. Vá fundo no catálogo obscuro.
-            Responda JSON: {{ "recomendacoes": [ {{"rec_original": "TITLE", "rec": "TITLE", "ano": 2000, "base": "GENERO", "desc": "DESC"}} ] }}"""
+            Recomende EXATAMENTE 20 filmes de estilo similar mas que sejam ABSOLUTAMENTE INÉDITOS para ele.
+            
+            ESQUEÇA ESTES FILMES (O usuário já viu ou conhece):
+            {', '.join(blacklist_amostra)}
+            {', '.join(list(excl_sessao)[:30])}
+            
+            DICA: O usuário é um CINEFILO HARDCORE. PROÍBA filmes mainstream ou blockbusters. Vá fundo no catálogo. Procure filmes lado B, diretores obscuros, cinema internacional ou clássicos esquecidos.
+            NÃO USE asteriscos (*) nos nomes.
+            Responda OBRIGATORIAMENTE em formato json:
+            {{ "recomendacoes": [ {{"rec_original": "TITLE", "rec": "TITLE", "ano": 2000, "base": "GENERO", "desc": "DESC"}} ] }}"""
 
-            dados_json = gerar_resposta_ia(prompt)
-            if not dados_json or "recomendacoes" not in dados_json:
-                tentativas_ia += 1
-                continue
+            try:
+                dados_json = gerar_resposta_ia(prompt)
+                recs_ia = dados_json.get("recomendacoes", []) if dados_json else []
                 
-            for r in dados_json.get("recomendacoes", []):
-                nome = r.get('rec', '').strip().lower()
-                orig = r.get('rec_original', '').strip().lower()
-                if nome not in blacklist_total and orig not in blacklist_total:
-                    if nome not in [rf['rec'].lower() for rf in recs_finais]:
-                        recs_finais.append(r)
-                        if len(recs_finais) >= 8: break 
+                if len(recs_ia) == 0:
+                    api_falhou = True
+                else:
+                    # A IA funcionou! Vamos ver se os filmes sobrevivem à blacklist
+                    sobreviveram = 0
+                    for r in recs_ia:
+                        nome = r.get('rec', '').strip().lower()
+                        orig = r.get('rec_original', '').strip().lower()
+                        
+                        if nome not in blacklist_total and orig not in blacklist_total:
+                            if nome not in [rf['rec'].lower() for rf in recs_finais]:
+                                recs_finais.append(r)
+                                sobreviveram += 1
+                                if len(recs_finais) >= 8: break 
+                    
+                    # Se a IA sugeriu filmes inéditos, mas TODOS já estavam na lista do cara
+                    if sobreviveram == 0:
+                        is_real_terror = True
+
+            except Exception as e:
+                api_falhou = True
             
             tentativas_ia += 1
-            if len(recs_finais) < 4: time.sleep(0.5)
+            if len(recs_finais) < 4: 
+                time.sleep(0.5)
 
-        if len(recs_finais) < 4: is_real_terror = True
-
-        res_payload = {"recomendacoes": recs_finais[:4]} 
-        if is_real_terror and len(recs_finais) > 0:
+        # --- FIM DO WHILE ---
+        
+        res_payload = {"recomendacoes": recs_finais[:4]}
+        
+        # Se a IA funcionou, mas a gente não achou 4 filmes pq o cara já viu tudo:
+        if is_real_terror or (len(recs_finais) < 4 and not api_falhou):
             res_payload["terror_mode"] = True
-            res_payload["recomendacoes"][0]["base"] = "O REAL TERROR"
-            res_payload["recomendacoes"][0]["desc"] = "Você já viu tudo o que existe? A IA suou sangue pra achar isso. 💀💅"
+            if len(recs_finais) > 0:
+                res_payload["recomendacoes"][0]["base"] = "O REAL TERROR"
+                res_payload["recomendacoes"][0]["desc"] = "Sua lista é gigantesca. O Oráculo suou sangue pra achar isso e quase desistiu. Você zerou o cinema. 💀💅"
+
+        # Se a API falhou (caiu, limit rate, etc) e a gente não tem nada
+        if api_falhou and len(recs_finais) == 0:
+            return jsonify({"erro": "RATE_LIMIT", "recomendacoes": []})
 
         return jsonify(res_payload)
     except Exception as e:
@@ -464,8 +462,10 @@ def processar_em_segundo_plano(watchlist_data, sid):
             
         streamings = []
         try:
+            time.sleep(0.1) 
             url = f"https://api.themoviedb.org/3/search/movie?api_key={TMDB_API_KEY}&query={quote(filme)}&language=pt-BR"
             if ano and str(ano).isdigit(): url += f"&year={int(float(ano))}"
+            
             res = requests.get(url, timeout=10)
             if res.status_code == 200 and res.json().get('results'):
                 mid = res.json()['results'][0]['id']
@@ -477,7 +477,7 @@ def processar_em_segundo_plano(watchlist_data, sid):
                         if cat in br:
                             for p in br[cat]:
                                 if p['provider_name'] not in streamings: streamings.append(p['provider_name'])
-        except Exception as e: pass
+        except: pass
             
         if not streamings: streamings.append("Não disponível")
         set_cache_streamings(chave, streamings)
@@ -492,9 +492,9 @@ def processar_em_segundo_plano(watchlist_data, sid):
                     dados_filmes[chave] = st
                     atual += 1
                     set_progresso(sid, atual, total, False, chave)
-                except Exception as ex: pass
+                except: pass
         salvar_dados_finais(sid, {"stats": {}, "watchlist": dados_filmes})
-    except Exception as e: salvar_dados_finais(sid, {"stats": {}, "watchlist": dados_filmes})
+    except: salvar_dados_finais(sid, {"stats": {}, "watchlist": dados_filmes})
     finally: set_progresso(sid, total, total, True, "Finalizado!")
 
 @app.route('/process_watchlist', methods=['POST'])
@@ -506,6 +506,20 @@ def process_watchlist():
     threading.Thread(target=processar_em_segundo_plano, args=(sessao['watchlist'], sid)).start()
     return jsonify({'mensagem': 'Iniciado'})
 
+def liberar_porta(porta):
+    try:
+        if platform.system() == 'Windows':
+            res = subprocess.run(f'netstat -ano | findstr :{porta}', shell=True, capture_output=True, text=True)
+            for l in res.stdout.splitlines():
+                if 'LISTENING' in l: subprocess.run(f'taskkill /F /PID {l.strip().split()[-1]}', shell=True)
+        else:
+            res = subprocess.run(f'lsof -t -i:{porta}', shell=True, capture_output=True, text=True)
+            for p in res.stdout.strip().split('\n'):
+                if p: os.system(f'kill -9 {p}')
+    except: pass
+
 if __name__ == '__main__':
     PORTA = 5000
+    liberar_porta(PORTA)
+    threading.Timer(1.5, lambda: webbrowser.open(f'http://127.0.0.1:{PORTA}')).start()
     app.run(port=PORTA, debug=False, threaded=True)
