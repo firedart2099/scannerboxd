@@ -2,13 +2,11 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Scannerboxd</title>
     
-    <!-- ÍCONE DA ABA (FAVICON) COM OS 3 PONTINHOS DO LOGO -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='20' cy='50' r='15' fill='%2300e054'/><circle cx='50' cy='50' r='15' fill='%2340bcf4'/><circle cx='80' cy='50' r='15' fill='%23ff8000'/></svg>">
     
-    <!-- SISTEMA ANTI-TRAVAMENTO DE FIREWALL CORPORATIVO -->
     <script>
         const twScript = document.createElement('script');
         twScript.src = "https://cdn.tailwindcss.com";
@@ -48,6 +46,7 @@
             background-image: radial-gradient(circle at 50% -20%, #202830 0%, #14181c 80%);
             overflow-x: hidden;
             margin: 0;
+            overscroll-behavior-y: none;
         }
 
         h1, h2, h3, .stat-value { font-family: 'Space Grotesk', sans-serif; }
@@ -65,9 +64,7 @@
             }
         }
 
-        .glass-panel:hover {
-            border-color: rgba(64, 188, 244, 0.4); 
-        }
+        .glass-panel:hover { border-color: rgba(64, 188, 244, 0.4); }
 
         #countdown-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -102,13 +99,8 @@
             transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
         }
         @media (min-width: 768px) {
-            .movie-card {
-                box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-            }
-            .movie-card:hover {
-                transform: scale(1.05) translateY(-5px);
-                z-index: 10;
-            }
+            .movie-card { box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+            .movie-card:hover { transform: scale(1.05) translateY(-5px); z-index: 10; }
         }
         
         .fav-poster {
@@ -133,12 +125,8 @@
             align-items: center;
             gap: 20px;
         }
-        @media (min-width: 768px) {
-            .profile-card-ref { padding: 30px; gap: 30px; }
-        }
-        @media (max-width: 768px) {
-            .profile-card-ref { flex-direction: column; text-align: center; }
-        }
+        @media (min-width: 768px) { .profile-card-ref { padding: 30px; gap: 30px; } }
+        @media (max-width: 768px) { .profile-card-ref { flex-direction: column; text-align: center; } }
 
         .animate-fade-in-fast { animation: fadeInFast 0.2s ease-out forwards; }
         @keyframes fadeInFast {
@@ -150,55 +138,54 @@
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
         .ps-trophy {
-            position: fixed;
-            top: 24px;
-            right: -450px;
-            width: 320px;
-            background: rgba(20, 24, 28, 0.95);
-            border: 1px solid rgba(64, 188, 244, 0.4);
-            border-radius: 12px;
-            padding: 16px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
+            position: fixed; top: 24px; right: -450px; width: 320px;
+            background: rgba(20, 24, 28, 0.95); border: 1px solid rgba(64, 188, 244, 0.4);
+            border-radius: 12px; padding: 16px; display: flex; align-items: center; gap: 16px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.8), inset 0 0 15px rgba(64,188,244,0.1);
-            z-index: 100000;
-            transition: right 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 100000; transition: right 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        @media (min-width: 768px) {
-            .ps-trophy { backdrop-filter: blur(10px); }
+        @media (min-width: 768px) { .ps-trophy { backdrop-filter: blur(10px); } }
+        .ps-trophy.show { right: 24px; }
+        @media (max-width: 640px) { .ps-trophy { width: 90%; top: auto; bottom: 80px; right: -100%; } .ps-trophy.show { right: 5%; } }
+
+        /* CIRCULAR PROGRESS MINIMALISTA */
+        .minimal-spinner {
+            width: 120px; height: 120px; border-radius: 50%;
+            border: 3px solid rgba(44, 52, 64, 0.5);
+            border-top-color: var(--lb-green);
+            animation: spin 1s linear infinite;
         }
-        .ps-trophy.show {
-            right: 24px;
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* DOTS DE NAVEGAÇÃO CUSTOMIZADOS */
+        .nav-dot {
+            width: 44px; height: 44px; border-radius: 50%;
+            background: #14181c; border: 2px solid #2c3440;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative; cursor: pointer;
         }
-        .trophy-icon {
-            width: 48px;
-            height: 48px;
-            background: radial-gradient(circle, rgba(64,188,244,0.2) 0%, transparent 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            border: 2px solid #40bcf4;
-            box-shadow: 0 0 15px rgba(64,188,244,0.5);
-            flex-shrink: 0;
-            animation: pulseGlow 2s infinite;
+        .nav-dot.active { transform: scale(1.15); box-shadow: 0 0 15px rgba(0,0,0,0.5); }
+        .nav-dot.active-0 { border-color: var(--lb-blue); }
+        .nav-dot.active-1 { border-color: var(--lb-orange); }
+        .nav-dot.active-2 { border-color: var(--lb-green); }
+        
+        .nav-dot-inner { width: 10px; height: 10px; border-radius: 50%; background: #2c3440; transition: all 0.3s; }
+        .nav-dot.active-0 .nav-dot-inner, .nav-dot.ready-0 .nav-dot-inner { background: var(--lb-blue); box-shadow: 0 0 8px var(--lb-blue); }
+        .nav-dot.active-1 .nav-dot-inner, .nav-dot.ready-1 .nav-dot-inner { background: var(--lb-orange); box-shadow: 0 0 8px var(--lb-orange); }
+        .nav-dot.active-2 .nav-dot-inner, .nav-dot.ready-2 .nav-dot-inner { background: var(--lb-green); box-shadow: 0 0 8px var(--lb-green); }
+
+        .loading-ring {
+            position: absolute; inset: -4px; border-radius: 50%;
+            border: 2px solid transparent; animation: spin 1.5s linear infinite; opacity: 0; transition: opacity 0.3s;
         }
-        @keyframes pulseGlow {
-            0% { box-shadow: 0 0 10px rgba(64,188,244,0.3); }
-            50% { box-shadow: 0 0 25px rgba(64,188,244,0.8); }
-            100% { box-shadow: 0 0 10px rgba(64,188,244,0.3); }
-        }
-        @media (max-width: 640px) {
-            .ps-trophy { width: 90%; top: auto; bottom: 24px; right: -100%; }
-            .ps-trophy.show { right: 5%; }
-        }
+        .nav-dot.loading-1 .loading-ring { border-top-color: var(--lb-orange); opacity: 1; }
+        .nav-dot.loading-2 .loading-ring { border-top-color: var(--lb-green); opacity: 1; }
     </style>
 </head>
-<body class="p-2 sm:p-4 md:p-8 min-h-screen relative">
+<body class="p-0 min-h-screen relative">
 
-<div id="custom-toast" class="fixed bottom-10 left-1/2 transform -translate-x-1/2 bg-[#1c2228]/95 backdrop-blur-md border border-[#ff8000]/50 text-[#ff8000] px-5 py-3.5 rounded-2xl shadow-[0_10px_30px_rgba(255,128,0,0.15)] z-[100000] flex items-center gap-3 transition-all duration-500 opacity-0 pointer-events-none translate-y-10 max-w-[90vw]">
+<div id="custom-toast" class="fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-[#1c2228]/95 backdrop-blur-md border border-[#ff8000]/50 text-[#ff8000] px-5 py-3.5 rounded-2xl shadow-[0_10px_30px_rgba(255,128,0,0.15)] z-[100000] flex items-center gap-3 transition-all duration-500 opacity-0 pointer-events-none translate-y-10 max-w-[90vw]">
     <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
     <p id="custom-toast-msg" class="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-center">Erro.</p>
 </div>
@@ -208,26 +195,287 @@
     <div>
         <p class="text-[#40bcf4] text-[9px] font-black uppercase tracking-widest mb-0.5">Conquista Desbloqueada</p>
         <h4 class="text-white font-bold text-sm leading-tight mb-1">O Terror do Letterboxd 💀</h4>
-        <p class="text-[#8c9bab] text-[10px] leading-snug">Sua lista é tão gigante que o Oráculo entrou em pânico. Escavando os confins da internet...</p>
+        <p class="text-[#8c9bab] text-[10px] leading-snug">Você já assistiu tudo! A IA suou sangue para encontrar algo obscuro...</p>
     </div>
 </div>
 
-<div class="absolute top-0 left-0 w-full h-[50vh] md:h-[80vh] -z-10 pointer-events-none">
-    <img id="hero-backdrop-img" 
-         src="" 
-         alt="Cinema Backdrop" 
-         class="w-full h-full object-cover opacity-0 transition-opacity duration-500 grayscale-[20%]" 
-         style="-webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.5) 40%, rgba(0,0,0,0) 100%); mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.5) 40%, rgba(0,0,0,0) 100%);">
+<div class="fixed top-0 left-0 w-full h-[50vh] md:h-[80vh] -z-10 pointer-events-none">
+    <img id="hero-backdrop-img" src="" class="w-full h-full object-cover opacity-0 transition-opacity duration-500 grayscale-[20%]" style="-webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.5) 40%, rgba(0,0,0,0) 100%); mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.5) 40%, rgba(0,0,0,0) 100%);">
 </div>
 
 <div id="countdown-overlay">
     <div id="countdown-text" class="countdown-number">3</div>
 </div>
 
+<div class="absolute top-0 left-0 w-full px-4 sm:px-8 pt-4 sm:pt-8 z-30 pointer-events-none">
+    <header class="max-w-5xl mx-auto flex justify-between items-start md:items-center">
+        <div class="flex items-start sm:items-center gap-2 sm:gap-4 pointer-events-auto cursor-pointer" onclick="location.reload()">
+            <div class="flex items-center gap-1.5 transition-transform mt-1.5 sm:mt-0">
+                <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[#00e054]"></div>
+                <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[#40bcf4]"></div>
+                <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[#ff8000]"></div>
+            </div>
+            <div class="flex flex-col justify-center">
+                <h1 class="text-sm sm:text-xl font-bold tracking-widest text-white uppercase drop-shadow-md leading-none">Scanner<span class="text-[#40bcf4] block sm:inline text-[10px] sm:text-xl mt-0.5 sm:mt-0">boxd</span></h1>
+            </div>
+        </div>
+
+        <div id="slideshow-info" class="transition-opacity duration-500 opacity-0 flex-col items-end justify-center hidden sm:flex">
+            <h2 id="slide-title" class="text-sm md:text-lg font-black text-white tracking-tighter drop-shadow-md leading-tight mb-0.5 max-w-[150px] md:max-w-[200px] break-words line-clamp-2 text-right">...</h2>
+            <div class="flex items-center justify-end gap-2">
+                <span id="slide-year" class="text-gray-300 font-bold text-[9px] md:text-[10px]"></span>
+                <span id="slide-rating" class="text-[#00e054] text-[9px] md:text-[10px] tracking-widest drop-shadow-md"></span>
+            </div>
+        </div>
+    </header>
+</div>
+
+<!-- PÍLULA GLOBAL DE LOADING (Fica no topo enquanto carrega coisas no fundo) -->
+<div id="global-loading-pill" class="fixed top-20 sm:top-6 left-1/2 transform -translate-x-1/2 z-[100] flex-col items-center transition-all duration-500 opacity-0 pointer-events-none hidden">
+    <div class="bg-[#1c2228]/95 backdrop-blur-md border border-[#40bcf4]/30 px-5 py-2.5 rounded-full shadow-[0_10px_30px_rgba(0,0,0,0.5)] flex items-center gap-3">
+        <svg class="animate-spin w-4 h-4 text-[#40bcf4]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+        <span id="funny-text" class="text-white text-[10px] font-bold uppercase tracking-widest">Iniciando motores...</span>
+    </div>
+    <span class="text-[8px] text-[#8c9bab] mt-2 uppercase tracking-widest font-bold bg-[#14181c]/80 px-2 py-1 rounded-md text-center max-w-[250px] leading-tight">
+        A curadoria pode demorar um pouco. <br>Deslize a tela para explorar o que já está pronto.
+    </span>
+</div>
+
+<!-- TELA INICIAL (UPLOAD) -->
+<div id="main-content" class="w-full h-screen flex flex-col justify-center px-4 sm:px-8 absolute inset-0 z-20">
+    <div class="max-w-2xl mx-auto w-full mt-10">
+        <div class="text-center space-y-3 sm:space-y-4 mb-8 sm:mb-12">
+            <h2 class="text-3xl sm:text-4xl md:text-6xl font-black text-white leading-tight tracking-tighter drop-shadow-lg">QUAL É O SEU PERFIL <br><span class="text-[#40bcf4] italic">CINEMATOGRÁFICO?</span></h2>
+            <p class="text-[#8c9bab] max-w-xl mx-auto text-sm sm:text-base md:text-lg font-medium px-2">Descubra a verdade sobre o seu gosto e encontre onde assistir a sua Watchlist.</p>
+        </div>
+
+        <div class="space-y-4">
+            <div class="flex justify-center">
+                <a href="https://letterboxd.com/data/export/" target="_blank" class="hidden sm:flex items-center gap-4 bg-[#1c2228] border border-[#2c3440] hover:border-[#40bcf4] text-[#8c9bab] hover:text-white px-6 py-4 rounded-xl transition-all w-full shadow-md group">
+                    <span class="bg-[#40bcf4]/20 text-[#40bcf4] w-6 h-6 rounded-full flex items-center justify-center text-xs font-black shrink-0 group-hover:bg-[#40bcf4] group-hover:text-[#14181c] transition-colors">1</span>
+                    <span class="font-bold text-sm tracking-wide">Baixar arquivo .ZIP oficial</span>
+                    <svg class="w-5 h-5 text-[#40bcf4] ml-auto opacity-70 group-hover:opacity-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                </a>
+                <div class="sm:hidden w-full bg-[#1c2228] border border-[#2c3440] p-4 rounded-xl shadow-md text-left">
+                    <p class="text-white text-[12px] font-bold uppercase tracking-widest mb-2 flex items-center gap-2">
+                        <span class="bg-[#40bcf4]/20 text-[#40bcf4] w-5 h-5 rounded-full flex items-center justify-center text-[9px] shrink-0">1</span>
+                        Baixar arquivo .ZIP
+                    </p>
+                    <div class="flex items-center gap-2 bg-[#14181c] p-1.5 rounded-lg border border-[#40bcf4]/30">
+                        <input type="text" id="export-link-input-main" readonly value="https://letterboxd.com/data/export/" class="flex-1 bg-transparent text-[#40bcf4] text-[10px] font-mono outline-none px-2 w-full min-w-0">
+                        <button id="copy-link-btn-main" onclick="copyMainExportLink()" class="bg-[#40bcf4] text-[#14181c] text-[10px] font-black px-3 py-2 rounded transition-colors uppercase tracking-widest shrink-0">Copiar</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-panel p-6 md:p-10 text-center border-dashed border-2 border-[#2c3440] hover:border-[#40bcf4]/50 transition-all group" id="upload-container">
+                <label for="csv-file" id="dropzone-label" class="cursor-pointer group block">
+                    <div class="flex items-center justify-center gap-2 mb-6">
+                        <p class="text-white font-bold text-sm tracking-wide">Carregar no Scannerboxd</p>
+                    </div>
+                    <div class="w-16 h-16 sm:w-20 sm:h-20 bg-[#40bcf4]/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform border border-[#40bcf4]/20">
+                        <svg class="w-8 h-8 sm:w-10 sm:h-10 text-[#40bcf4]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v16m8-8H4"></path></svg>
+                    </div>
+                    <p class="text-lg sm:text-2xl font-bold text-white mb-2">
+                        <span class="hidden sm:inline">Arraste seu arquivo <span class="text-[#40bcf4]">.zip</span> aqui</span>
+                        <span class="sm:hidden">Selecione o arquivo <span class="text-[#40bcf4]">.zip</span></span>
+                    </p>
+                    <p class="text-[9px] sm:text-[11px] text-[#8c9bab] uppercase tracking-widest font-bold">Nenhum dado é salvo nos servidores</p>
+                </label>
+                <input type="file" id="csv-file" class="hidden" accept=".zip" onchange="fileSelected()">
+                
+                <div id="action-area" class="hidden mt-4 flex-col items-center gap-4 bg-[#14181c] p-6 rounded-xl border border-[#2c3440]">
+                    <div class="flex items-center justify-center gap-2 bg-[#1c2228] border border-[#40bcf4]/30 px-4 py-2.5 rounded-lg w-full">
+                        <svg class="w-4 h-4 text-[#40bcf4] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <p id="file-name-display" class="text-[#40bcf4] font-mono text-xs sm:text-sm truncate"></p>
+                    </div>
+                    <button id="btn-start-analysis" onclick="handleFileUpload()" class="w-full bg-gradient-to-r from-[#40bcf4] to-[#2ba8e0] text-[#14181c] font-black py-3.5 sm:py-4 px-8 rounded-xl uppercase tracking-widest transition-all shadow-lg flex items-center justify-center gap-2 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 text-xs sm:text-sm">
+                        <svg id="btn-spinner" class="animate-spin hidden w-5 h-5 text-[#14181c]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        <span id="btn-text">Iniciar Análise</span>
+                    </button>
+                    <button onclick="resetUpload()" class="text-[9px] sm:text-[10px] text-[#8c9bab] hover:text-white uppercase tracking-widest underline decoration-dashed">Escolher outro arquivo</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CARROSSEL DE 3 TELAS (Deslize para os lados) -->
+<div id="carousel-wrapper" class="hidden fixed inset-0 z-20 pt-20 sm:pt-28 pb-20 overflow-hidden">
+    <div id="carousel-track" class="flex h-full w-[300vw] transition-transform duration-500 ease-out" style="transform: translateX(0%);">
+        
+        <!-- TELA 1: PERFIL (AZUL) -->
+        <div class="w-screen h-full overflow-y-auto no-scrollbar px-4 sm:px-8 pb-10">
+            <div class="max-w-3xl mx-auto space-y-6 sm:space-y-8 animate-fade-in-fast">
+                <div class="text-center flex justify-center items-center gap-2">
+                    <svg class="w-5 h-5 text-[#40bcf4]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                    <h2 id="profile-greeting" class="text-xl md:text-2xl font-bold text-[#40bcf4] tracking-tighter drop-shadow-md">O Seu Perfil de Crítico</h2>
+                </div>
+
+                <div class="profile-card-ref relative overflow-hidden shadow-xl p-5 md:p-8">
+                    <div class="w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 shrink-0 relative rounded-full border-4 border-[#40bcf4] overflow-hidden bg-[#14181c] flex items-center justify-center mx-auto md:mx-0">
+                        <div id="profile-pulse-loader" class="w-full h-full bg-[#1c2228] animate-pulse absolute inset-0"></div>
+                        <img id="profile-img-element" src="" loading="lazy" class="w-full h-full object-cover hidden transition-opacity duration-500 relative z-10">
+                    </div>
+                    
+                    <div class="flex-1 space-y-2 md:space-y-3 min-w-0 mt-4 md:mt-0">
+                        <div class="flex items-center gap-2 flex-wrap justify-center md:justify-start">
+                            <h3 id="roast-title" class="text-lg sm:text-2xl md:text-3xl font-black text-white tracking-tighter flex items-center gap-2 text-center md:text-left leading-tight">
+                                Analisando o gosto... 
+                                <svg class="animate-spin w-4 h-4 text-[#40bcf4] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                            </h3>
+                        </div>
+                        <p id="roast-desc" class="text-gray-300 text-xs md:text-sm leading-relaxed font-light whitespace-pre-line">Processando avaliações...</p>
+                        <div class="pt-1 flex flex-col items-center md:items-start gap-2">
+                            <span id="roast-vibe" class="text-[9px] md:text-xs text-[#14181c] font-black uppercase tracking-widest bg-[#40bcf4] px-2 py-1 rounded-sm truncate max-w-full inline-block">CALCULANDO...</span>
+                            
+                            <button id="btn-retry-profile" onclick="tentarRefazerPerfil()" class="hidden mt-2 text-[9px] sm:text-[10px] bg-[#ff8000]/10 text-[#ff8000] border border-[#ff8000]/30 px-3 py-1.5 rounded uppercase tracking-widest font-black flex items-center gap-1.5 transition-all w-fit">
+                                <svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                                <span id="retry-btn-text">Refazer Análise</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 sm:gap-6 pb-8">
+                    <div class="glass-panel p-4 md:p-8 text-center">
+                        <span id="stat-total" class="text-3xl sm:text-5xl font-black text-[#40bcf4] block mb-1 md:mb-2">0</span>
+                        <p class="text-[#8c9bab] text-[8px] sm:text-xs font-black uppercase tracking-widest">Avaliados</p>
+                    </div>
+                    <div class="glass-panel p-4 md:p-8 text-center">
+                        <span id="stat-avg" class="text-3xl sm:text-5xl font-black text-[#00e054] block mb-1 md:mb-2">0.00</span>
+                        <p class="text-[#8c9bab] text-[8px] sm:text-xs font-black uppercase tracking-widest">Média</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TELA 2: ORÁCULO (LARANJA) -->
+        <div class="w-screen h-full overflow-y-auto no-scrollbar px-4 sm:px-8 pb-10 relative">
+            <div class="max-w-4xl mx-auto space-y-6 animate-fade-in-fast">
+                
+                <!-- Overlay de Loading do Oráculo -->
+                <div id="oracle-loading-overlay" class="absolute inset-0 z-30 flex flex-col items-center pt-20 bg-[#14181c]">
+                    <div class="relative w-16 h-16 mb-6">
+                        <div class="absolute inset-0 border-2 border-[#2c3440] rounded-full"></div>
+                        <div class="absolute inset-0 border-2 border-[#ff8000] rounded-full border-t-transparent animate-spin"></div>
+                    </div>
+                    <h3 class="text-[#ff8000] font-black uppercase tracking-widest text-sm mb-2">Oráculo Pensando</h3>
+                    <p class="text-[#8c9bab] text-xs font-medium text-center max-w-xs px-4">Procurando os filmes mais obscuros que você ainda não viu...</p>
+                </div>
+
+                <div id="oracle-content" class="hidden flex-col space-y-6">
+                    <div class="flex flex-col md:flex-row items-center justify-between px-1 mb-2 gap-4 text-center md:text-left">
+                        <div>
+                            <div class="flex items-center justify-center md:justify-start gap-2">
+                                <svg class="w-5 h-5 text-[#ff8000] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"></path></svg>
+                                <h4 class="text-white font-bold text-lg sm:text-2xl drop-shadow-md">Oráculo de Recomendações</h4>
+                            </div>
+                            <p class="text-[#8c9bab] text-[10px] md:text-xs mt-1 px-2 md:px-0">Cruzamos o seu histórico. <br class="sm:hidden"><strong class="text-[#ff8000]">Toque nos cartazes para exportar.</strong></p>
+                        </div>
+                        <button id="btn-export-desktop" onclick="abrirTutorial()" class="hidden md:flex items-center gap-1.5 px-6 py-3 bg-[#ff8000]/20 text-[#ff8000] border border-[#ff8000]/50 rounded-lg font-black text-[10px] uppercase tracking-widest hover:bg-[#ff8000] hover:text-[#14181c] transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                            EXPORTAR SELECIONADOS (4)
+                        </button>
+                    </div>
+                    
+                    <div id="oracle-warning" class="hidden mb-2 bg-[#ff8000]/10 border border-[#ff8000]/30 p-3 rounded-xl text-center mx-1">
+                        <p class="text-[#ff8000] text-[10px] sm:text-xs font-bold leading-relaxed">🚨 Sua lista é GIGANTE! O Oráculo está improvisando clássicos obscuros.</p>
+                    </div>
+
+                    <div id="oracle-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6 px-1 md:px-2"></div>
+
+                    <div class="flex flex-col items-center gap-3 px-1 pb-8">
+                        <button id="btn-load-more" onclick="carregarMaisSugestoes()" class="w-full md:w-auto px-6 py-3.5 md:py-3 bg-[#1c2228] text-[#ff8000] border border-[#2c3440] rounded-xl font-black text-[10px] sm:text-xs uppercase tracking-widest transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50">
+                            <svg id="load-more-spinner" class="w-4 h-4 animate-spin hidden shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                            <svg id="load-more-icon" class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                            <span>Descobrir Mais</span>
+                        </button>
+                        <button id="btn-export-mobile" onclick="abrirTutorial()" class="md:hidden w-full flex items-center justify-center gap-1.5 px-6 py-3.5 bg-[#ff8000]/20 text-[#ff8000] border border-[#ff8000]/50 rounded-xl font-black text-[10px] uppercase tracking-widest disabled:opacity-50 disabled:cursor-not-allowed">
+                            EXPORTAR SELECIONADOS (4)
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TELA 3: WATCHLIST / STREAMING (VERDE) -->
+        <div class="w-screen h-full overflow-y-auto no-scrollbar px-4 sm:px-8 pb-10 relative">
+            <div class="max-w-5xl mx-auto space-y-6 animate-fade-in-fast h-full">
+                
+                <!-- Loading Minimalista estilo Obscuriboxd -->
+                <div id="watchlist-loading-overlay" class="absolute inset-0 z-30 flex flex-col items-center justify-center bg-[#14181c] pb-20">
+                    <div class="minimal-spinner mb-8 relative flex items-center justify-center">
+                        <span id="load-percent-minimal" class="text-white font-black text-2xl absolute">0%</span>
+                    </div>
+                    <p id="current-movie-minimal" class="text-[#8c9bab] text-[10px] sm:text-xs uppercase tracking-widest font-bold max-w-[250px] truncate text-center px-4">Conectando aos catálogos...</p>
+                    <p class="text-[#2c3440] text-[9px] uppercase tracking-widest mt-4 font-bold flex gap-1"><span id="loading-count-minimal">0/0</span> • <span id="eta-timer-minimal">--:--</span></p>
+                </div>
+
+                <div id="watchlist-content" class="hidden flex-col space-y-6 md:space-y-10 pb-8">
+                    <div class="text-center pt-2">
+                        <h2 class="text-3xl md:text-5xl font-black text-white tracking-tighter uppercase mb-1 drop-shadow-lg">A Sua <span class="text-[#00e054]">Watchlist</span></h2>
+                        <p class="text-[#8c9bab] font-bold uppercase tracking-widest text-[9px] md:text-xs">Pronta para dar play</p>
+                    </div>
+
+                    <div id="dynamic-podium" class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8"></div>
+
+                    <div class="glass-panel p-4 md:p-8 space-y-4 md:space-y-6 mt-4">
+                        <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                            <div class="flex items-center gap-3 w-full md:w-auto">
+                                <span class="text-[#00e054] bg-[#00e054]/10 p-2.5 rounded-xl border border-[#00e054]/20 shrink-0">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                                </span>
+                                <h3 class="text-white font-bold text-base md:text-xl tracking-tighter uppercase truncate">O Catálogo</h3>
+                            </div>
+                            <div class="w-full md:w-1/3 relative shrink-0">
+                                <input type="text" id="search-input" oninput="handleSearch()" placeholder="Procurar filme..." class="w-full bg-[#14181c] border border-[#2c3440] text-white pl-4 pr-10 py-2.5 rounded-xl focus:outline-none focus:border-[#00e054] text-xs sm:text-sm">
+                                <svg class="w-4 h-4 absolute right-3 top-3 text-[#8c9bab]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                            </div>
+                        </div>
+
+                        <div class="border-t border-[#2c3440] pt-4">
+                            <p class="text-[#8c9bab] text-[9px] font-black uppercase tracking-widest mb-3 flex items-center gap-1.5">Filtros de Plataforma</p>
+                            <div id="stats-container" class="flex flex-row overflow-x-auto no-scrollbar snap-x gap-2 pb-2 md:flex-wrap"></div>
+                        </div>
+                    </div>
+
+                    <div id="movies-panel" class="space-y-4 animate-fade-in-fast">
+                        <div class="flex justify-between items-center bg-[#1c2228] p-3 sm:p-6 rounded-xl border border-[#2c3440] gap-3 flex-col sm:flex-row">
+                            <div class="flex items-center gap-2 min-w-0 w-full justify-between sm:justify-start">
+                                <h3 class="text-white font-bold text-sm sm:text-xl tracking-tighter uppercase truncate">Resultados</h3>
+                                <span id="movie-counter" class="bg-[#14181c] px-2 py-1 rounded text-[9px] font-black text-[#00e054] border border-[#00e054]/20 shrink-0">0 FILMES</span>
+                            </div>
+                        </div>
+                        <ul id="results" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- BOLINHAS DE NAVEGAÇÃO INFERIOR -->
+<div id="bottom-nav-dots" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-[#1c2228]/80 backdrop-blur-lg border border-[#2c3440] px-5 py-3 rounded-full gap-5 z-50 transition-all duration-500 opacity-0 pointer-events-none hidden shadow-[0_10px_40px_rgba(0,0,0,0.8)]">
+    
+    <button id="dot-0" onclick="goToSlide(0)" class="nav-dot active active-0 ready-0">
+        <div class="nav-dot-inner"></div>
+    </button>
+
+    <button id="dot-1" onclick="goToSlide(1)" class="nav-dot loading-1">
+        <div class="loading-ring"></div>
+        <div class="nav-dot-inner"></div>
+    </button>
+
+    <button id="dot-2" onclick="goToSlide(2)" class="nav-dot loading-2">
+        <div class="loading-ring"></div>
+        <div class="nav-dot-inner"></div>
+    </button>
+</div>
+
+<!-- MODAIS DE TUTORIAL E DOAÇÃO (Mantidos exatamente iguais) -->
 <div id="tutorial-modal" class="fixed inset-0 bg-[#14181c]/90 z-[10000] hidden items-center justify-center backdrop-blur-sm p-4">
     <div class="bg-[#1c2228] border border-[#40bcf4]/30 rounded-2xl p-6 md:p-8 max-w-lg w-full shadow-2xl relative animate-fade-in-fast max-h-[90vh] flex flex-col">
         <button onclick="fecharTutorial()" class="absolute top-4 right-5 text-[#8c9bab] hover:text-white text-3xl font-light z-10">&times;</button>
-        
         <div class="text-center mb-6 shrink-0">
             <div class="w-12 h-12 md:w-16 md:h-16 bg-[#40bcf4]/10 rounded-full flex items-center justify-center text-[#40bcf4] mx-auto mb-4 border border-[#40bcf4]/30">
                 <svg class="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
@@ -235,13 +483,11 @@
             <h3 class="text-xl md:text-2xl font-black text-white uppercase tracking-tighter">Atualizar sua Watchlist</h3>
             <p class="text-[#8c9bab] text-xs md:text-sm mt-2">Vamos adicionar as suas obras-primas escolhidas à sua lista oficial.</p>
         </div>
-
         <div class="space-y-3 mb-6 overflow-y-auto pr-2 no-scrollbar flex-1">
             <div class="flex gap-4 items-start bg-white/5 p-4 rounded-xl border border-white/5">
                 <span class="bg-[#40bcf4] text-[#14181c] font-black w-6 h-6 rounded-full flex items-center justify-center shrink-0 text-xs">1</span>
                 <p class="text-sm text-gray-300 leading-snug">Baixe o arquivo CSV. (Ele contém <strong>apenas os <span id="tut-count" class="text-[#40bcf4] font-bold">4</span> filmes</strong>).</p>
             </div>
-
             <div class="bg-white/5 p-4 rounded-xl border border-white/5 space-y-3">
                 <div class="flex gap-3 items-center">
                     <span class="bg-[#40bcf4] text-[#14181c] font-black w-6 h-6 rounded-full flex items-center justify-center shrink-0 text-xs">2</span>
@@ -252,7 +498,6 @@
                     <li>Clique em <span class="text-white font-bold">Import films to watchlist</span> na direita.</li>
                 </ol>
             </div>
-
             <div class="bg-white/5 p-4 rounded-xl border border-white/5 space-y-3">
                 <div class="flex gap-3 items-center">
                     <span class="bg-[#40bcf4] text-[#14181c] font-black w-6 h-6 rounded-full flex items-center justify-center shrink-0 text-xs">3</span>
@@ -264,7 +509,6 @@
                 </ol>
             </div>
         </div>
-
         <button onclick="baixarWatchlistCompleta()" class="w-full bg-gradient-to-r from-[#40bcf4] to-[#2ba8e0] text-[#14181c] font-black py-4 rounded-xl uppercase tracking-widest transition-all shadow-lg flex items-center justify-center gap-2 shrink-0">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
             Baixar CSV
@@ -275,18 +519,14 @@
 <div id="donation-modal" class="fixed inset-0 bg-[#14181c]/95 z-[10000] hidden items-center justify-center backdrop-blur-sm p-4">
     <div class="bg-[#1c2228] border border-[#ff8000]/50 rounded-2xl p-6 md:p-8 max-w-md w-full shadow-2xl relative text-center animate-fade-in-fast max-h-[90vh] overflow-y-auto no-scrollbar flex flex-col">
         <button onclick="fecharDoacao()" class="absolute top-4 right-5 text-[#8c9bab] hover:text-white text-3xl font-light">&times;</button>
-        
         <div class="w-14 h-14 md:w-16 md:h-16 bg-[#ff8000]/10 rounded-full flex items-center justify-center text-[#ff8000] mx-auto mb-4 border border-[#ff8000]/30 shrink-0">
             <svg class="w-7 h-7 md:w-8 md:h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z"></path></svg>
         </div>
-        
         <h3 class="text-xl md:text-2xl font-black text-white uppercase tracking-tighter mb-2">Apoie o Projeto</h3>
-        
         <p class="text-[#8c9bab] text-[11px] sm:text-xs md:text-sm mb-6 leading-relaxed flex-1">
             As consultas e os bancos de dados de streaming têm um custo.<br><br>
             Se você está curtindo a experiência, considere dar um apoio de apenas <strong>R$ 1,90</strong>. E já aviso: se os servidores caírem e o site sair do ar, a culpa é sua! 💀
         </p>
-        
         <div class="space-y-3 shrink-0 mt-auto">
             <button onclick="abrirMercadoPago()" class="w-full bg-gradient-to-r from-[#ff8000] to-[#e67300] text-[#14181c] font-black py-3 sm:py-3.5 px-4 rounded-xl uppercase tracking-widest transition-all shadow-md flex items-center justify-center gap-2 text-[10px] sm:text-xs">
                 Apoiar com Mercado Pago
@@ -295,328 +535,19 @@
     </div>
 </div>
 
-<div class="max-w-5xl mx-auto relative z-10">
-    <header class="flex justify-between items-start md:items-center mb-8 md:mb-16">
-        <div class="flex items-start sm:items-center gap-2 sm:gap-4 group cursor-pointer shrink-0" onclick="location.reload()">
-            <div class="flex items-center gap-1.5 group-hover:scale-110 transition-transform mt-1.5 sm:mt-0">
-                <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[#00e054]"></div>
-                <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[#40bcf4]"></div>
-                <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[#ff8000]"></div>
-            </div>
-            <div class="flex flex-col justify-center">
-                <h1 class="text-sm sm:text-xl font-bold tracking-widest text-white uppercase drop-shadow-md leading-none">Scanner<span class="text-[#40bcf4] block sm:inline text-[10px] sm:text-xl mt-0.5 sm:mt-0">boxd</span></h1>
-                <p class="text-[8px] sm:text-[10px] text-[#8c9bab] font-bold tracking-[0.3em] uppercase drop-shadow-md mt-1 sm:mt-0.5">v1.0.0 Oficial</p>
-            </div>
-        </div>
-
-        <div class="flex items-center gap-3 sm:gap-5 text-right">
-            <button onclick="abrirDoacao()" class="flex items-center gap-1.5 bg-[#ff8000]/10 text-[#ff8000] border border-[#ff8000]/30 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-[9px] sm:text-xs font-black uppercase tracking-widest transition-all hover:scale-105 shrink-0 mt-1 sm:mt-0">
-                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z"></path></svg>
-                <span class="hidden md:inline">Apoiar</span>
-            </button>
-
-            <div id="slideshow-info" class="transition-opacity duration-500 opacity-0 flex flex-col items-end justify-center hidden sm:flex">
-                <h2 id="slide-title" class="text-sm md:text-lg font-black text-white tracking-tighter drop-shadow-md leading-tight mb-0.5 max-w-[150px] md:max-w-[200px] break-words line-clamp-2">...</h2>
-                <div class="flex items-center justify-end gap-2">
-                    <span id="slide-year" class="text-gray-300 font-bold text-[9px] md:text-[10px]"></span>
-                    <span id="slide-rating" class="text-[#00e054] text-[9px] md:text-[10px] tracking-widest drop-shadow-md"></span>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <div id="main-content" class="space-y-8 sm:space-y-12">
-        <div class="text-center space-y-3 sm:space-y-4 pt-4 sm:pt-6">
-            <h2 class="text-3xl sm:text-4xl md:text-6xl font-black text-white leading-tight tracking-tighter drop-shadow-lg">QUAL É O SEU PERFIL <br><span class="text-[#40bcf4] italic">CINEMATOGRÁFICO?</span></h2>
-            <p class="text-[#8c9bab] max-w-xl mx-auto text-sm sm:text-base md:text-lg font-medium px-2">Descubra a verdade sobre o seu gosto e encontre onde assistir a sua Watchlist.</p>
-            
-            <div class="flex items-center justify-center gap-1.5 opacity-50 pt-1">
-                <svg class="w-3.5 h-3.5 text-[#8c9bab]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2-2v10a2 2 0 002 2z"></path></svg>
-                <span class="text-[#8c9bab] text-[10px] sm:text-xs uppercase tracking-widest font-medium">Recomendado uso no PC</span>
-            </div>
-        </div>
-
-        <div class="max-w-2xl mx-auto mt-8 sm:mt-12">
-            <div class="text-center mb-5">
-                <p class="text-[#8c9bab] text-[10px] sm:text-xs uppercase tracking-widest font-bold opacity-60">
-                    Passo a passo de como conseguir:
-                </p>
-            </div>
-            
-            <div class="space-y-4">
-                <div class="flex justify-center">
-                    <a href="https://letterboxd.com/data/export/" target="_blank" class="hidden sm:flex items-center gap-4 bg-[#1c2228] border border-[#2c3440] hover:border-[#40bcf4] text-[#8c9bab] hover:text-white px-6 py-4 rounded-xl transition-all w-full shadow-md group">
-                        <span class="bg-[#40bcf4]/20 text-[#40bcf4] w-6 h-6 rounded-full flex items-center justify-center text-xs font-black shrink-0 group-hover:bg-[#40bcf4] group-hover:text-[#14181c] transition-colors">1</span>
-                        <span class="font-bold text-sm tracking-wide">Baixar arquivo .ZIP oficial</span>
-                        <svg class="w-5 h-5 text-[#40bcf4] ml-auto opacity-70 group-hover:opacity-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                    </a>
-
-                    <div class="sm:hidden w-full bg-[#1c2228] border border-[#2c3440] p-4 rounded-xl shadow-md text-left">
-                        <p class="text-white text-[12px] font-bold uppercase tracking-widest mb-2 flex items-center gap-2">
-                            <span class="bg-[#40bcf4]/20 text-[#40bcf4] w-5 h-5 rounded-full flex items-center justify-center text-[9px] shrink-0">1</span>
-                            Baixar arquivo .ZIP
-                        </p>
-                        <p class="text-[#8c9bab] text-[11px] mb-3 leading-relaxed">
-                            Como o aplicativo do Letterboxd às vezes entra num loop na hora do download, <strong class="text-white">copie o link abaixo</strong> e abra direto no seu navegador (Chrome, Safari, etc):
-                        </p>
-                        <div class="flex items-center gap-2 bg-[#14181c] p-1.5 rounded-lg border border-[#40bcf4]/30">
-                            <input type="text" id="export-link-input-main" readonly value="https://letterboxd.com/data/export/" class="flex-1 bg-transparent text-[#40bcf4] text-[10px] font-mono outline-none px-2 w-full min-w-0">
-                            <button id="copy-link-btn-main" onclick="copyMainExportLink()" class="bg-[#40bcf4] text-[#14181c] text-[10px] font-black px-3 py-2 rounded transition-colors uppercase tracking-widest shrink-0">Copiar</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="glass-panel p-6 md:p-10 text-center border-dashed border-2 border-[#2c3440] hover:border-[#40bcf4]/50 transition-all group" id="upload-container">
-                    <label for="csv-file" id="dropzone-label" class="cursor-pointer group block">
-                        <div class="flex items-center justify-center gap-2 mb-6">
-                            <p class="text-white font-bold text-sm tracking-wide">Carregar no Scannerboxd</p>
-                        </div>
-                        
-                        <div class="w-16 h-16 sm:w-20 sm:h-20 bg-[#40bcf4]/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform border border-[#40bcf4]/20">
-                            <svg class="w-8 h-8 sm:w-10 sm:h-10 text-[#40bcf4]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v16m8-8H4"></path></svg>
-                        </div>
-                        <p class="text-lg sm:text-2xl font-bold text-white mb-2">
-                            <span class="hidden sm:inline">Arraste seu arquivo <span class="text-[#40bcf4]">.zip</span> aqui</span>
-                            <span class="sm:hidden">Selecione o arquivo <span class="text-[#40bcf4]">.zip</span></span>
-                        </p>
-                        <p class="text-[9px] sm:text-[11px] text-[#8c9bab] uppercase tracking-widest font-bold">
-                            Nenhum dado é salvo nos servidores
-                        </p>
-                    </label>
-                    <input type="file" id="csv-file" class="hidden" accept=".zip" onchange="fileSelected()">
-                    
-                    <div id="action-area" class="hidden mt-4 flex-col items-center gap-4 bg-[#14181c] p-6 rounded-xl border border-[#2c3440]">
-                        <div class="flex items-center justify-center gap-2 bg-[#1c2228] border border-[#40bcf4]/30 px-4 py-2.5 rounded-lg w-full">
-                            <svg class="w-4 h-4 text-[#40bcf4] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                            <p id="file-name-display" class="text-[#40bcf4] font-mono text-xs sm:text-sm truncate"></p>
-                        </div>
-                        <button id="btn-start-analysis" onclick="handleFileUpload()" class="w-full bg-gradient-to-r from-[#40bcf4] to-[#2ba8e0] text-[#14181c] font-black py-3.5 sm:py-4 px-8 rounded-xl uppercase tracking-widest transition-all shadow-lg flex items-center justify-center gap-2 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 text-xs sm:text-sm">
-                            <svg id="btn-spinner" class="animate-spin hidden w-5 h-5 text-[#14181c]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                            <span id="btn-text">Iniciar Análise</span>
-                        </button>
-                        <button onclick="resetUpload()" class="text-[9px] sm:text-[10px] text-[#8c9bab] hover:text-white uppercase tracking-widest underline decoration-dashed">Escolher outro arquivo</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="text-center mt-6">
-                <button onclick="toggleImportTutorial()" class="inline-block text-[10px] text-[#8c9bab] hover:text-white font-bold tracking-widest uppercase transition-colors underline decoration-dashed underline-offset-4">
-                    Ver passo a passo manual
-                </button>
-                
-                <div id="import-tutorial" class="hidden mt-4 p-5 bg-[#1c2228]/95 border border-[#2c3440] rounded-xl text-left text-sm text-gray-300 shadow-lg">
-                    <h4 class="text-white font-black mb-3 uppercase tracking-widest text-xs flex items-center gap-2">
-                        <svg class="w-4 h-4 text-[#40bcf4]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
-                        Instruções Manuais
-                    </h4>
-                    <ol class="space-y-2 list-decimal list-inside text-xs text-gray-300 px-1">
-                        <li>Acesse o Letterboxd e vá em <strong class="text-white">Settings > Import & Export</strong>.</li>
-                        <li>Clique no botão <strong class="text-white">Export your data</strong>.</li>
-                        <li>Um arquivo .zip será baixado. <strong class="text-[#00e054]">Não precisa extrair!</strong> Basta enviá-lo aqui no passo 2.</li>
-                    </ol>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="analyzer-panel" class="hidden space-y-8 animate-fade-in mt-40 md:mt-80 relative z-20">
-        
-        <!-- Pílula do Oráculo High-Tech com as frases disfarçadas -->
-        <div id="oracle-status-pill" class="flex justify-center transition-opacity duration-500 mb-2">
-            <div class="inline-flex items-center gap-2.5 bg-[#1c2228]/80 backdrop-blur-md border border-[#40bcf4]/30 px-4 py-2 rounded-full shadow-lg">
-                <svg class="animate-spin w-3.5 h-3.5 text-[#40bcf4]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                <p id="funny-text" class="text-[#40bcf4] font-bold uppercase text-[9px] md:text-[10px] tracking-widest m-0 transition-opacity duration-500">Invocando o Oráculo...</p>
-            </div>
-        </div>
-
-        <div class="text-center flex justify-center items-center gap-2">
-            <svg class="w-5 h-5 text-[#40bcf4]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-            <h2 id="profile-greeting" class="text-xl md:text-2xl font-bold text-[#40bcf4] tracking-tighter drop-shadow-md">O Seu Perfil de Crítico</h2>
-        </div>
-
-        <div class="profile-card-ref relative overflow-hidden shadow-xl p-5 md:p-8">
-            <div class="w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 shrink-0 relative rounded-full border-4 border-[#40bcf4] overflow-hidden bg-[#14181c] flex items-center justify-center mx-auto md:mx-0">
-                <div id="profile-pulse-loader" class="w-full h-full bg-[#1c2228] animate-pulse absolute inset-0"></div>
-                <img id="profile-img-element" src="" loading="lazy" class="w-full h-full object-cover hidden transition-opacity duration-500 relative z-10">
-            </div>
-            
-            <div class="flex-1 space-y-2 md:space-y-3 min-w-0 mt-4 md:mt-0">
-                <div class="flex items-center gap-2 flex-wrap justify-center md:justify-start">
-                    <h3 id="roast-title" class="text-lg sm:text-2xl md:text-3xl font-black text-white tracking-tighter flex items-center gap-2 text-center md:text-left leading-tight">
-                        Analisando gosto... 
-                        <svg class="animate-spin w-4 h-4 text-[#40bcf4] shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                    </h3>
-                </div>
-                <p id="roast-desc" class="text-gray-300 text-xs md:text-sm leading-relaxed font-light whitespace-pre-line">Processando avaliações...</p>
-                <div class="pt-1 flex flex-col items-center md:items-start gap-2">
-                    <span id="roast-vibe" class="text-[9px] md:text-xs text-[#14181c] font-black uppercase tracking-widest bg-[#40bcf4] px-2 py-1 rounded-sm truncate max-w-full inline-block">CALCULANDO...</span>
-                    
-                    <button id="btn-retry-profile" onclick="tentarRefazerPerfil()" class="hidden mt-2 text-[9px] sm:text-[10px] bg-[#ff8000]/10 text-[#ff8000] border border-[#ff8000]/30 px-3 py-1.5 rounded uppercase tracking-widest font-black flex items-center gap-1.5 transition-all w-fit">
-                        <svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                        <span id="retry-btn-text">Refazer Análise</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-3 sm:gap-6">
-            <div class="glass-panel p-4 md:p-8 text-center">
-                <span id="stat-total" class="text-3xl sm:text-5xl font-black text-[#40bcf4] block mb-1 md:mb-2">0</span>
-                <p class="text-[#8c9bab] text-[8px] sm:text-xs font-black uppercase tracking-widest">Avaliados</p>
-            </div>
-            <div class="glass-panel p-4 md:p-8 text-center">
-                <span id="stat-avg" class="text-3xl sm:text-5xl font-black text-[#00e054] block mb-1 md:mb-2">0.00</span>
-                <p class="text-[#8c9bab] text-[8px] sm:text-xs font-black uppercase tracking-widest">Média</p>
-            </div>
-        </div>
-
-        <div class="space-y-6 pt-6 border-t border-[#2c3440]" id="oracle-section">
-            <div class="flex flex-col md:flex-row items-center justify-between px-1 mb-4 gap-4 text-center md:text-left">
-                <div>
-                    <div class="flex items-center justify-center md:justify-start gap-2">
-                        <svg class="w-5 h-5 text-[#40bcf4] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"></path></svg>
-                        <h4 class="text-white font-bold text-lg sm:text-2xl drop-shadow-md">Oráculo de Recomendações</h4>
-                    </div>
-                    <p class="text-[#8c9bab] text-[10px] md:text-xs mt-1 px-2 md:px-0">Cruzamos o seu histórico. <br class="sm:hidden"><strong class="text-[#40bcf4]">Toque nos cartazes para exportar.</strong></p>
-                </div>
-                <button id="btn-export-desktop" onclick="abrirTutorial()" class="hidden md:flex items-center gap-1.5 px-6 py-3 bg-[#40bcf4]/20 text-[#40bcf4] border border-[#40bcf4]/50 rounded-lg font-black text-[10px] uppercase tracking-widest hover:bg-[#40bcf4] hover:text-[#14181c] transition-all disabled:opacity-50 disabled:cursor-not-allowed">
-                    EXPORTAR SELECIONADOS (4)
-                </button>
-            </div>
-            
-            <div id="oracle-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6 px-1 md:px-2 mb-6">
-                <div class="movie-card border-[#2c3440] border-2 aspect-[2/3]">
-                   <div class="h-full w-full bg-[#1c2228] flex items-center justify-center animate-pulse"><span class="text-[#8c9bab] text-[10px] font-bold uppercase tracking-widest text-center">Consultando...</span></div>
-                </div>
-                <div class="movie-card border-[#2c3440] border-2 aspect-[2/3]">
-                   <div class="h-full w-full bg-[#1c2228] flex items-center justify-center animate-pulse"><span class="text-[#8c9bab] text-[10px] font-bold uppercase tracking-widest text-center">Buscando...</span></div>
-                </div>
-                <div class="movie-card border-[#2c3440] border-2 aspect-[2/3] hidden sm:block">
-                   <div class="h-full w-full bg-[#1c2228] flex items-center justify-center animate-pulse"><span class="text-[#8c9bab] text-[10px] font-bold uppercase tracking-widest text-center">Filtrando...</span></div>
-                </div>
-                <div class="movie-card border-[#2c3440] border-2 aspect-[2/3] hidden sm:block">
-                   <div class="h-full w-full bg-[#1c2228] flex items-center justify-center animate-pulse"><span class="text-[#8c9bab] text-[10px] font-bold uppercase tracking-widest text-center">Gerando...</span></div>
-                </div>
-            </div>
-
-            <div class="flex flex-col items-center gap-3 px-1">
-                <button id="btn-load-more" onclick="carregarMaisSugestoes()" class="w-full md:w-auto px-6 py-3.5 md:py-3 bg-[#1c2228] text-[#40bcf4] border border-[#2c3440] rounded-xl font-black text-[10px] sm:text-xs uppercase tracking-widest transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50">
-                    <svg id="load-more-spinner" class="w-4 h-4 animate-spin hidden shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                    <svg id="load-more-icon" class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                    <span>Descobrir Mais</span>
-                </button>
-
-                <button id="btn-export-mobile" onclick="abrirTutorial()" class="md:hidden w-full flex items-center justify-center gap-1.5 px-6 py-3.5 bg-[#40bcf4]/20 text-[#40bcf4] border border-[#40bcf4]/50 rounded-xl font-black text-[10px] uppercase tracking-widest disabled:opacity-50 disabled:cursor-not-allowed">
-                    EXPORTAR SELECIONADOS (4)
-                </button>
-            </div>
-        </div>
-
-        <div id="loading-container" class="hidden mt-10 max-w-2xl mx-auto bg-[#1c2228] md:bg-[#1c2228]/95 p-5 md:p-10 rounded-2xl md:rounded-3xl border border-[#2c3440] relative overflow-hidden z-20">
-            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#40bcf4] via-[#00e054] to-[#40bcf4] bg-[length:200%_200%] animate-gradient-x"></div>
-            
-            <div class="text-center mb-6">
-                <h3 class="text-xl md:text-3xl font-black text-white uppercase tracking-tighter mb-2">Buscando Plataformas</h3>
-                
-                <p class="text-[#8c9bab] text-[10px] sm:text-xs max-w-lg mx-auto leading-relaxed mb-4 px-2">
-                    O sistema está cruzando a sua <strong>Watchlist</strong>, filme por filme, com os catálogos mundiais de streaming. <br>
-                    <span class="text-[9px] sm:text-[10px] italic opacity-60 mt-1 block">*O carregamento será instantâneo nas suas próximas visitas.</span>
-                </p>
-                
-                <p id="current-movie-name" class="text-white font-medium text-xs md:text-sm max-w-sm mx-auto truncate bg-[#14181c] py-2 px-4 rounded-lg border border-[#2c3440] inline-block shadow-inner mt-2">A processar...</p>
-                
-                <div class="flex flex-row justify-center gap-2 mt-5">
-                    <div class="bg-[#14181c] p-3 rounded-xl border border-[#2c3440] flex-1">
-                        <span class="block text-[8px] text-[#8c9bab] font-black uppercase mb-1">Verificados</span>
-                        <span id="loading-count" class="text-lg font-black text-[#40bcf4]">0/0</span>
-                    </div>
-                    <div class="bg-[#14181c] p-3 rounded-xl border border-[#2c3440] flex-1">
-                        <span class="block text-[8px] text-[#00e054] font-black uppercase mb-1">Tempo Est.</span>
-                        <span id="eta-timer" class="text-lg font-black text-white">--:--</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="space-y-2 relative z-10">
-                <div class="flex justify-end px-1">
-                    <span id="load-percent" class="text-2xl md:text-4xl font-black text-white tracking-tighter">0%</span>
-                </div>
-                <div class="w-full bg-[#14181c] h-3 md:h-4 rounded-full overflow-hidden border border-[#2c3440]">
-                    <div id="progress-bar-fill" class="bg-gradient-to-r from-[#40bcf4] to-[#00e054] h-full w-0 transition-all duration-300"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="streaming-panel" class="hidden space-y-6 md:space-y-10 animate-fade-in pb-10 md:pb-20 mt-10 relative z-20">
-        <div class="text-center">
-            <h2 class="text-3xl md:text-5xl font-black text-white tracking-tighter uppercase mb-1 drop-shadow-lg">A Sua <span class="text-[#40bcf4]">Watchlist</span></h2>
-            <p class="text-[#8c9bab] font-bold uppercase tracking-widest text-[9px] md:text-xs">Pronta para dar play</p>
-        </div>
-
-        <div id="dynamic-podium" class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8"></div>
-        <p id="price-disclaimer" class="text-center text-[#8c9bab]/60 text-[8px] uppercase tracking-widest mt-2 hidden">* Valores mensais estimados.</p>
-
-        <div class="glass-panel p-4 md:p-8 space-y-4 md:space-y-6 mt-4">
-            <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-                <div class="flex items-center gap-3 w-full md:w-auto">
-                    <span class="text-[#40bcf4] bg-[#40bcf4]/10 p-2.5 rounded-xl border border-[#40bcf4]/20 shrink-0">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    </span>
-                    <div class="min-w-0">
-                        <h3 class="text-white font-bold text-base md:text-xl tracking-tighter uppercase truncate">O Catálogo</h3>
-                    </div>
-                </div>
-                <div class="w-full md:w-1/3 relative shrink-0">
-                    <input type="text" id="search-input" oninput="handleSearch()" placeholder="Procurar filme..." class="w-full bg-[#14181c] border border-[#2c3440] text-white pl-4 pr-10 py-2.5 rounded-xl focus:outline-none focus:border-[#40bcf4] text-xs sm:text-sm">
-                    <svg class="w-4 h-4 absolute right-3 top-3 text-[#8c9bab]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                </div>
-            </div>
-
-            <div class="border-t border-[#2c3440] pt-4">
-                <p class="text-[#8c9bab] text-[9px] font-black uppercase tracking-widest mb-3 flex items-center gap-1.5">
-                    Filtros de Plataforma
-                </p>
-                <div id="stats-container" class="flex flex-row overflow-x-auto no-scrollbar snap-x gap-2 pb-2 md:flex-wrap">
-                </div>
-            </div>
-        </div>
-
-        <div id="movies-panel" class="space-y-4 hidden animate-fade-in-fast">
-            <div class="flex justify-between items-center bg-[#1c2228] p-3 sm:p-6 rounded-xl border border-[#2c3440] gap-3 flex-col sm:flex-row">
-                <div class="flex items-center gap-2 min-w-0 w-full justify-between sm:justify-start">
-                    <h3 id="current-filter-title" class="text-white font-bold text-sm sm:text-xl tracking-tighter uppercase truncate">Resultados</h3>
-                    <span id="movie-counter" class="bg-[#14181c] px-2 py-1 rounded text-[9px] font-black text-[#40bcf4] border border-[#40bcf4]/20 shrink-0">0 FILMES</span>
-                </div>
-            </div>
-            <ul id="results" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></ul>
-        </div>
-    </div>
-    
-    <footer class="mt-12 border-t border-[#2c3440] pt-6 pb-10 text-center text-[#8c9bab] text-[8px] sm:text-[10px] uppercase tracking-widest leading-relaxed relative z-20">
-        <p class="mb-1">Scannerboxd é independente e não afiliado ao Letterboxd.</p>
-        <p>Dados de TMDB API.</p>
-    </footer>
-</div>
-
 <script>
     let sessionId = localStorage.getItem('oraculo_session_id');
-    if (!sessionId) {
-        sessionId = crypto.randomUUID();
-        localStorage.setItem('oraculo_session_id', sessionId);
-    }
+    if (!sessionId) { sessionId = crypto.randomUUID(); localStorage.setItem('oraculo_session_id', sessionId); }
 
-    let statsData = {};
-    let rawDatabase = {};
-    let frasesAleatorias = ["Analisando suas avaliações obscuras...", "Buscando clássicos que você ignorou...", "Preparando a bronca do Oráculo...", "Julgando seu gosto peculiar...", "Vasculhando o Letterboxd..."];
-    let oraculoRecomendacoesGlobais = []; 
-    let filmesSelecionados = new Set(); 
-    const posterCache = {}; 
+    let statsData = {}; let rawDatabase = {}; let frasesAleatorias = [];
+    let oraculoRecomendacoesGlobais = []; let filmesSelecionados = new Set(); 
     let activePlatformFilters = new Set();
-    let backdropInterval;
-    let initialBackdropInterval;
-    let fraseTimerInterval;
-    let retryProfileInterval; 
+    let backdropInterval; let initialBackdropInterval; let fraseTimerInterval; let retryProfileInterval; 
+
+    // Estados de Carregamento
+    let isOracleReady = false;
+    let isWatchlistReady = false;
+    let currentSlideIndex = 0;
 
     const iconicMovies = [
         { Name: "Interstellar", Year: 2014, backdrop: "https://image.tmdb.org/t/p/original/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg" },
@@ -624,9 +555,12 @@
         { Name: "The Dark Knight", Year: 2008, backdrop: "https://image.tmdb.org/t/p/original/nMKdUUepR0i5zn0y1T4CsSB5chy.jpg" },
         { Name: "Spirited Away", Year: 2001, backdrop: "https://image.tmdb.org/t/p/original/2w11gS27aB60hZ1yDk8nO8J1O1O.jpg" },
         { Name: "Pulp Fiction", Year: 1994, backdrop: "https://image.tmdb.org/t/p/original/suaEOtk1N1sgg2MTM7oZd2cfVp3.jpg" },
-        { Name: "Everything Everywhere All at Once", Year: 2022, backdrop: "https://image.tmdb.org/t/p/original/wPU78OPN4BYEgWYdXy7wMqwqFDb.jpg" }
+        { Name: "Everything Everywhere All at Once", Year: 2022, backdrop: "https://image.tmdb.org/t/p/original/wPU78OPN4BYEgWYdXy7wMqwqFDb.jpg" },
+        { Name: "The Matrix", Year: 1999, backdrop: "https://image.tmdb.org/t/p/original/ncEsesgOJDNrTUED89hYbA117wo.jpg" },
+        { Name: "Blade Runner 2049", Year: 2017, backdrop: "https://image.tmdb.org/t/p/original/ilRyazdndIGMqWhH2tYdK0mHihM.jpg" },
+        { Name: "Goodfellas", Year: 1990, backdrop: "https://image.tmdb.org/t/p/original/sw7mordbZxgITU877yTpZCud90M.jpg" },
+        { Name: "Inception", Year: 2010, backdrop: "https://image.tmdb.org/t/p/original/8ZTVqvKDQ8emSGUEMjsS4yHAwrp.jpg" }
     ];
-
     let currentIconicIdx = Math.floor(Math.random() * iconicMovies.length);
 
     function mostrarErro(mensagem) {
@@ -634,33 +568,20 @@
         const msgEl = document.getElementById('custom-toast-msg');
         msgEl.innerText = mensagem;
         toast.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-10');
-        setTimeout(() => {
-            toast.classList.add('opacity-0', 'pointer-events-none', 'translate-y-10');
-        }, 4000);
+        setTimeout(() => toast.classList.add('opacity-0', 'pointer-events-none', 'translate-y-10'), 4000);
     }
 
     function copyMainExportLink() {
         const input = document.getElementById('export-link-input-main');
-        input.select();
-        document.execCommand('copy');
+        input.select(); document.execCommand('copy');
         const btn = document.getElementById('copy-link-btn-main');
-        btn.innerText = 'Copiado! Cole no Navegador';
-        btn.classList.add('bg-[#00e054]');
-        btn.classList.remove('bg-[#40bcf4]');
-        setTimeout(() => { 
-            btn.innerText = 'Copiar'; 
-            btn.classList.remove('bg-[#00e054]');
-            btn.classList.add('bg-[#40bcf4]');
-        }, 4000);
+        btn.innerText = 'Copiado! Cole no Navegador'; btn.classList.add('bg-[#00e054]'); btn.classList.remove('bg-[#40bcf4]');
+        setTimeout(() => { btn.innerText = 'Copiar'; btn.classList.remove('bg-[#00e054]'); btn.classList.add('bg-[#40bcf4]'); }, 4000);
     }
 
     const updateSlideInfo = (movie) => {
-        const st = document.getElementById('slide-title');
-        const sy = document.getElementById('slide-year');
-        const sr = document.getElementById('slide-rating');
-        if(st) st.innerText = movie.Name;
-        if(sy) sy.innerText = movie.Year;
-        
+        const st = document.getElementById('slide-title'); const sy = document.getElementById('slide-year'); const sr = document.getElementById('slide-rating');
+        if(st) st.innerText = movie.Name; if(sy) sy.innerText = movie.Year;
         let starsHTML = '';
         if(movie.Rating) {
             for(let i=0; i<Math.floor(movie.Rating); i++) starsHTML += '★';
@@ -670,41 +591,63 @@
     };
 
     function startInitialSlideshow() {
-        const heroImg = document.getElementById('hero-backdrop-img');
-        const slideInfo = document.getElementById('slideshow-info');
+        const heroImg = document.getElementById('hero-backdrop-img'); const slideInfo = document.getElementById('slideshow-info');
         if (!heroImg) return;
-
-        const startMovie = iconicMovies[currentIconicIdx];
-        heroImg.src = startMovie.backdrop;
-        updateSlideInfo(startMovie);
-        heroImg.onload = () => {
-            heroImg.style.opacity = '0.3';
-            if(slideInfo) slideInfo.style.opacity = '1';
-        };
-
+        const startMovie = iconicMovies[currentIconicIdx]; heroImg.src = startMovie.backdrop; updateSlideInfo(startMovie);
+        heroImg.onload = () => { heroImg.style.opacity = '0.3'; if(slideInfo) slideInfo.style.opacity = '1'; };
         initialBackdropInterval = setInterval(() => {
-            currentIconicIdx = (currentIconicIdx + 1) % iconicMovies.length;
-            const nextMovie = iconicMovies[currentIconicIdx];
+            currentIconicIdx = (currentIconicIdx + 1) % iconicMovies.length; const nextMovie = iconicMovies[currentIconicIdx];
             const tempImg = new Image();
             tempImg.onload = () => {
-                heroImg.style.opacity = '0';
-                if(slideInfo) slideInfo.style.opacity = '0';
-                setTimeout(() => {
-                    heroImg.src = nextMovie.backdrop;
-                    updateSlideInfo(nextMovie);
-                    heroImg.style.opacity = '0.3';
-                    if(slideInfo) slideInfo.style.opacity = '1';
-                }, 500);
+                heroImg.style.opacity = '0'; if(slideInfo) slideInfo.style.opacity = '0';
+                setTimeout(() => { heroImg.src = nextMovie.backdrop; updateSlideInfo(nextMovie); heroImg.style.opacity = '0.3'; if(slideInfo) slideInfo.style.opacity = '1'; }, 500);
             };
             tempImg.src = nextMovie.backdrop;
         }, 5000);
     }
     document.addEventListener('DOMContentLoaded', startInitialSlideshow);
 
+    // LOGICA DO CARROSSEL E BOLINHAS
+    function goToSlide(index) {
+        currentSlideIndex = index;
+        const track = document.getElementById('carousel-track');
+        track.style.transform = `translateX(-${index * 33.333}%)`;
+        
+        // Atualiza estilo visual das bolinhas
+        for(let i=0; i<3; i++) {
+            const dot = document.getElementById(`dot-${i}`);
+            dot.classList.remove('active', 'active-0', 'active-1', 'active-2');
+        }
+        const activeDot = document.getElementById(`dot-${index}`);
+        activeDot.classList.add('active', `active-${index}`);
+    }
+
+    // Gestos de Deslizar (Swipe) para Mobile
+    let touchStartX = 0; let touchEndX = 0;
+    document.getElementById('carousel-wrapper').addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, {passive: true});
+    document.getElementById('carousel-wrapper').addEventListener('touchend', e => { 
+        touchEndX = e.changedTouches[0].screenX; 
+        handleSwipe(); 
+    }, {passive: true});
+
+    function handleSwipe() {
+        const diff = touchStartX - touchEndX;
+        if (Math.abs(diff) > 50) { // Tolerância de arrasto
+            if (diff > 0 && currentSlideIndex < 2) goToSlide(currentSlideIndex + 1); // Desliza pra esquerda -> Próximo
+            else if (diff < 0 && currentSlideIndex > 0) goToSlide(currentSlideIndex - 1); // Desliza pra direita -> Anterior
+        }
+    }
+
+    function checkGlobalLoadingState() {
+        if(isOracleReady && isWatchlistReady) {
+            pararCicloDeFrases();
+            document.getElementById('global-loading-pill').classList.add('opacity-0', 'pointer-events-none', '-translate-y-4');
+        }
+    }
+
     async function verificarCredito() {
         try {
-            const res = await fetch('/api/creditos');
-            const data = await res.json();
+            const res = await fetch('/api/creditos'); const data = await res.json();
             if (data.creditos <= 0) { abrirDoacao(); return false; }
             return true;
         } catch (e) { return true; }
@@ -714,6 +657,375 @@
     function fecharDoacao() { document.getElementById('donation-modal')?.classList.add('hidden'); document.getElementById('donation-modal')?.classList.remove('flex'); }
     function abrirMercadoPago() { window.open("https://mpago.la/15FPHv4", '_blank'); fecharDoacao(); recarregarGratis(); }
     async function recarregarGratis() { try { for(let i=0;i<5;i++) await fetch('/api/adicionar_credito', { method: 'POST' }); } catch (e) {} }
+
+    fetch('/frases').then(res => res.json()).then(data => { if(data.length>0) frasesAleatorias = data; }).catch(e => {});
+
+    function iniciarCicloDeFrases() {
+        const t = document.getElementById('funny-text'); const pill = document.getElementById('global-loading-pill');
+        if(!t || !pill) return;
+        pill.classList.remove('hidden', 'opacity-0', 'pointer-events-none');
+        
+        if(frasesAleatorias.length > 0) t.innerText = frasesAleatorias[0];
+        if(fraseTimerInterval) clearInterval(fraseTimerInterval);
+        fraseTimerInterval = setInterval(() => {
+            if(frasesAleatorias.length > 0) {
+                t.style.opacity = '0';
+                setTimeout(() => { t.innerText = frasesAleatorias[Math.floor(Math.random() * frasesAleatorias.length)]; t.style.opacity = '1'; }, 500);
+            }
+        }, 5000);
+    }
+    function pararCicloDeFrases() { if(fraseTimerInterval) clearInterval(fraseTimerInterval); }
+
+    function countdown(msg, cb) {
+        const o = document.getElementById('countdown-overlay'); const t = document.getElementById('countdown-text');
+        if(o) o.style.display = 'flex'; let c = 3;
+        if(t) { t.innerText = c; t.className = 'countdown-number'; }
+        const iv = setInterval(() => {
+            c--;
+            if(c>0) { if(t) t.innerText=c; }
+            else if(c===0) { 
+                if(t){ t.style.fontSize='3rem'; t.className='text-white font-black uppercase tracking-widest px-4'; t.innerText=msg; } 
+            }
+            else { clearInterval(iv); if(o) o.style.display='none'; cb(); }
+        }, 800);
+    }
+
+    function fileSelected() {
+        const file = document.getElementById('csv-file')?.files[0];
+        if(file) {
+            document.getElementById('file-name-display').innerText = file.name;
+            document.getElementById('dropzone-label').classList.add('hidden');
+            document.getElementById('action-area').classList.remove('hidden', 'flex');
+            document.getElementById('action-area').classList.add('flex');
+        }
+    }
+    function resetUpload() {
+        document.getElementById('csv-file').value = '';
+        document.getElementById('dropzone-label').classList.remove('hidden');
+        document.getElementById('action-area').classList.add('hidden');
+        document.getElementById('action-area').classList.remove('flex');
+    }
+
+    async function handleFileUpload() {
+        const file = document.getElementById('csv-file')?.files[0];
+        if(!file) return;
+        const btn = document.getElementById('btn-start-analysis'); const btnText = document.getElementById('btn-text'); const btnSpinner = document.getElementById('btn-spinner');
+
+        btn.disabled = true; btnSpinner.classList.remove('hidden'); btnText.innerText = "Processando...";
+        if (!(await verificarCredito())) { btn.disabled = false; btnSpinner.classList.add('hidden'); btnText.innerText = "Iniciar Análise"; return; }
+        
+        const fd = new FormData(); fd.append("file", file); fd.append("session_id", sessionId); 
+        
+        try {
+            const res = await fetch('/upload_profile', { method: 'POST', body: fd });
+            if (!res.ok) throw new Error("Bloqueio de rede");
+            statsData = (await res.json()).stats;
+            await consumirCredito();
+            
+            countdown("INICIANDO MOTOR...", () => {
+                // Esconde Main, Mostra Carrossel
+                document.getElementById('main-content')?.classList.add('hidden');
+                document.getElementById('carousel-wrapper')?.classList.remove('hidden');
+                
+                // Exibe as Bolinhas e a Pílula do Topo
+                document.getElementById('bottom-nav-dots').classList.remove('hidden');
+                setTimeout(()=> document.getElementById('bottom-nav-dots').classList.remove('opacity-0', 'pointer-events-none'), 100);
+                iniciarCicloDeFrases();
+                
+                goToSlide(0); // Força tela inicial (Perfil)
+                
+                exibirRaioX(); // Perfil -> Dispara na hora
+                iniciarFluxoWatchlist(); // Watchlist -> Trabalha no fundo
+                
+                // Oráculo -> Efeito cascata para não engarrafar a API
+                setTimeout(() => { carregarOraculo(); }, 6000);
+            });
+        } catch(e) { 
+            mostrarErro("Erro de conexão. A rede corporativa bloqueou o arquivo!"); 
+            btn.disabled = false; btnSpinner.classList.add('hidden'); btnText.innerText = "Iniciar Análise";
+        }
+    }
+
+    function exibirRaioX() {
+        document.getElementById('stat-total').innerText = statsData?.total_avaliados || 0;
+        document.getElementById('stat-avg').innerText = (statsData?.media_notas || 0).toFixed(2);
+        
+        const greeting = document.getElementById('profile-greeting');
+        if (greeting && statsData.username) greeting.innerHTML = `E aí, <span class="text-white">${statsData.username}</span>! O Seu Perfil:`;
+        
+        gerarPerfilIA();
+
+        if (initialBackdropInterval) clearInterval(initialBackdropInterval);
+        if (backdropInterval) clearInterval(backdropInterval);
+
+        const favs = statsData?.favoritos || [];
+        if (favs.length > 0) {
+            const heroImg = document.getElementById('hero-backdrop-img');
+            const slideInfo = document.getElementById('slideshow-info');
+            
+            const backdropPromises = favs.map(f => 
+                fetch(`/api/tmdb/search?query=${encodeURIComponent(f.Name)}`)
+                .then(res => res.json())
+                .then(data => {
+                    if(data.results && data.results.length > 0 && data.results[0].backdrop_path) return { url: `https://image.tmdb.org/t/p/original${data.results[0].backdrop_path}`, movie: f };
+                    return null;
+                }).catch(() => null)
+            );
+
+            Promise.all(backdropPromises).then(results => {
+                let validSlides = results.filter(r => r !== null).sort(() => Math.random() - 0.5);
+                if (validSlides.length > 0) {
+                    let currentIdx = 0;
+                    if(heroImg) { heroImg.style.opacity = '0'; heroImg.classList.remove('grayscale-[20%]'); }
+                    if(slideInfo) slideInfo.style.opacity = '0';
+                    
+                    setTimeout(() => {
+                        if(heroImg) heroImg.src = validSlides[0].url;
+                        if (slideInfo) updateSlideInfo(validSlides[0].movie);
+                        if(heroImg) heroImg.onload = () => { heroImg.style.opacity = '0.4'; if(slideInfo) slideInfo.style.opacity = '1'; };
+                    }, 500);
+
+                    if (validSlides.length > 1) {
+                        backdropInterval = setInterval(() => {
+                            const nextIdx = (currentIdx + 1) % validSlides.length; const nextSlide = validSlides[nextIdx];
+                            const tempImg = new Image();
+                            tempImg.onload = () => {
+                                if(heroImg) heroImg.style.opacity = '0'; if(slideInfo) slideInfo.style.opacity = '0';
+                                setTimeout(() => {
+                                    if(heroImg) heroImg.src = nextSlide.url; if(slideInfo) updateSlideInfo(nextSlide.movie); currentIdx = nextIdx;
+                                    if(heroImg) heroImg.style.opacity = '0.4'; if(slideInfo) slideInfo.style.opacity = '1';
+                                }, 500);
+                            };
+                            tempImg.onerror = () => { currentIdx = nextIdx; }; tempImg.src = nextSlide.url;
+                        }, 5000); 
+                    }
+                }
+            });
+        }
+    }
+
+    async function gerarPerfilIA(isRetry = false) {
+        const tt=document.getElementById('roast-title'), td=document.getElementById('roast-desc'), tv=document.getElementById('roast-vibe'),
+              ti=document.getElementById('profile-img-element'), pl=document.getElementById('profile-pulse-loader'),
+              retryBtn = document.getElementById('btn-retry-profile');
+
+        if (retryBtn) retryBtn.classList.add('hidden');
+        ti?.classList.add('hidden'); pl?.classList.remove('hidden');
+        if(tt) tt.innerHTML = `Analisando gosto... <svg class="animate-spin w-4 h-4 ml-1 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>`;
+        
+        try {
+            const res = await fetch('/gerar_perfil', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({stats: statsData}) });
+            if(res.ok) {
+                const data = await res.json();
+                if(data.erro === "RATE_LIMIT" || data.titulo?.includes("Algoritmo em Choque")) throw new Error("RATE_LIMIT");
+                if(!data.erro) {
+                    if(tt) tt.innerHTML = data.titulo; if(td) td.innerText = data.descricao; if(tv) tv.innerText = data.personagem_referencia;
+                    fetch(`/api/tmdb/search?query=${encodeURIComponent(data.filme_referencia)}`).then(r=>r.json()).then(d=>{
+                        if(d.results?.[0]?.poster_path){ ti.src=`https://image.tmdb.org/t/p/w500${d.results[0].poster_path}`; ti.onload=()=> { ti.classList.remove('hidden'); pl.classList.add('hidden'); } }
+                    });
+                    return;
+                }
+            } throw new Error("Falha Geral");
+        } catch(e) {
+            if(!isRetry) mostrarErro("Servidores cheios. Perfil genérico ativado.");
+            if(tt) tt.innerHTML = "O Inclassificável 💀";
+            if(td) td.innerText = "Os servidores piscaram e não conseguimos catalogar sua mente. Aguarde uns segundos e force a análise novamente. 💅";
+            if(tv) tv.innerText = "Patrick Bateman";
+            fetch(`/api/tmdb/search?query=American%20Psycho`).then(r=>r.json()).then(d=>{
+                if(d.results?.[0]?.poster_path){ ti.src=`https://image.tmdb.org/t/p/w500${d.results[0].poster_path}`; ti.onload=()=> { ti.classList.remove('hidden'); pl.classList.add('hidden'); } }
+            });
+            ativarCooldownRetry();
+        }
+    }
+
+    function ativarCooldownRetry() {
+        const btn = document.getElementById('btn-retry-profile'), textSpan = document.getElementById('retry-btn-text');
+        if (!btn || !textSpan) return;
+        btn.classList.remove('hidden'); btn.disabled = true; btn.classList.add('opacity-50', 'cursor-not-allowed', 'hover:bg-[#ff8000]/10', 'hover:text-[#ff8000]');
+        let timeLeft = 60; textSpan.innerText = `Aguarde ${timeLeft}s...`;
+        if (retryProfileInterval) clearInterval(retryProfileInterval);
+        retryProfileInterval = setInterval(() => {
+            timeLeft--; textSpan.innerText = `Aguarde ${timeLeft}s...`;
+            if (timeLeft <= 0) {
+                clearInterval(retryProfileInterval); btn.disabled = false;
+                btn.classList.remove('opacity-50', 'cursor-not-allowed', 'hover:bg-[#ff8000]/10', 'hover:text-[#ff8000]');
+                btn.classList.add('hover:bg-[#ff8000]', 'hover:text-[#14181c]'); textSpan.innerText = "Refazer Análise";
+            }
+        }, 1000);
+    }
+    function tentarRefazerPerfil() { const btn = document.getElementById('btn-retry-profile'); if(btn && !btn.disabled) gerarPerfilIA(true); }
+
+    async function carregarOraculo() {
+        const f = await buscarAteQuatroIneditos();
+        document.getElementById('oracle-loading-overlay').classList.add('hidden'); // Esconde loading central do oraculo
+        document.getElementById('oracle-content').classList.remove('hidden'); // Mostra a grid do oraculo
+        document.getElementById('oracle-content').classList.add('flex');
+        
+        const grid = document.getElementById('oracle-grid');
+        grid.innerHTML = ''; 
+        if(f.length > 0) {
+            oraculoRecomendacoesGlobais = f; f.forEach((_,i)=>filmesSelecionados.add(i));
+            renderizarOraculoCards(f, 0);
+        } else {
+            grid.innerHTML = `<div class="col-span-full text-center p-6 bg-[#ff8000]/10 border border-[#ff8000]/30 rounded-xl mx-2"><p class="text-[#ff8000] text-xs font-bold leading-relaxed">Oráculo engarrafado 💀.<br>Tente novamente mais tarde.</p></div>`;
+        }
+        
+        // Finaliza o estado da bolinha Laranja
+        isOracleReady = true;
+        document.getElementById('dot-1').classList.remove('loading-1');
+        document.getElementById('dot-1').classList.add('ready-1');
+        checkGlobalLoadingState();
+    }
+
+    async function buscarAteQuatroIneditos() {
+        let f = [], t = 0;
+        while(f.length < 4 && t < 4) {
+            if(t >= 1) { 
+                const trophy = document.getElementById('ps-trophy');
+                if (trophy && !trophy.classList.contains('show')) { trophy.classList.add('show'); setTimeout(() => trophy.classList.remove('show'), 5000); }
+            }
+            try {
+                const excl = [...oraculoRecomendacoesGlobais.map(x => x.rec), ...f.map(x => x.rec)];
+                const res = await fetch(`/oraculo?session_id=${sessionId}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ favorites: statsData.profile_favorites || [], exclude: excl }) });
+                const r = await res.json();
+                
+                if (r.erro === "RATE_LIMIT") break; 
+
+                if(r.recomendacoes && r.recomendacoes.length > 0) {
+                    r.recomendacoes.forEach(x => {
+                        const tituloLimpo = x.rec.toLowerCase().trim();
+                        if(!oraculoRecomendacoesGlobais.some(y => y.rec.toLowerCase().trim() === tituloLimpo) && !f.some(y => y.rec.toLowerCase().trim() === tituloLimpo) && f.length < 4) f.push(x);
+                    });
+                }
+                if (f.length < 4 && r.erro !== "RATE_LIMIT") await new Promise(resolve => setTimeout(resolve, 2500));
+            } catch(e) { await new Promise(resolve => setTimeout(resolve, 2500)); }
+            t++;
+        }
+        return f.slice(0,4); 
+    }
+
+    async function carregarMaisSugestoes() {
+        if(!(await verificarCredito())) return; await consumirCredito();
+        document.getElementById('load-more-spinner').classList.remove('hidden'); document.getElementById('load-more-icon').classList.add('hidden');
+        const nov = await buscarAteQuatroIneditos();
+        if(nov.length > 0) {
+            const s = oraculoRecomendacoesGlobais.length; oraculoRecomendacoesGlobais.push(...nov);
+            nov.forEach((_,i)=>filmesSelecionados.add(s+i)); renderizarOraculoCards(nov, s);
+        } else { mostrarErro("Limite de velocidade. Aguarde uns minutos!"); }
+        document.getElementById('load-more-spinner').classList.add('hidden'); document.getElementById('load-more-icon').classList.remove('hidden');
+    }
+
+    function toggleSelecao(idx) {
+        const c = document.getElementById(`oracle-card-${idx}`), ch = document.getElementById(`check-${idx}`);
+        if(filmesSelecionados.has(idx)) { filmesSelecionados.delete(idx); c.classList.remove('border-[#40bcf4]'); c.classList.add('border-[#2c3440]'); ch.classList.add('scale-0'); }
+        else { filmesSelecionados.add(idx); c.classList.add('border-[#40bcf4]'); c.classList.remove('border-[#2c3440]'); ch.classList.remove('scale-0'); }
+        const txt = filmesSelecionados.size>0 ? `EXPORTAR (${filmesSelecionados.size})` : "SELECIONE";
+        document.getElementById('btn-export-desktop').innerText = txt; document.getElementById('btn-export-mobile').innerText = txt;
+    }
+
+    function renderizarOraculoCards(recs, start) {
+        const g = document.getElementById('oracle-grid');
+        recs.forEach((r,i) => {
+            const idx = start+i, id=`oracle-card-${idx}`;
+            g.insertAdjacentHTML('beforeend', `
+                <div id="${id}" class="movie-card group opacity-0 translate-y-4 transition-all duration-700 cursor-pointer border-[#40bcf4] aspect-[2/3]" onclick="toggleSelecao(${idx})">
+                    <div id="check-${idx}" class="absolute top-2 right-2 z-40 bg-[#40bcf4] text-[#14181c] rounded-full p-1 transition-all"><svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg></div>
+                    <img class="fav-poster absolute inset-0 w-full h-full object-cover z-10" src="" loading="lazy">
+                    <div class="card-info z-20 pb-2 px-2 sm:pb-3 sm:px-3">
+                        <span class="text-[#ff8000] text-[7px] sm:text-[8px] font-black uppercase bg-[#14181c]/90 px-1 py-0.5 rounded inline-block truncate max-w-full mb-1 border border-[#ff8000]/30">${r.base}</span>
+                        <h5 class="text-white font-bold text-[10px] sm:text-xs line-clamp-2 leading-tight drop-shadow-md">${r.rec}</h5>
+                    </div>
+                    <div class="absolute inset-0 bg-[#14181c]/95 z-30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col p-3 sm:p-4 text-center justify-center items-center"> 
+                        <svg class="w-6 h-6 sm:w-8 sm:h-8 mb-1.5 sm:mb-2 text-[#ff8000] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                        <div class="w-full flex-1 overflow-y-auto no-scrollbar flex flex-col justify-center items-center mb-1">
+                            <p class="text-[9px] sm:text-[11px] text-gray-300 leading-snug sm:leading-relaxed line-clamp-6">"${r.desc}"</p>
+                        </div>
+                    </div>
+                </div>
+            `);
+            // Tentativa Tripla de Imagem (Nome+Ano -> Nome -> Original)
+            fetch(`/api/tmdb/search?query=${encodeURIComponent(r.rec)}&year=${r.ano}`).then(r=>r.json()).then(d=>{
+                if(d.results?.[0]?.poster_path) { const img=document.querySelector(`#${id} img`); img.src=`https://image.tmdb.org/t/p/w500${d.results[0].poster_path}`; img.onload=()=>img.style.opacity='1'; }
+                else {
+                    fetch(`/api/tmdb/search?query=${encodeURIComponent(r.rec)}`).then(r2=>r2.json()).then(d2=>{
+                        if(d2.results?.[0]?.poster_path) { const img=document.querySelector(`#${id} img`); img.src=`https://image.tmdb.org/t/p/w500${d2.results[0].poster_path}`; img.onload=()=>img.style.opacity='1'; }
+                        else if (r.rec_original) {
+                            fetch(`/api/tmdb/search?query=${encodeURIComponent(r.rec_original)}`).then(r3=>r3.json()).then(d3=>{
+                                if(d3.results?.[0]?.poster_path) { const img=document.querySelector(`#${id} img`); img.src=`https://image.tmdb.org/t/p/w500${d3.results[0].poster_path}`; img.onload=()=>img.style.opacity='1'; }
+                            });
+                        }
+                    });
+                }
+            });
+            setTimeout(()=>document.getElementById(id)?.classList.remove('opacity-0','translate-y-4'), 100+(i*200));
+        });
+    }
+
+    function abrirTutorial() { document.getElementById('tutorial-modal').classList.remove('hidden'); document.getElementById('tutorial-modal').classList.add('flex'); }
+    function fecharTutorial() { document.getElementById('tutorial-modal').classList.add('hidden'); document.getElementById('tutorial-modal').classList.remove('flex'); }
+    function toggleImportTutorial() { document.getElementById('import-tutorial').classList.toggle('hidden'); }
+    function baixarWatchlistCompleta() {
+        let c = "Title,Year\n"; filmesSelecionados.forEach(i => { c += `"${oraculoRecomendacoesGlobais[i].rec.replace(/"/g,'""')}",${oraculoRecomendacoesGlobais[i].ano}\n`; });
+        const a = document.createElement('a'); a.href = window.URL.createObjectURL(new Blob([c], {type:'text/csv'})); a.download = "oraculo.csv"; a.click(); fecharTutorial();
+    }
+
+    async function iniciarFluxoWatchlist() {
+        try { await fetch('/process_watchlist', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({session_id: sessionId}) }); } 
+        catch(e) {}
+        
+        let startTime = Date.now(); let lastAtual = -1; let stuckCount = 0;
+        
+        const m = setInterval(async () => {
+            try {
+                const res = await fetch(`/progress?session_id=${sessionId}`); if (!res.ok) return; 
+                const p = await res.json();
+                
+                if(p.total > 0) {
+                    const pct = (p.atual/p.total)*100;
+                    document.getElementById('load-percent-minimal').innerText = Math.floor(pct)+'%';
+                    document.getElementById('loading-count-minimal').innerText = `${p.atual}/${p.total}`;
+                    
+                    const currentMovie = document.getElementById('current-movie-minimal');
+                    if (currentMovie) currentMovie.innerText = p.filme_atual || "Processando...";
+                    
+                    if (p.atual === lastAtual && !p.finalizado) {
+                        stuckCount++;
+                        if (stuckCount > 20) { clearInterval(m); p.finalizado = true; }
+                    } else { lastAtual = p.atual; stuckCount = 0; }
+
+                    const itemsRemaining = p.total - p.atual; const elapsedSeconds = (Date.now() - startTime) / 1000;
+                    let etaSeconds = (p.atual > 0) ? itemsRemaining * (elapsedSeconds / p.atual) : itemsRemaining * 0.1;
+                    
+                    const min = Math.floor(etaSeconds / 60); const sec = Math.floor(etaSeconds % 60);
+                    const etaTimer = document.getElementById('eta-timer-minimal');
+                    if (etaTimer) etaTimer.innerText = (etaSeconds > 0 && !p.finalizado) ? `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}` : "Quase lá...";
+                    
+                    if(p.finalizado) {
+                        clearInterval(m); 
+                        
+                        document.getElementById('watchlist-loading-overlay').classList.add('hidden');
+                        document.getElementById('watchlist-content').classList.remove('hidden');
+                        document.getElementById('watchlist-content').classList.add('flex');
+                        
+                        try {
+                            const dadosRes = await fetch(`/dados?session_id=${sessionId}`);
+                            if(dadosRes.ok) {
+                                const dadosJson = await dadosRes.json();
+                                rawDatabase = normalizeDatabase(dadosJson.watchlist || {});
+                                mostrarVeredito();
+                            }
+                        } catch(e) {}
+                        
+                        // Finaliza o estado da bolinha Verde
+                        isWatchlistReady = true;
+                        document.getElementById('dot-2').classList.remove('loading-2');
+                        document.getElementById('dot-2').classList.add('ready-2');
+                        checkGlobalLoadingState();
+                    }
+                }
+            } catch(e) {}
+        }, 2500); 
+    }
 
     function normalizePlatformName(name) {
         let c = name.replace(/ Amazon Channel/gi, '').replace(/ Channels/gi, '').replace(/ Plus/gi, '+').trim().toLowerCase();
@@ -744,498 +1056,14 @@
         return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=14181c&color=fff&bold=true`;
     }
 
-    fetch('/frases').then(res => res.json()).then(data => { if(data.length>0) frasesAleatorias = data; }).catch(e => {});
-
-    function iniciarCicloDeFrases() {
-        const t = document.getElementById('funny-text');
-        const pill = document.getElementById('oracle-status-pill');
-        if(!t) return;
-        
-        if (pill) pill.classList.remove('hidden');
-        if(frasesAleatorias.length > 0) t.innerText = frasesAleatorias[0];
-        
-        if(fraseTimerInterval) clearInterval(fraseTimerInterval);
-        fraseTimerInterval = setInterval(() => {
-            if(frasesAleatorias.length > 0) {
-                t.style.opacity = '0';
-                setTimeout(() => { 
-                    t.innerText = frasesAleatorias[Math.floor(Math.random() * frasesAleatorias.length)]; 
-                    t.style.opacity = '1'; 
-                }, 500);
-            }
-        }, 4000);
-    }
-    
-    function pararCicloDeFrases() { 
-        if(fraseTimerInterval) clearInterval(fraseTimerInterval); 
-        const pill = document.getElementById('oracle-status-pill');
-        if (pill) pill.classList.add('hidden');
-    }
-
-    function countdown(msg, cb) {
-        const o = document.getElementById('countdown-overlay'); const t = document.getElementById('countdown-text');
-        if(o) o.style.display = 'flex'; let c = 3;
-        if(t) { t.innerText = c; t.className = 'countdown-number'; }
-        const iv = setInterval(() => {
-            c--;
-            if(c>0) { if(t) t.innerText=c; }
-            else if(c===0) { 
-                if(t){ 
-                    t.style.fontSize='3rem';
-                    t.className='text-white font-black uppercase tracking-widest px-4'; 
-                    t.innerText=msg; 
-                } 
-            }
-            else { clearInterval(iv); if(o) o.style.display='none'; cb(); }
-        }, 800);
-    }
-
-    function fileSelected() {
-        const file = document.getElementById('csv-file')?.files[0];
-        if(file) {
-            document.getElementById('file-name-display').innerText = file.name;
-            document.getElementById('dropzone-label').classList.add('hidden');
-            document.getElementById('action-area').classList.remove('hidden');
-            document.getElementById('action-area').classList.add('flex');
-        }
-    }
-
-    function resetUpload() {
-        document.getElementById('csv-file').value = '';
-        document.getElementById('dropzone-label').classList.remove('hidden');
-        document.getElementById('action-area').classList.add('hidden');
-        document.getElementById('action-area').classList.remove('flex');
-    }
-
-    async function handleFileUpload() {
-        const file = document.getElementById('csv-file')?.files[0];
-        if(!file) return;
-        
-        const btn = document.getElementById('btn-start-analysis');
-        const btnText = document.getElementById('btn-text');
-        const btnSpinner = document.getElementById('btn-spinner');
-
-        btn.disabled = true;
-        btnSpinner.classList.remove('hidden');
-        btnText.innerText = "Processando arquivo...";
-
-        if (!(await verificarCredito())) { 
-            btn.disabled = false;
-            btnSpinner.classList.add('hidden');
-            btnText.innerText = "Iniciar Análise";
-            return; 
-        }
-        
-        const fd = new FormData(); 
-        fd.append("file", file);
-        fd.append("session_id", sessionId); 
-        
-        try {
-            const res = await fetch('/upload_profile', { method: 'POST', body: fd });
-            if (!res.ok) throw new Error("Falha na rede");
-            statsData = (await res.json()).stats;
-            await consumirCredito();
-            
-            countdown("INICIANDO ANÁLISE...", () => {
-                document.getElementById('main-content')?.classList.add('hidden');
-                
-                exibirRaioX(); // Mostra tudo na tela
-                iniciarCicloDeFrases(); // Liga a pílula de loading lá no topo
-                
-                gerarPerfilIA(); // Dispara logo a primeira IA (Perfil)
-                iniciarFluxoWatchlist(); // Dispara o scanner de streaming no fundo
-                
-                // ATRASO MÁGICO: Espera 6 segundos para chamar o Oráculo
-                setTimeout(() => {
-                    carregarOraculo();
-                }, 6000); 
-                
-            });
-        } catch(e) { 
-            mostrarErro("Erro de conexão com o servidor. Envio falhou."); 
-            btn.disabled = false;
-            btnSpinner.classList.add('hidden');
-            btnText.innerText = "Iniciar Análise";
-        }
-    }
-
-    function exibirRaioX() {
-        document.getElementById('analyzer-panel')?.classList.remove('hidden');
-        document.getElementById('stat-total').innerText = statsData?.total_avaliados || 0;
-        document.getElementById('stat-avg').innerText = (statsData?.media_notas || 0).toFixed(2);
-        
-        const greeting = document.getElementById('profile-greeting');
-        if (greeting && statsData.username) {
-            greeting.innerHTML = `E aí, <span class="text-white">${statsData.username}</span>! O Seu Perfil de Crítico:`;
-        }
-        
-        if (initialBackdropInterval) clearInterval(initialBackdropInterval);
-        if (backdropInterval) clearInterval(backdropInterval);
-
-        const favs = statsData?.favoritos || [];
-        if (favs.length > 0) {
-            const heroImg = document.getElementById('hero-backdrop-img');
-            const slideInfo = document.getElementById('slideshow-info');
-            
-            const backdropPromises = favs.map(f => 
-                fetch(`/api/tmdb/search?query=${encodeURIComponent(f.Name)}`)
-                .then(res => res.json())
-                .then(data => {
-                    if(data.results && data.results.length > 0 && data.results[0].backdrop_path) {
-                        return { url: `https://image.tmdb.org/t/p/original${data.results[0].backdrop_path}`, movie: f };
-                    }
-                    return null;
-                }).catch(() => null)
-            );
-
-            Promise.all(backdropPromises).then(results => {
-                let validSlides = results.filter(r => r !== null).sort(() => Math.random() - 0.5);
-                if (validSlides.length > 0) {
-                    let currentIdx = 0;
-                    if(heroImg) {
-                        heroImg.style.opacity = '0';
-                        heroImg.classList.remove('grayscale-[20%]'); 
-                    }
-                    if (slideInfo) slideInfo.style.opacity = '0';
-                    
-                    setTimeout(() => {
-                        if(heroImg) heroImg.src = validSlides[0].url;
-                        if (slideInfo) updateSlideInfo(validSlides[0].movie);
-                        
-                        if(heroImg) heroImg.onload = () => { 
-                            heroImg.style.opacity = '0.4'; 
-                            if (slideInfo) slideInfo.style.opacity = '1';
-                        };
-                    }, 500);
-
-                    if (validSlides.length > 1) {
-                        backdropInterval = setInterval(() => {
-                            const nextIdx = (currentIdx + 1) % validSlides.length;
-                            const nextSlide = validSlides[nextIdx];
-                            const tempImg = new Image();
-                            tempImg.onload = () => {
-                                if(heroImg) heroImg.style.opacity = '0';
-                                if (slideInfo) slideInfo.style.opacity = '0';
-                                setTimeout(() => {
-                                    if(heroImg) heroImg.src = nextSlide.url;
-                                    if (slideInfo) updateSlideInfo(nextSlide.movie);
-                                    currentIdx = nextIdx;
-                                    if(heroImg) heroImg.style.opacity = '0.4';
-                                    if (slideInfo) slideInfo.style.opacity = '1';
-                                }, 500);
-                            };
-                            tempImg.onerror = () => { currentIdx = nextIdx; };
-                            tempImg.src = nextSlide.url;
-                        }, 5000); 
-                    }
-                }
-            });
-        }
-    }
-
-    async function gerarPerfilIA(isRetry = false) {
-        const tt=document.getElementById('roast-title'), td=document.getElementById('roast-desc'), tv=document.getElementById('roast-vibe'),
-              ti=document.getElementById('profile-img-element'), pl=document.getElementById('profile-pulse-loader');
-        const retryBtn = document.getElementById('btn-retry-profile');
-
-        if (retryBtn) retryBtn.classList.add('hidden');
-              
-        ti?.classList.add('hidden'); pl?.classList.remove('hidden');
-        if(tt) tt.innerHTML = `Analisando gosto... <svg class="animate-spin w-4 h-4 ml-1 inline" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>`;
-        
-        try {
-            const res = await fetch('/gerar_perfil', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({stats: statsData}) });
-            if(res.ok) {
-                const data = await res.json();
-                
-                if(data.erro === "RATE_LIMIT" || data.titulo?.includes("Algoritmo em Choque")) {
-                    if(!isRetry) mostrarErro("O Oráculo está sobrecarregado. Mostrando perfil genérico.");
-                    if(tt) tt.innerHTML = "Oráculo em Choque 💀";
-                    if(td) td.innerText = "O Oráculo bateu no limite de velocidade cósmica! Aguarde um minuto e tente refazer a análise. 💅";
-                    if(tv) tv.innerText = "Patrick Bateman";
-                    fetch(`/api/tmdb/search?query=American%20Psycho`).then(r=>r.json()).then(d=>{
-                        if(d.results?.[0]?.poster_path){ ti.src=`https://image.tmdb.org/t/p/w500${d.results[0].poster_path}`; ti.classList.remove('hidden'); pl.classList.add('hidden'); }
-                    });
-                    
-                    ativarCooldownRetry();
-                    return;
-                }
-
-                if(!data.erro) {
-                    if(tt) tt.innerHTML = data.titulo; 
-                    if(td) td.innerText = data.descricao; 
-                    if(tv) tv.innerText = data.personagem_referencia;
-                    
-                    fetch(`/api/tmdb/search?query=${encodeURIComponent(data.filme_referencia)}`).then(r=>r.json()).then(d=>{
-                        if(d.results?.[0]?.poster_path){ ti.src=`https://image.tmdb.org/t/p/w500${d.results[0].poster_path}`; ti.classList.remove('hidden'); pl.classList.add('hidden'); }
-                    });
-                    return;
-                }
-            } throw new Error();
-        } catch(e) {
-            if(tt) tt.innerHTML = "O Inclassificável"; pl?.classList.remove('hidden');
-            ativarCooldownRetry();
-        }
-    }
-
-    function ativarCooldownRetry() {
-        const btn = document.getElementById('btn-retry-profile');
-        const textSpan = document.getElementById('retry-btn-text');
-        if (!btn || !textSpan) return;
-
-        btn.classList.remove('hidden');
-        btn.disabled = true;
-        btn.classList.add('opacity-50', 'cursor-not-allowed', 'hover:bg-[#ff8000]/10', 'hover:text-[#ff8000]');
-
-        let timeLeft = 60;
-        textSpan.innerText = `Aguarde ${timeLeft}s...`;
-
-        if (retryProfileInterval) clearInterval(retryProfileInterval);
-        retryProfileInterval = setInterval(() => {
-            timeLeft--;
-            textSpan.innerText = `Aguarde ${timeLeft}s...`;
-            if (timeLeft <= 0) {
-                clearInterval(retryProfileInterval);
-                btn.disabled = false;
-                btn.classList.remove('opacity-50', 'cursor-not-allowed', 'hover:bg-[#ff8000]/10', 'hover:text-[#ff8000]');
-                btn.classList.add('hover:bg-[#ff8000]', 'hover:text-[#14181c]'); 
-                textSpan.innerText = "Refazer Análise";
-            }
-        }, 1000);
-    }
-
-    function tentarRefazerPerfil() {
-        const btn = document.getElementById('btn-retry-profile');
-        if(btn && !btn.disabled) {
-            gerarPerfilIA(true);
-        }
-    }
-
-    async function carregarOraculo() {
-        const f = await buscarAteQuatroIneditos();
-        const grid = document.getElementById('oracle-grid');
-        grid.innerHTML = ''; 
-        if(f.length > 0) {
-            oraculoRecomendacoesGlobais = f; f.forEach((_,i)=>filmesSelecionados.add(i));
-            renderizarOraculoCards(f, 0);
-        } else {
-            grid.innerHTML = `
-                <div class="col-span-full text-center p-6 bg-[#ff8000]/10 border border-[#ff8000]/30 rounded-xl mx-2">
-                    <p class="text-[#ff8000] text-xs font-bold leading-relaxed">
-                        O Oráculo atingiu o limite de acessos por minuto 💀.<br>Aguarde 60 segundos e tente recarregar a página!
-                    </p>
-                </div>
-            `;
-        }
-        // Desliga a pílula de frases quando o Oráculo termina de carregar.
-        pararCicloDeFrases();
-    }
-
-    async function buscarAteQuatroIneditos() {
-        let f = [], t = 0;
-        while(f.length < 4 && t < 2) {
-            if(t >= 1) { 
-                const trophy = document.getElementById('ps-trophy');
-                if (trophy && !trophy.classList.contains('show')) {
-                    trophy.classList.add('show');
-                    setTimeout(() => trophy.classList.remove('show'), 5000); 
-                }
-            }
-            try {
-                const excl = [...oraculoRecomendacoesGlobais.map(x => x.rec), ...f.map(x => x.rec)];
-                const reqBody = JSON.stringify({ favorites: statsData.profile_favorites || [], exclude: excl });
-                const res = await fetch(`/oraculo?session_id=${sessionId}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: reqBody });
-                const r = await res.json();
-                
-                if (r.erro === "RATE_LIMIT") {
-                    mostrarErro("O Oráculo precisa de um minuto para respirar!");
-                    break; 
-                }
-
-                if(r.recomendacoes && r.recomendacoes.length > 0) {
-                    r.recomendacoes.forEach(x => {
-                        const tituloLimpo = x.rec.toLowerCase().trim();
-                        const jaExisteGlob = oraculoRecomendacoesGlobais.some(y => y.rec.toLowerCase().trim() === tituloLimpo);
-                        const jaExisteLocal = f.some(y => y.rec.toLowerCase().trim() === tituloLimpo);
-                        if(!jaExisteGlob && !jaExisteLocal && f.length < 4) { f.push(x); }
-                    });
-                }
-                
-                if (f.length < 4 && r.erro !== "RATE_LIMIT") {
-                    await new Promise(resolve => setTimeout(resolve, 2500));
-                }
-            } catch(e) { 
-                console.error("Erro na tentativa de recomendação:", e); 
-                await new Promise(resolve => setTimeout(resolve, 2500));
-            }
-            t++;
-        }
-        return f.slice(0,4); 
-    }
-
-    async function carregarMaisSugestoes() {
-        if(!(await verificarCredito())) return; await consumirCredito();
-        document.getElementById('load-more-spinner').classList.remove('hidden');
-        document.getElementById('load-more-icon').classList.add('hidden');
-        
-        const nov = await buscarAteQuatroIneditos();
-        
-        if(nov.length > 0) {
-            const s = oraculoRecomendacoesGlobais.length; oraculoRecomendacoesGlobais.push(...nov);
-            nov.forEach((_,i)=>filmesSelecionados.add(s+i)); renderizarOraculoCards(nov, s);
-        } else {
-            mostrarErro("O Oráculo precisa de uma pausa de 1 minuto por limites de acesso!");
-        }
-        
-        document.getElementById('load-more-spinner').classList.add('hidden');
-        document.getElementById('load-more-icon').classList.remove('hidden');
-    }
-
-    function toggleSelecao(idx) {
-        const c = document.getElementById(`oracle-card-${idx}`), ch = document.getElementById(`check-${idx}`);
-        if(filmesSelecionados.has(idx)) { filmesSelecionados.delete(idx); c.classList.remove('border-[#40bcf4]'); c.classList.add('border-[#2c3440]'); ch.classList.add('scale-0'); }
-        else { filmesSelecionados.add(idx); c.classList.add('border-[#40bcf4]'); c.classList.remove('border-[#2c3440]'); ch.classList.remove('scale-0'); }
-        const txt = filmesSelecionados.size>0 ? `EXPORTAR (${filmesSelecionados.size})` : "SELECIONE";
-        document.getElementById('btn-export-desktop').innerText = txt; document.getElementById('btn-export-mobile').innerText = txt;
-    }
-
-    function renderizarOraculoCards(recs, start) {
-        const g = document.getElementById('oracle-grid');
-        recs.forEach((r,i) => {
-            const idx = start+i, id=`oracle-card-${idx}`;
-            g.insertAdjacentHTML('beforeend', `
-                <div id="${id}" class="movie-card group opacity-0 translate-y-4 transition-all duration-700 cursor-pointer border-[#40bcf4] aspect-[2/3]" onclick="toggleSelecao(${idx})">
-                    <div id="check-${idx}" class="absolute top-2 right-2 z-40 bg-[#40bcf4] text-[#14181c] rounded-full p-1 transition-all"><svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg></div>
-                    <img class="fav-poster absolute inset-0 w-full h-full object-cover z-10" src="" loading="lazy">
-                    
-                    <div class="card-info z-20 pb-2 px-2 sm:pb-3 sm:px-3">
-                        <span class="text-[#40bcf4] text-[7px] sm:text-[8px] font-black uppercase bg-[#14181c]/90 px-1 py-0.5 rounded inline-block truncate max-w-full mb-1 border border-[#40bcf4]/30">${r.base}</span>
-                        <h5 class="text-white font-bold text-[10px] sm:text-xs line-clamp-2 leading-tight drop-shadow-md">${r.rec}</h5>
-                    </div>
-
-                    <div class="absolute inset-0 bg-[#14181c]/95 z-30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col p-3 sm:p-4 text-center justify-center items-center"> 
-                        <svg class="w-6 h-6 sm:w-8 sm:h-8 mb-1.5 sm:mb-2 text-[#40bcf4] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                        <div class="w-full flex-1 overflow-y-auto no-scrollbar flex flex-col justify-center items-center mb-1">
-                            <p class="text-[9px] sm:text-[11px] text-gray-300 leading-snug sm:leading-relaxed line-clamp-6">"${r.desc}"</p>
-                        </div>
-                        <span class="text-[7px] sm:text-[9px] text-[#40bcf4] font-black uppercase tracking-widest mt-auto shrink-0">CLIQUE P/ SELECIONAR</span> 
-                    </div>
-                </div>
-            `);
-            fetch(`/api/tmdb/search?query=${encodeURIComponent(r.rec)}&year=${r.ano}`).then(r=>r.json()).then(d=>{
-                if(d.results?.[0]?.poster_path) { const img=document.querySelector(`#${id} img`); img.src=`https://image.tmdb.org/t/p/w500${d.results[0].poster_path}`; img.onload=()=>img.style.opacity='1'; }
-            });
-            setTimeout(()=>document.getElementById(id)?.classList.remove('opacity-0','translate-y-4'), 100+(i*200));
-        });
-    }
-
-    function abrirTutorial() { document.getElementById('tutorial-modal').classList.remove('hidden'); document.getElementById('tutorial-modal').classList.add('flex'); }
-    function fecharTutorial() { document.getElementById('tutorial-modal').classList.add('hidden'); document.getElementById('tutorial-modal').classList.remove('flex'); }
-    function toggleImportTutorial() { document.getElementById('import-tutorial').classList.toggle('hidden'); }
-    function baixarWatchlistCompleta() {
-        let c = "Title,Year\n"; filmesSelecionados.forEach(i => { c += `"${oraculoRecomendacoesGlobais[i].rec.replace(/"/g,'""')}",${oraculoRecomendacoesGlobais[i].ano}\n`; });
-        const a = document.createElement('a'); a.href = window.URL.createObjectURL(new Blob([c], {type:'text/csv'})); a.download = "oraculo.csv"; a.click(); fecharTutorial();
-    }
-
-    async function iniciarFluxoWatchlist() {
-        document.getElementById('loading-container').classList.remove('hidden');
-        
-        try {
-            await fetch('/process_watchlist', { 
-                method: 'POST', 
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({session_id: sessionId}) 
-            });
-        } catch(e) {
-            console.warn("Aviso na chamada inicial do backend:", e);
-        }
-        
-        let startTime = Date.now();
-        let lastAtual = -1;
-        let stuckCount = 0;
-        
-        const m = setInterval(async () => {
-            try {
-                const res = await fetch(`/progress?session_id=${sessionId}`);
-                if (!res.ok) return; 
-                const p = await res.json();
-                
-                if(p.total > 0) {
-                    const pct = (p.atual/p.total)*100;
-                    document.getElementById('progress-bar-fill').style.width = pct+'%';
-                    document.getElementById('load-percent').innerText = Math.floor(pct)+'%';
-                    document.getElementById('loading-count').innerText = `${p.atual}/${p.total}`;
-                    
-                    const currentMovie = document.getElementById('current-movie-name');
-                    if (currentMovie) currentMovie.innerText = p.filme_atual || "Processando...";
-                    
-                    if (p.atual === lastAtual && !p.finalizado) {
-                        stuckCount++;
-                        if (stuckCount > 20) { 
-                            clearInterval(m);
-                            mostrarErro("A rede da empresa pode ter cortado a conexão. Tente no 4G.");
-                            p.finalizado = true;
-                        }
-                    } else {
-                        lastAtual = p.atual;
-                        stuckCount = 0;
-                    }
-
-                    const itemsRemaining = p.total - p.atual;
-                    const elapsedSeconds = (Date.now() - startTime) / 1000;
-                    let etaSeconds = 0;
-                    
-                    if (p.atual > 0) {
-                        const timePerItem = elapsedSeconds / p.atual;
-                        etaSeconds = itemsRemaining * timePerItem;
-                    } else {
-                        etaSeconds = itemsRemaining * 0.1;
-                    }
-                    
-                    const min = Math.floor(etaSeconds / 60);
-                    const sec = Math.floor(etaSeconds % 60);
-                    
-                    const etaTimer = document.getElementById('eta-timer');
-                    if (etaTimer) {
-                        if (etaSeconds > 0 && !p.finalizado) {
-                            etaTimer.innerText = `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
-                        } else {
-                            etaTimer.innerText = "Quase lá...";
-                        }
-                    }
-                    
-                    if(p.finalizado) {
-                        clearInterval(m); 
-                        document.getElementById('loading-container').classList.add('hidden');
-                        try {
-                            const dadosRes = await fetch(`/dados?session_id=${sessionId}`);
-                            if(dadosRes.ok) {
-                                const dadosJson = await dadosRes.json();
-                                rawDatabase = normalizeDatabase(dadosJson.watchlist || {});
-                                mostrarVeredito();
-                            } else {
-                                throw new Error("Erro dados HTTP");
-                            }
-                        } catch(e) {
-                            mostrarErro("Não foi possível carregar os resultados finais.");
-                        }
-                    }
-                }
-            } catch(e) {
-                console.warn("Interferência na rede corporativa. Tentando novamente...", e);
-            }
-        }, 2500); 
-    }
-
     function mostrarVeredito() {
         const c = {}; for(let f in rawDatabase) rawDatabase[f].forEach(s => { if(s!=="Não disponível") c[s]=(c[s]||0)+1; });
         const srt = Object.entries(c).sort((a,b)=>b[1]-a[1]);
         
-        document.getElementById('streaming-panel').classList.remove('hidden');
         document.getElementById('dynamic-podium').innerHTML = srt.slice(0,2).map((x,i) => `
-            <div class="glass-panel p-6 text-center border-${i===0?'#40bcf4':'#00e054'}/20 relative">
-                <div class="absolute top-0 left-0 w-full h-1 bg-${i===0?'#40bcf4':'#00e054'}"></div>
-                <h3 class="text-${i===0?'#40bcf4':'#00e054'} font-black text-[9px] uppercase mb-2">${i+1}º Recomendação</h3>
+            <div class="glass-panel p-6 text-center border-[#00e054]/20 relative">
+                <div class="absolute top-0 left-0 w-full h-1 bg-[#00e054]"></div>
+                <h3 class="text-[#00e054] font-black text-[9px] uppercase mb-2">${i+1}º Recomendação</h3>
                 <h1 class="font-black text-2xl text-white mb-1 truncate">${x[0].toUpperCase()}</h1>
                 <p class="text-[#8c9bab] font-bold uppercase text-[10px]">${x[1]} Filmes</p>
             </div>
@@ -1261,11 +1089,9 @@
 
     function renderMovies() {
         const q = document.getElementById('search-input').value.toLowerCase();
-        document.getElementById('movies-panel').classList.remove('hidden');
-        
         document.querySelectorAll('.filter-btn').forEach(b => {
-            b.classList.remove('border-[#40bcf4]');
-            if((activePlatformFilters.size===0 && b.innerText==='Todos') || activePlatformFilters.has(b.getAttribute('data-platform'))) b.classList.add('border-[#40bcf4]');
+            b.classList.remove('border-[#00e054]');
+            if((activePlatformFilters.size===0 && b.innerText==='Todos') || activePlatformFilters.has(b.getAttribute('data-platform'))) b.classList.add('border-[#00e054]');
         });
 
         let html = '', count = 0;
@@ -1275,10 +1101,9 @@
             if(q && !t.toLowerCase().includes(q)) continue;
             if(activePlatformFilters.size===0 && !q && rawDatabase[f][0]==="Não disponível") continue;
             
-            count++; const id = f.replace(/[^a-zA-Z0-9]/g, '');
-            
+            count++; 
             html += `
-                <li class="glass-panel p-3.5 flex flex-col border-l-2 border-l-[#40bcf4] gap-2 h-full"> 
+                <li class="glass-panel p-3.5 flex flex-col border-l-2 border-l-[#00e054] gap-2 h-full"> 
                     <div class="w-full">
                         <span class="text-white font-bold text-sm leading-tight line-clamp-2" title="${t}">${t}</span>
                         <span class="text-[10px] text-[#8c9bab] block mt-1">${y}</span>
@@ -1289,7 +1114,7 @@
                 </li>
             `;
         }
-        document.getElementById('results').innerHTML = html || `<li class="p-4 text-center text-xs text-[#8c9bab]">Nenhum resultado.</li>`;
+        document.getElementById('results').innerHTML = html || `<li class="p-4 text-center text-xs text-[#8c9bab] col-span-full">Nenhum resultado.</li>`;
         document.getElementById('movie-counter').innerText = `${count} FILMES`;
     }
 </script>
