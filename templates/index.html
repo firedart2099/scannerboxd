@@ -5,27 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Scannerboxd</title>
     
-    <!-- FAVICON (As 3 bolinhas na aba do navegador!) -->
+    <!-- FAVICON -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2220%22 cy=%2250%22 r=%2215%22 fill=%22%2300e054%22/><circle cx=%2250%22 cy=%2250%22 r=%2215%22 r=%2215%22 fill=%22%2340bcf4%22/><circle cx=%2280%22 cy=%2250%22 r=%2215%22 fill=%22%23ff8000%22/></svg>">
     
-    <!-- SISTEMA ANTI-TRAVAMENTO DE FIREWALL CORPORATIVO -->
     <script>
         const twScript = document.createElement('script');
         twScript.src = "https://cdn.tailwindcss.com";
         document.head.appendChild(twScript);
-
-        setTimeout(() => {
-            if (typeof tailwind === 'undefined') {
-                document.body.innerHTML = `
-                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; background: #14181c; color: #8c9bab; font-family: sans-serif; text-align: center; padding: 20px; box-sizing: border-box;">
-                        <div style="font-size: 4rem; margin-bottom: 10px;">🚧</div>
-                        <h2 style="color: #ff8000; font-size: 1.5rem; font-weight: bold; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 2px;">Bloqueio Corporativo</h2>
-                        <p style="max-width: 400px; line-height: 1.6; margin-bottom: 10px;">A rede da sua empresa está bloqueando os arquivos visuais (Tailwind CSS) do Scannerboxd.</p>
-                        <p style="max-width: 400px; line-height: 1.6; color: #fff; font-weight: bold; background: #1c2228; padding: 15px; border-radius: 8px; border: 1px solid #2c3440;">Acesse pelo 4G do seu celular ou na rede da sua casa para usar a ferramenta!</p>
-                    </div>
-                `;
-            }
-        }, 4000);
     </script>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&family=Space+Grotesk:wght@300;700;900&display=swap" rel="stylesheet">
@@ -41,7 +27,6 @@
 
         h1, h2, h3, .space-font { font-family: 'Space Grotesk', sans-serif !important; }
 
-        /* Custom Scrollbar Elegante em Acrílico */
         ::-webkit-scrollbar { width: 10px; }
         ::-webkit-scrollbar-track { background: rgba(15, 17, 21, 0.9); }
         ::-webkit-scrollbar-thumb { background: rgba(64, 188, 244, 0.4); border-radius: 10px; border: 2px solid rgba(15, 17, 21, 0.9); }
@@ -50,7 +35,7 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* O GLASSMORPHISM PREMIUM (Estilo Tidal / Windows 11) */
+        /* O GLASSMORPHISM PREMIUM */
         .fluent-glass {
             background: rgba(24, 28, 33, 0.55) !important; 
             backdrop-filter: blur(24px) saturate(150%) !important; 
@@ -66,7 +51,6 @@
             border-color: rgba(64, 188, 244, 0.5) !important;
         }
 
-        /* As 3 Bolinhas Minimalistas do Rodapé (Sem borda, sem fundo) */
         .bottom-nav-dot {
             width: 14px; height: 14px;
             border-radius: 50%;
@@ -129,12 +113,10 @@
 </head>
 <body class="text-white relative w-screen min-h-screen overflow-x-hidden overflow-y-auto pb-8">
 
-<!-- Alerta Minimalista (Toast) -->
 <div id="custom-toast" class="fixed top-12 left-1/2 transform -translate-x-1/2 fluent-glass text-white px-6 py-3 rounded-full z-[100000] flex items-center gap-3 transition-all duration-500 opacity-0 pointer-events-none -translate-y-10 max-w-[90vw] shadow-2xl">
     <p id="custom-toast-msg" class="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-center"></p>
 </div>
 
-<!-- Troféu Terror do Letterboxd -->
 <div id="ps-trophy" class="ps-trophy">
     <div class="trophy-icon">🏆</div>
     <div>
@@ -144,13 +126,11 @@
     </div>
 </div>
 
-<!-- Imagem de Fundo Rotativa (MAIS CLARA E VIVA) -->
 <div class="fixed inset-0 w-full h-full z-0 bg-[#0f1115] pointer-events-none">
     <img id="hero-backdrop-img" src="" class="w-full h-full object-cover opacity-0 transition-opacity duration-1000 grayscale-[10%]" style="-webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 50%, rgba(0,0,0,0) 100%); mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 50%, rgba(0,0,0,0) 100%);">
     <div class="absolute inset-0 bg-gradient-to-b from-transparent via-[#0f1115]/10 to-[#0f1115] pointer-events-none"></div>
 </div>
 
-<!-- Header (Logo) -->
 <header class="absolute top-6 left-6 md:top-8 md:left-8 flex items-start md:items-center gap-3 z-40 pointer-events-auto w-full justify-between pr-12 md:pr-16">
     <div class="flex items-center gap-1.5 cursor-pointer hover:scale-105 transition-transform" onclick="location.reload()">
         <div class="w-3 h-3 rounded-full bg-[#00e054]"></div>
@@ -162,8 +142,7 @@
         </div>
     </div>
     
-    <!-- Informações do Filme no Fundo -->
-    <div id="slideshow-info" class="transition-opacity duration-500 flex flex-col items-end text-right hidden sm:flex">
+    <div id="slideshow-info" class="transition-opacity duration-500 flex flex-col items-end text-right hidden sm:flex opacity-0">
         <h2 id="slide-title" class="text-sm md:text-lg font-black text-white tracking-tighter drop-shadow-md leading-tight mb-0.5 max-w-[200px] truncate">...</h2>
         <div class="flex items-center justify-end gap-2">
             <span id="slide-year" class="text-gray-300 font-bold text-[10px]"></span>
@@ -172,7 +151,6 @@
     </div>
 </header>
 
-<!-- TELA INICIAL (UPLOAD) -->
 <div id="main-content" class="relative w-full z-20 flex flex-col pt-[35vh] px-4 md:px-8 pb-32 transition-transform duration-700 ease-in-out">
     <div class="max-w-2xl mx-auto w-full">
         
@@ -185,7 +163,6 @@
         </div>
 
         <div class="space-y-4 relative z-30">
-            <!-- Passo 1 (Azul/Branco) -->
             <a href="https://letterboxd.com/data/export/" target="_blank" class="fluent-glass flex items-center gap-4 px-6 py-4 w-full group hover:border-[#40bcf4]/50">
                 <span class="bg-[#40bcf4]/20 text-[#40bcf4] w-7 h-7 rounded-full flex items-center justify-center text-xs font-black shrink-0 group-hover:bg-[#40bcf4] group-hover:text-[#0f1115] transition-colors">1</span>
                 <div class="text-left">
@@ -195,11 +172,9 @@
                 <svg class="w-5 h-5 text-[#40bcf4] ml-auto opacity-70 group-hover:opacity-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
             </a>
 
-            <!-- Passo 2 (Upload Zone) -->
             <div class="fluent-glass p-8 text-center hover:border-[#40bcf4]/50 transition-all group cursor-pointer relative overflow-hidden">
                 <label for="csv-file" id="dropzone-label" class="cursor-pointer block w-full h-full">
                     <div class="w-16 h-16 bg-[#40bcf4]/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-all border border-[#40bcf4]/30 shadow-inner">
-                        <!-- Flecha Oficial Simétrica Heroicons -->
                         <svg class="w-8 h-8 text-[#40bcf4]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z"></path></svg>
                     </div>
                     <p class="text-xl md:text-2xl font-bold text-white mb-1 drop-shadow-sm">Arraste seu arquivo <span class="text-[#40bcf4]">.zip</span> aqui</p>
@@ -219,7 +194,6 @@
                 </div>
             </div>
 
-            <!-- Botão Mock -->
             <div class="text-center pt-6 pb-10">
                 <button onclick="iniciarMockupTeste()" class="text-[10px] text-[#40bcf4] font-bold uppercase tracking-widest underline decoration-dashed hover:text-white transition-colors opacity-50 hover:opacity-100">
                     🧪 Testar Layout (Modo Mock)
@@ -229,23 +203,18 @@
     </div>
 </div>
 
-<!-- Frases Globais Minimalistas Flutuantes -->
 <div id="global-loading-phrase" class="fixed top-10 left-1/2 -translate-x-1/2 z-[60] opacity-0 transition-opacity duration-500 pointer-events-none hidden">
     <p class="text-white text-[9px] font-bold uppercase tracking-widest text-center whitespace-nowrap drop-shadow-lg bg-[#0f1115]/50 px-4 py-1.5 rounded-full border border-white/10" id="phrase-text">Invocando o Oráculo...</p>
 </div>
 
-<!-- TELA DO APP (Oculta Inicialmente) -->
 <div id="app-view" class="fixed inset-0 w-full h-full z-30 opacity-0 transition-opacity duration-700 hidden">
     
-    <!-- Container do Carrossel (3 Telas) -->
     <div id="carousel-wrapper" class="flex w-[300vw] h-full transition-transform duration-500 ease-in-out pointer-events-auto">
         
-        <!-- ABA 1: PERFIL (Verde) -->
         <div class="w-[100vw] h-full overflow-y-auto pb-32 pt-28 px-4 sm:px-8 flex flex-col items-center">
             <div class="max-w-2xl w-full space-y-6">
                 <div class="fluent-glass p-8 relative flex flex-col items-center text-center border-t-[#00e054]/50 shadow-[0_10px_40px_rgba(0,224,84,0.1)]">
                     
-                    <!-- Avatar Contido Blindado -->
                     <div class="w-24 h-24 rounded-full border-2 border-[#00e054] bg-[#0f1115] mb-6 flex items-center justify-center shadow-[0_0_20px_rgba(0,224,84,0.3)] shrink-0 overflow-hidden relative">
                         <svg id="profile-avatar-fallback" class="w-10 h-10 text-[#2c3440] absolute" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
                         <div id="profile-avatar" class="w-full h-full absolute inset-0 z-10"></div>
@@ -273,7 +242,6 @@
             </div>
         </div>
 
-        <!-- ABA 2: ORÁCULO (Azul) -->
         <div class="w-[100vw] h-full overflow-y-auto pb-32 pt-28 px-4 sm:px-8">
             <div class="max-w-5xl mx-auto">
                 <div class="text-center mb-8">
@@ -300,7 +268,6 @@
             </div>
         </div>
 
-        <!-- ABA 3: WATCHLIST (Laranja) -->
         <div class="w-[100vw] h-full overflow-y-auto pb-32 pt-28 px-4 sm:px-8">
             <div class="max-w-5xl mx-auto h-full flex flex-col items-center">
                 
@@ -315,19 +282,16 @@
                 </div>
 
                 <div id="watchlist-content" class="hidden w-full space-y-6">
-                    <!-- Search & Filtro Minimalista (Z-INDEX GIGANTE AQUI) -->
                     <div class="fluent-glass p-2 shrink-0 relative flex items-center z-[9999]">
                         <svg class="w-5 h-5 text-[#8c9bab] ml-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                         <input type="text" id="search-input" oninput="handleSearch()" placeholder="Procurar filme..." class="w-full bg-transparent border-none text-white px-4 py-2 focus:outline-none text-sm">
                         
-                        <!-- O menu de filtros agora tem z-[10000] e não some quando clica nos checkboxes -->
                         <div class="relative shrink-0 z-[10000]">
                             <button onclick="toggleFilterDropdown(event)" class="text-[#ff8000] hover:text-white p-2 rounded transition-colors mr-1 bg-[#1c2228]/50 border border-[#ff8000]/30 hover:border-[#ff8000]/80">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
                             </button>
 
                             <div id="filter-dropdown" class="hidden absolute right-0 top-[120%] w-72 fluent-glass p-3 flex flex-col gap-1 max-h-80 overflow-y-auto no-scrollbar shadow-2xl border border-[#ff8000]/50" onclick="event.stopPropagation()">
-                                <!-- Injetado via JS -->
                             </div>
                         </div>
                     </div>
@@ -338,7 +302,6 @@
         </div>
     </div>
 
-    <!-- Navegação Flutuante Rodapé (As 3 Bolinhas Minimalistas Livres) -->
     <div class="absolute bottom-8 left-1/2 -translate-x-1/2 z-50 flex items-center justify-center gap-4 pointer-events-auto">
         <div class="bottom-nav-dot dot-green active" onclick="slideTo(0)" title="Perfil"></div>
         <div class="bottom-nav-dot dot-blue" id="tab-oracle" onclick="slideTo(1)" title="Oráculo"></div>
@@ -346,7 +309,6 @@
     </div>
 </div>
 
-<!-- Modal Tutorial Exportação CSV -->
 <div id="tutorial-modal" class="fixed inset-0 bg-[#0f1115]/90 z-[10000] hidden items-center justify-center p-4 opacity-0 transition-opacity duration-300 pointer-events-auto">
     <div class="fluent-glass p-8 max-w-lg w-full relative flex flex-col border border-[#40bcf4]/30 shadow-2xl">
         <button onclick="fecharTutorial()" class="absolute top-4 right-5 text-[#8c9bab] hover:text-white text-3xl font-light">&times;</button>
@@ -399,7 +361,6 @@
         "Buscando as maiores pedradas cinematográficas..."
     ];
 
-    // RADAR CINÉFILO AUTOMÁTICO
     const cinephileReleases = [
         { Name: "Project Hail Mary", Year: 2026 },
         { Name: "Marty Supreme", Year: 2026 },
@@ -513,7 +474,6 @@
         }, 4000);
     }
 
-    // Carrossel
     let currentSlide = 0;
     const totalSlides = 3;
     function slideTo(index) {
@@ -571,6 +531,7 @@
             if (!res.ok) throw new Error("Upload falhou");
             statsData = (await res.json()).stats;
             iniciarAppReal();
+            iniciarFluxoWatchlist(); // CHAMA INSTANTANEAMENTE
         } catch(e) {
             mostrarErro("Erro ao ler o ZIP. Tente de novo.");
             btn.innerHTML = `<span id="btn-text-real">Iniciar Análise</span>`;
@@ -584,7 +545,6 @@
         clearInterval(bgInterval); 
         const favs = statsData.favoritos.slice(0, 15);
         
-        // Promessas em paralelo pra voar
         const fetchPromises = favs.map(async (f) => {
             try {
                 let res = await fetch(`/api/tmdb/search?query=${encodeURIComponent(f.Name)}`);
@@ -688,7 +648,6 @@
             iniciarCicloDeFrases();
 
             gerarPerfilIA();
-            iniciarFluxoWatchlist();
             setTimeout(() => { carregarOraculoInicial(); }, 3000); 
             
         }, 700);
@@ -708,7 +667,6 @@
                 const av = document.getElementById('profile-avatar');
                 const fb = document.getElementById('profile-avatar-fallback');
                 
-                // O Pulo do Gato (Busca a foto exata do personagem na cena do filme!)
                 try {
                     let imgRes = await fetch(`/api/tmdb/character_image?movie=${encodeURIComponent(data.filme_referencia)}&character=${encodeURIComponent(data.personagem_referencia)}`);
                     let imgD = await imgRes.json();
@@ -758,7 +716,6 @@
             document.getElementById('oracle-actions').classList.add('flex');
 
             if(data.terror_mode) {
-                // Não mostra os botões se a IA já morreu logo de cara
                 document.getElementById('btn-descobrir-mais').classList.add('hidden');
                 document.getElementById('btn-export-desktop').classList.add('hidden');
             }
@@ -775,7 +732,6 @@
         const btnSpinner = document.getElementById('load-more-spinner');
         const btnText = document.getElementById('btn-descobrir-mais');
 
-        // Se já tem filmes no bolso pra preencher a tela inteira (4), cospe na hora!
         if(oraculoBuffer.length >= 4) {
             let batch = oraculoBuffer.splice(0, 4);
             const startIdx = document.querySelectorAll('.movie-card').length;
@@ -783,7 +739,6 @@
             return;
         }
 
-        // Se tem buracos, vai na API pedir mais e junta com os que sobraram!
         btnSpinner.classList.remove('hidden');
         btnText.disabled = true;
         
@@ -797,7 +752,6 @@
             if(data.erro === "RATE_LIMIT") {
                 mostrarErro("As APIs estão superlotadas. Aguarde 1 minuto e tente novamente!");
             } else if(data.recomendacoes && data.recomendacoes.length > 0) {
-                // Filtro Javascript Anticlone Mestre: varre pra ver se o novo lote já não tá na tela
                 data.recomendacoes.forEach(novo_rec => {
                     const tituloLimpo = novo_rec.rec.toLowerCase().replace(/[^a-z0-9]/g, '');
                     let jaExiste = false;
@@ -807,11 +761,9 @@
                     if (!jaExiste) oraculoBuffer.push(novo_rec);
                 });
 
-                // Agora que enchemos o tanque, tiramos 4 certinho
                 let batch = oraculoBuffer.splice(0, Math.min(4, oraculoBuffer.length));
                 renderizarOraculoCards(batch, document.querySelectorAll('.movie-card').length);
             } else if (data.terror_mode) {
-                // A IA desistiu. Espeje tudo que tem no buffer e avise o Terror
                 if (oraculoBuffer.length > 0) {
                     let batch = oraculoBuffer.splice(0, oraculoBuffer.length);
                     renderizarOraculoCards(batch, document.querySelectorAll('.movie-card').length);
@@ -972,7 +924,7 @@
                         gerarFiltrosEWatchlist(rawDatabase);
                     }
                 }
-            }, 1000); 
+            }, 1000); // <-- ACELERADO AQUI (1 Segundo de update visual)
         } catch(e) {}
     }
 
@@ -981,7 +933,6 @@
         document.getElementById('filter-dropdown').classList.toggle('hidden');
     }
 
-    // Fecha o menu de filtros se clicar fora
     document.addEventListener('click', function(event) {
         const dropdown = document.getElementById('filter-dropdown');
         if(!dropdown) return;
