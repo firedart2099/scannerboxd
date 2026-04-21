@@ -98,7 +98,6 @@ def limpar_e_parsear_json(content):
     
     if match:
         try:
-            # strict=False permite que o Python leia "enters" literais (newlines) dentro das strings sem crachar
             dados = json.loads(match.group(0), strict=False)
         except Exception as e: 
             print(f"Erro ao fazer parse do regex JSON: {e}")
@@ -126,7 +125,7 @@ def limpar_e_parsear_json(content):
     return dados
 
 def gerar_resposta_ia(prompt):
-    # Removido o ia_lock para permitir chamadas em paralelo sem engarrafar o servidor
+    # Sem o ia_lock para permitir paralelismo e não travar o Render
     if GEMINI_API_KEY:
         try:
             url_gemini = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={GEMINI_API_KEY}"
@@ -408,33 +407,33 @@ def gerar_perfil():
     amados_recentes = stats.get('amados_recentes', [])
     odiados_recentes = stats.get('odiados_recentes', [])
     
-    prompt = f"""Atue como um psicanalista de cinema genial, perspicaz e 1000% sincero. Sua missão é ler a alma cinematográfica do usuário. Seu tom deve ser astuto, levemente irônico e muito bem-humorado, mas NUNCA ofensivo, agressivo ou tóxico. Você não quer humilhar, quer desvendar a pessoa com elegância, precisão e uma pitada de sarcasmo amigável.
+    prompt = f"""Atue como um psicanalista de cinema genial, ácido, elegante e 1000% sincero. Sua missão é ler a alma do usuário através das suas escolhas cinematográficas. Seja direto e perspicaz. Você não está aqui para ofender gratuitamente, mas sim para desvendar as contradições do gosto dele com muita ironia.
     
     DADOS DA VÍTIMA:
-    - Nome do Usuário: {username}
+    - Nome: {username}
     - Bio do Perfil: "{bio}"
-    - Filmes que a pessoa mais ama: {', '.join(filmes_amados) if filmes_amados else 'Nenhum'}
-    - Outros filmes que avaliou com 5 estrelas: {', '.join(amados_recentes) if amados_recentes else 'Nenhum'}
-    - Filmes que a pessoa odiou (Nota baixa): {', '.join(odiados_recentes) if odiados_recentes else 'Nenhum'}
+    - Filmes que a pessoa ama: {', '.join(filmes_amados) if filmes_amados else 'Nenhum'}
+    - Outros que deu 5 estrelas: {', '.join(amados_recentes) if amados_recentes else 'Nenhum'}
+    - Filmes que odiou (Nota baixa): {', '.join(odiados_recentes) if odiados_recentes else 'Nenhum'}
     - Média de Notas: {stats.get('media_notas', 0)}
     - Total de Filmes Avaliados: {stats.get('total_avaliados', 0)}
     
-    REGRAS DA MISSÃO (SIGA À RISCA):
-    1. FALE COM O USUÁRIO: Comece o texto chamando o usuário pelo nome ({username}) de forma intimista e analítica.
-    2. SINCERIDADE CIRÚRGICA: Analise a Bio (se tiver), os filmes que ama e os que odeia. Aponte os padrões, as paixões ocultas ou as contradições engraçadas no gosto dele (ex: amar um tipo de filme e odiar outro muito parecido). Diga a verdade sobre a vibe da pessoa, mas com classe.
-    3. EXAGERE NOS EMOJIS: Espalhe os emojis desta exata lista [🙈🤓😼🥺😿😻💋🫦🔥💅👍☠️💀😢😭😞😓😔🤤🙄] organicamente no meio das frases. NUNCA crie uma lista no final explicando os emojis.
-    4. O TÍTULO: Crie um rótulo criativo e analítico no campo "titulo" (Ex: "O Filósofo do Caos", "O Romântico Disfarçado").
-    5. O PERSONAGEM E A EXPLICAÇÃO (OBRIGATÓRIO): Escolha um personagem do cinema que represente a essência desse usuário. O NOME DO USUÁRIO NÃO É UM PERSONAGEM. Ao final do segundo parágrafo, explique de forma inteligente e genial o POR QUÊ desse personagem representá-lo tão bem psicologicamente.
-    6. TAMANHO E FORMATAÇÃO: Escreva EXATAMENTE 2 parágrafos. NÃO use aspas duplas (") dentro das strings do JSON, use aspas simples (').
+    REGRAS INQUEBRÁVEIS (SIGA SOB PENA DE FALHA):
+    1. COTA E LISTA DE EMOJIS (MUITO IMPORTANTE): Você SÓ PODE usar emojis desta exata string: 🙈🤓😼🥺😿😻💋🫦🔥💅👍☠️💀😢😭😞😓😔🤤🙄. É EXPRESSAMENTE PROIBIDO usar estrelas, arco-íris, tornados, pombas ou câmeras. Use no máximo 4 emojis no texto todo. NÃO crie listas de significado de emojis no final. Espalhe organicamente.
+    2. FRASES CURTAS E PONTUADAS: Você DEVE usar pontos finais. Não faça frases infinitas com vírgulas. Escreva textos dinâmicos. Máximo de 4 frases por parágrafo.
+    3. FALE COM A PESSOA: Chame-a pelo nome de forma intimista e irônica. Sintetize a "vibe" da pessoa em vez de apenas fazer uma lista de leitura do que ela gosta ou odeia.
+    4. PERSONAGEM (PROIBIÇÃO DE CLICHÊS): É estritamente PROIBIDO usar Tyler Durden, Patrick Bateman, Ryan Gosling (Drive) ou Coringa. Escolha um personagem muito específico e criativo que combine com as contradições do usuário e a vibe da bio dele. NÃO use o nome do usuário como personagem.
+    5. EXPLICAÇÃO: No final do segundo parágrafo, dê o xeque-mate explicando por que o personagem escolhido representa a mente dele perfeitamente.
+    6. Formato: O texto deve ter exatamente 2 parágrafos. NÃO use aspas duplas dentro das strings do JSON.
     
     Responda EXCLUSIVAMENTE em formato json estruturado exatamente assim:
     {{ 
-        "titulo": "SEU RÓTULO ANALÍTICO AQUI", 
-        "personagem_referencia": "NOME DO PERSONAGEM FICTÍCIO ESCOLHIDO", 
-        "filme_referencia": "NOME DO FILME DESSE PERSONAGEM", 
+        "titulo": "RÓTULO SARCÁSTICO E ELEGANTE AQUI", 
+        "personagem_referencia": "Nome do Personagem Fora do Óbvio", 
+        "filme_referencia": "Nome do Filme Desse Personagem", 
         "descricao": [
-            "PRIMEIRO PARÁGRAFO: Abertura analítica chamando o nome do usuário, desvendando a bio e a vibe dos filmes favoritos com sinceridade e ironia fina, usando emojis.",
-            "SEGUNDO PARÁGRAFO: Analisando as contradições dos filmes odiados e da média de notas, e finalizando com a explicação genial de por que o personagem escolhido reflete a psicologia do usuário."
+            "PRIMEIRO PARÁGRAFO: Abertura analítica chamando o nome do usuário. Sintetize a vibe da bio e dos filmes favoritos com sinceridade e ironia fina, usando frases curtas e pontos finais.",
+            "SEGUNDO PARÁGRAFO: Analise as contradições dos filmes odiados ou a média de notas. Finalize com a explicação genial de por que o personagem escolhido reflete a psicologia do usuário."
         ]
     }}"""
     
@@ -449,7 +448,7 @@ def gerar_perfil():
         if not dados or "titulo" not in dados:
             raise Exception("IA falhou ou retornou JSON invalido")
             
-        # Se a IA retornou os parágrafos em lista como pedimos, junta com quebra de linha
+        # Se a IA retornou os parágrafos em lista, junta com quebra de linha dupla
         if isinstance(dados.get("descricao"), list):
             dados["descricao"] = "\n\n".join(dados["descricao"])
             
@@ -459,7 +458,7 @@ def gerar_perfil():
         if "RATE_LIMIT" in str(e):
             return jsonify({"erro": "RATE_LIMIT"})
             
-        return jsonify({"titulo": "O Incompreendido 💀", "personagem_referencia": "Patrick Bateman", "filme_referencia": "American Psycho", "descricao": "Seu gosto é tão caótico que a IA pifou tentando processar. 🙄💅 Tente refazer a análise."})
+        return jsonify({"titulo": "O Incompreendido 💀", "personagem_referencia": "Donnie Darko", "filme_referencia": "Donnie Darko", "descricao": "Seu gosto é tão caótico que a IA pifou tentando processar. 🙄💅 Tente refazer a análise em alguns segundos."})
 
 @app.route('/oraculo', methods=['GET', 'POST'])
 def oraculo():
@@ -507,7 +506,6 @@ def oraculo():
                 
                 # Checagem pesada para evitar que a IA mande filmes que o cara já viu e evite clones
                 if nome not in blacklist_total and orig not in blacklist_total:
-                    # Verifica se o filme já não foi adicionado nas recomendações finais pra não ter clone
                     if nome not in [rf['rec'].lower() for rf in recs_finais] and orig not in [rf['rec_original'].lower() for rf in recs_finais]:
                         recs_finais.append(r)
                         if len(recs_finais) >= 8: break 
@@ -517,7 +515,6 @@ def oraculo():
             if len(recs_finais) < 4: 
                 time.sleep(0.5)
 
-        # Checagem de Terror
         if len(recs_finais) < 4:
             is_real_terror = True
 
