@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Scannerboxd</title>
     
+    <!-- FAVICON (As 3 bolinhas na aba do navegador!) -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2220%22 cy=%2250%22 r=%2215%22 fill=%22%2300e054%22/><circle cx=%2250%22 cy=%2250%22 r=%2215%22 r=%2215%22 fill=%22%2340bcf4%22/><circle cx=%2280%22 cy=%2250%22 r=%2215%22 fill=%22%23ff8000%22/></svg>">
     
     <!-- SISTEMA ANTI-TRAVAMENTO DE FIREWALL CORPORATIVO -->
@@ -319,13 +320,15 @@
                         <svg class="w-5 h-5 text-[#8c9bab] ml-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                         <input type="text" id="search-input" oninput="handleSearch()" placeholder="Procurar filme..." class="w-full bg-transparent border-none text-white px-4 py-2 focus:outline-none text-sm">
                         
-                        <button onclick="toggleFilterDropdown()" class="text-[#ff8000] hover:text-white p-2 rounded transition-colors mr-1">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
-                        </button>
+                        <div class="relative shrink-0 z-50">
+                            <button onclick="toggleFilterDropdown()" class="text-[#ff8000] hover:text-white p-2 rounded transition-colors mr-1 bg-[#1c2228]/50 border border-[#ff8000]/30 hover:border-[#ff8000]/80">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+                            </button>
 
-                        <!-- Dropdown de Filtros (Checkboxes) -->
-                        <div id="filter-dropdown" class="hidden absolute right-0 top-[110%] w-72 fluent-glass p-3 z-50 flex flex-col gap-1 max-h-80 overflow-y-auto no-scrollbar shadow-2xl border border-[#ff8000]/30">
-                            <!-- Injetado via JS -->
+                            <!-- Dropdown de Filtros (Checkboxes) super rápido -->
+                            <div id="filter-dropdown" class="hidden absolute right-0 top-[120%] w-72 fluent-glass p-3 z-[100] flex flex-col gap-1 max-h-80 overflow-y-auto no-scrollbar shadow-2xl border border-[#ff8000]/50">
+                                <!-- Injetado via JS -->
+                            </div>
                         </div>
                     </div>
                     
@@ -396,7 +399,7 @@
         "Buscando as maiores pedradas cinematográficas..."
     ];
 
-    // RADAR CINÉFILO AUTOMÁTICO (Filmes recentes e aclamados 2024-2026 - ESCOLHA DO USUARIO)
+    // RADAR CINÉFILO AUTOMÁTICO
     const cinephileReleases = [
         { Name: "Project Hail Mary", Year: 2026 },
         { Name: "Marty Supreme", Year: 2026 },
@@ -415,21 +418,18 @@
         const slideInfo = document.getElementById('slideshow-info');
         if (!heroImg) return;
 
-        // Oculta as estrelas fakes antes de logar
         const slideRating = document.getElementById('slide-rating');
         if(slideRating) slideRating.classList.add('hidden');
 
-        // Seleciona 5 filmes aclamados aleatórios
         const shuffled = cinephileReleases.sort(() => 0.5 - Math.random()).slice(0, 5);
         
-        // Busca paralela instantânea no TMDB
         const fetchPromises = shuffled.map(async (film) => {
             try {
                 let res = await fetch(`/api/tmdb/search?query=${encodeURIComponent(film.Name)}&year=${film.Year}`);
                 let d = await res.json();
                 if(d.results && d.results.length > 0 && d.results[0].backdrop_path) {
                     return {
-                        Name: d.results[0].title, // Título oficial BR
+                        Name: d.results[0].title, 
                         Year: film.Year,
                         backdrop: `https://image.tmdb.org/t/p/original${d.results[0].backdrop_path}`
                     };
@@ -441,7 +441,6 @@
         Promise.all(fetchPromises).then(results => {
             currentBgList = results.filter(r => r !== null);
             
-            // Fallback de emergência absoluto
             if(currentBgList.length === 0) {
                 currentBgList = [{ Name: "Interstellar", Year: 2014, backdrop: "https://image.tmdb.org/t/p/original/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg" }];
             }
@@ -452,7 +451,7 @@
             if(document.getElementById('slide-year')) document.getElementById('slide-year').innerText = startMovie.Year;
             
             heroImg.onload = () => {
-                heroImg.style.opacity = '0.6'; // Ajuste de opacidade pra tela inicial (Mais vivo)
+                heroImg.style.opacity = '0.6'; 
                 if(slideInfo) slideInfo.style.opacity = '1';
             };
 
@@ -468,7 +467,7 @@
                             heroImg.src = nextMovie.backdrop;
                             if(document.getElementById('slide-title')) document.getElementById('slide-title').innerText = nextMovie.Name;
                             if(document.getElementById('slide-year')) document.getElementById('slide-year').innerText = nextMovie.Year;
-                            heroImg.style.opacity = '0.6'; // Mantém o brilho vivo na troca
+                            heroImg.style.opacity = '0.6'; 
                             if(slideInfo) slideInfo.style.opacity = '1';
                         }, 500);
                     };
@@ -532,7 +531,6 @@
         tabs.forEach((t, i) => { t.classList.toggle('active', i === index); });
     }
 
-    // Swipe Mobile
     let startX = 0; let endX = 0;
     const wrapper = document.getElementById('carousel-wrapper');
     if (wrapper) {
@@ -589,9 +587,8 @@
         if(!statsData || !statsData.favoritos || statsData.favoritos.length === 0) return;
         
         clearInterval(bgInterval); 
-        const favs = statsData.favoritos.slice(0, 15); // Pega os top 15 reais do user
+        const favs = statsData.favoritos.slice(0, 15);
         
-        // Puxa tudo paralelo num estalo
         const fetchPromises = favs.map(async (f) => {
             try {
                 let res = await fetch(`/api/tmdb/search?query=${encodeURIComponent(f.Name)}`);
@@ -612,7 +609,6 @@
         let newBgList = results.filter(r => r !== null);
         
         if(newBgList.length > 0) {
-            // Garante que o Top 4 venha primeiro
             let top4 = newBgList.slice(0, 4);
             let rest = newBgList.slice(4).sort(() => Math.random() - 0.5);
             currentBgList = [...top4, ...rest];
@@ -630,7 +626,6 @@
                 document.getElementById('slide-title').innerText = startMovie.Name;
                 document.getElementById('slide-year').innerText = startMovie.Year || '';
                 
-                // Acende as estrelas reais do cara!
                 if(startMovie.Rating) {
                     let stars = '';
                     let r = parseFloat(startMovie.Rating);
@@ -643,7 +638,7 @@
                 }
 
                 heroImg.onload = () => {
-                    heroImg.style.opacity = '0.7'; // Ainda mais brilhante pros favoritos do user
+                    heroImg.style.opacity = '0.7'; 
                     if(slideInfo) slideInfo.style.opacity = '1';
                 }
             }, 300);
@@ -671,7 +666,7 @@
                             slideRating.classList.add('hidden');
                         }
 
-                        heroImg.style.opacity = '0.7'; // Mantém o brilho extra vivo
+                        heroImg.style.opacity = '0.7'; 
                         if(slideInfo) slideInfo.style.opacity = '1';
                     }, 500);
                 };
@@ -696,25 +691,11 @@
             loadUserBackgrounds();
             iniciarCicloDeFrases();
 
-            // Cascata do Oráculo (Sem engarrafar o server)
             gerarPerfilIA();
             iniciarFluxoWatchlist();
             setTimeout(() => { carregarOraculoInicial(); }, 5000); 
             
         }, 700);
-    }
-
-    async function fetchPersonagemOuAtor(atorNome) {
-        if(!atorNome) return null;
-        try {
-            // Busca a foto do ATOR real no TMDB (Rosto garantido de aparecer sem máscara)
-            let res = await fetch(`/api/tmdb/person?query=${encodeURIComponent(atorNome)}`);
-            let d = await res.json();
-            if(d.results && d.results.length > 0 && d.results[0].profile_path) {
-                return `https://image.tmdb.org/t/p/w500${d.results[0].profile_path}`;
-            }
-        } catch(e) {}
-        return null;
     }
 
     async function gerarPerfilIA() {
@@ -731,13 +712,15 @@
                 const av = document.getElementById('profile-avatar');
                 const fb = document.getElementById('profile-avatar-fallback');
                 
-                // Tenta puxar o ROSTO do ator!
-                let imgUrl = await fetchPersonagemOuAtor(data.ator_referencia);
-                
-                if(imgUrl) {
-                    fb.classList.add('hidden');
-                    av.innerHTML = `<img src="${imgUrl}" class="w-full h-full object-cover absolute inset-0 rounded-full" style="object-position: top;">`;
-                }
+                // O Segredo: Busca a capa do FILME (ex: The Matrix) pra representar o personagem (ex: Neo). Nada de atores civil!
+                try {
+                    let imgRes = await fetch(`/api/tmdb/search?query=${encodeURIComponent(data.filme_referencia)}`);
+                    let imgD = await imgRes.json();
+                    if(imgD.results && imgD.results.length > 0 && imgD.results[0].poster_path) {
+                        fb.classList.add('hidden');
+                        av.innerHTML = `<img src="https://image.tmdb.org/t/p/w500${imgD.results[0].poster_path}" class="w-full h-full object-cover absolute inset-0 rounded-full" style="object-position: top;">`;
+                    }
+                } catch(e) {}
             } else {
                 throw new Error("Limites");
             }
@@ -801,7 +784,6 @@
         const btnSpinner = document.getElementById('load-more-spinner');
         const btnText = document.getElementById('btn-descobrir-mais');
 
-        // Se o buffer invisível ainda tem 4 filmes de estoque, ele só cospe na tela imediatamente!
         if(oraculoBuffer.length >= 4) {
             let batch = oraculoBuffer.splice(0, 4);
             const startIdx = document.querySelectorAll('.movie-card').length;
@@ -809,7 +791,6 @@
             return;
         }
 
-        // Se a gente esgotou o buffer, temos que ir lá no servidor buscar mais.
         btnSpinner.classList.remove('hidden');
         btnText.disabled = true;
         
@@ -821,7 +802,6 @@
             const data = await res.json();
             
             if(data.erro === "RATE_LIMIT") {
-                // Se a API bateu no limite, mas eu tenho 2 ou 3 filmes sobrando na gaveta, eu jogo eles na tela.
                 if (oraculoBuffer.length > 0) {
                     let batch = oraculoBuffer.splice(0, oraculoBuffer.length);
                     renderizarOraculoCards(batch, document.querySelectorAll('.movie-card').length);
@@ -997,6 +977,7 @@
 
     document.addEventListener('click', function(event) {
         const dropdown = document.getElementById('filter-dropdown');
+        if(!dropdown) return;
         const btn = dropdown.previousElementSibling;
         if (!dropdown.contains(event.target) && !btn.contains(event.target)) {
             dropdown.classList.add('hidden');
@@ -1044,8 +1025,8 @@
     function handleSearch() {
         const q = document.getElementById('search-input').value.toLowerCase();
         const res = document.getElementById('results');
-        res.innerHTML = '';
         
+        let html = '';
         let matchCount = 0;
 
         for(const [filme, streamings] of Object.entries(rawDatabase)) {
@@ -1065,7 +1046,7 @@
                 return `<span class="border text-[8px] px-2 py-1 rounded font-black uppercase whitespace-nowrap shadow-sm transition-colors ${style}">${s}</span>`;
             }).join(' ');
 
-            res.innerHTML += `
+            html += `
                 <li class="fluent-glass p-4 md:p-5 border-l-4 border-l-[#ff8000] flex flex-col justify-between gap-3 transition-all hover:scale-[1.02] hover:border-l-[#ffb366]">
                     <div>
                         <span class="text-white font-bold text-sm md:text-base block leading-tight truncate">${titulo}</span>
@@ -1077,8 +1058,9 @@
         }
 
         if(matchCount === 0) {
-            res.innerHTML = `<li class="col-span-full text-center p-8 text-[#8c9bab] text-xs uppercase tracking-widest font-bold">Nenhum filme encontrado nos filtros atuais.</li>`;
+            html = `<li class="col-span-full text-center p-8 text-[#8c9bab] text-xs uppercase tracking-widest font-bold">Nenhum filme encontrado nos filtros atuais.</li>`;
         }
+        res.innerHTML = html;
     }
 
     // Mockup Teste
