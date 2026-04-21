@@ -480,13 +480,13 @@ def oraculo():
             blacklist_amostra = random.sample(list(blacklist_total), min(100, len(blacklist_total)))
 
             prompt = f"""Atue como curador profissional. Favoritos do usuário: {favoritos}.
-            Recomende EXATAMENTE 10 filmes de estilo similar mas que sejam ABSOLUTAMENTE INÉDITOS para ele.
+            Recomende EXATAMENTE 25 filmes de estilo similar mas que sejam ABSOLUTAMENTE INÉDITOS para ele.
             
             ESQUEÇA ESTES FILMES (O usuário já viu ou conhece):
             {', '.join(blacklist_amostra)}
             {', '.join(list(excl_sessao)[:30])}
             
-            DICA: Se ele gosta de coisas populares, procure o 'lado B'. Se gosta de cult, procure o 'underground'.
+            DICA DE OURO: O usuário é um CINEFILO HARDCORE. PROÍBA filmes mainstream ou blockbusters. Vá fundo no catálogo. Procure filmes lado B, diretores obscuros, cinema internacional ou clássicos esquecidos.
             NÃO USE asteriscos (*) nos nomes.
             Responda OBRIGATORIAMENTE em formato json:
             {{ "recomendacoes": [ {{"rec_original": "TITLE", "rec": "TITLE", "ano": 2000, "base": "GENERO", "desc": "DESC"}} ] }}"""
@@ -503,24 +503,29 @@ def oraculo():
                 nome = r.get('rec', '').strip().lower()
                 orig = r.get('rec_original', '').strip().lower()
                 
+                # Só adiciona se ele realmente nunca tiver visto
                 if nome not in blacklist_total and orig not in blacklist_total:
                     if nome not in [rf['rec'].lower() for rf in recs_finais]:
                         recs_finais.append(r)
                         if len(recs_finais) >= 8: break 
             
             tentativas_ia += 1
-            if tentativas_ia >= 1 and len(recs_finais) < 4:
-                is_real_terror = True
             
             if len(recs_finais) < 4: 
                 time.sleep(0.5)
 
-        res_payload = {"recomendacoes": recs_finais}
+        # FIM DO WHILE - Checagem do terror resolvida aqui fora!
+        if len(recs_finais) < 4:
+            is_real_terror = True
+
+        res_payload = {"recomendacoes": recs_finais[:4]} # Garante que manda no máximo os 4 primeiros pra interface ficar alinhada
+        
         if is_real_terror:
             res_payload["terror_mode"] = True
+            # Se a IA conseguiu pelo menos 1 filme, a gente usa ele e mete a mensagem de terror
             if len(recs_finais) > 0:
-                recs_finais[0]["base"] = "O REAL TERROR"
-                recs_finais[0]["desc"] = "Você já viu tudo o que existe? A IA desistiu de tentar te surpreender. Você é o verdadeiro terror do Letterboxd. 💀💅"
+                res_payload["recomendacoes"][0]["base"] = "O REAL TERROR"
+                res_payload["recomendacoes"][0]["desc"] = "Você já viu tudo o que existe? A IA suou sangue pra achar isso. Você é o verdadeiro terror do Letterboxd. 💀💅"
 
         return jsonify(res_payload)
     except Exception as e:
