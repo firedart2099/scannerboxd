@@ -428,6 +428,16 @@
     </div>
 
     <div id="analyzer-panel" class="hidden space-y-8 animate-fade-in mt-40 md:mt-80 relative z-20">
+        
+        <!-- NOVO BANNER NO TOPO PARA DISTRAIR O USUÁRIO DURANTE O LOAD LENTO -->
+        <div id="top-loading-banner" class="bg-[#1c2228]/80 backdrop-blur-sm border border-[#40bcf4]/40 rounded-xl p-4 md:p-5 mb-8 text-center shadow-[0_5px_20px_rgba(64,188,244,0.1)] transition-all duration-500 max-w-2xl mx-auto">
+            <div class="flex items-center justify-center gap-2 mb-1.5">
+                <svg class="animate-spin w-4 h-4 text-[#40bcf4]" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                <p id="funny-text" class="text-[#40bcf4] font-black uppercase text-[10px] md:text-xs tracking-widest transition-opacity duration-500 drop-shadow-md m-0">Iniciando análise profunda...</p>
+            </div>
+            <p class="text-[#8c9bab] text-[8px] md:text-[9px] uppercase tracking-widest font-bold opacity-80">* As IAs estão trabalhando. Esse processo pode demorar um pouco. Relaxe e leia seu perfil enquanto isso.</p>
+        </div>
+
         <div class="text-center flex justify-center items-center gap-2">
             <svg class="w-5 h-5 text-[#40bcf4]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
             <h2 id="profile-greeting" class="text-xl md:text-2xl font-bold text-[#40bcf4] tracking-tighter drop-shadow-md">O Seu Perfil de Crítico</h2>
@@ -491,7 +501,7 @@
 
             <div id="oracle-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6 px-1 md:px-2 mb-6">
                 <div class="movie-card border-[#2c3440] border-2 aspect-[2/3]">
-                   <div class="h-full w-full bg-[#1c2228] flex items-center justify-center animate-pulse"><span class="text-[#8c9bab] text-[10px] font-bold uppercase tracking-widest text-center">Analisando...</span></div>
+                   <div class="h-full w-full bg-[#1c2228] flex items-center justify-center animate-pulse"><span class="text-[#8c9bab] text-[10px] font-bold uppercase tracking-widest text-center">Aguardando IA...</span></div>
                 </div>
                 <div class="movie-card border-[#2c3440] border-2 aspect-[2/3]">
                    <div class="h-full w-full bg-[#1c2228] flex items-center justify-center animate-pulse"><span class="text-[#8c9bab] text-[10px] font-bold uppercase tracking-widest text-center">Buscando...</span></div>
@@ -521,9 +531,7 @@
             <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#40bcf4] via-[#00e054] to-[#40bcf4] bg-[length:200%_200%] animate-gradient-x"></div>
             
             <div class="text-center mb-6">
-                <div class="mb-4 h-6 flex items-center justify-center">
-                    <p id="funny-text" class="text-[#40bcf4] font-bold uppercase text-[9px] md:text-xs tracking-widest text-center transition-opacity duration-500">Iniciando...</p>
-                </div>
+                <!-- A FRASE ANTIGA FOI REMOVIDA DAQUI E SUBIU PARA O TOPO DA TELA -->
                 
                 <h3 class="text-xl md:text-3xl font-black text-white uppercase tracking-tighter mb-2">Buscando Plataformas</h3>
                 
@@ -852,7 +860,19 @@
             
             countdown(msgFinal, () => {
                 document.getElementById('main-content')?.classList.add('hidden');
-                exibirRaioX(); carregarOraculo(); iniciarFluxoWatchlist();
+                
+                // STAGGERING: Separar as chamadas para não engasgar o servidor
+                
+                // 1. Inicia o Perfil (Rápido, consome IA)
+                exibirRaioX(); 
+                
+                // 2. Inicia o TMDB no fundo (Lento, mas não consome IA nem trava)
+                iniciarFluxoWatchlist(); 
+                
+                // 3. Aguarda 6 segundos para chamar o Oráculo, dando tempo da IA respirar
+                setTimeout(() => {
+                    carregarOraculo();
+                }, 6000); 
             });
         } catch(e) { 
             mostrarErro("Erro de conexão. A rede bloqueou o envio do .zip!"); 
@@ -1210,7 +1230,15 @@
                     }
                     
                     if(p.finalizado) {
-                        clearInterval(m); pararCicloDeFrases(); document.getElementById('loading-container').classList.add('hidden');
+                        clearInterval(m); 
+                        pararCicloDeFrases(); 
+                        
+                        document.getElementById('loading-container').classList.add('hidden');
+                        
+                        // Esconde o aviso amarelo do topo que entretinha o usuário
+                        const banner = document.getElementById('top-loading-banner');
+                        if (banner) banner.classList.add('hidden');
+                        
                         try {
                             const dadosRes = await fetch(`/dados?session_id=${sessionId}`);
                             if(dadosRes.ok) {
