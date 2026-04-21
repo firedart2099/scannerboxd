@@ -339,38 +339,56 @@ def gerar_perfil():
     stats = request.json.get('stats', {})
     username = stats.get('username', 'Usuário')
     bio = stats.get('bio', '')
+    
     profile_favs = stats.get('profile_favorites', [])
     favoritos_calc = [f['Name'] for f in stats.get('favoritos', [])[:5]]
     filmes_amados = profile_favs if profile_favs else favoritos_calc
+    
     amados_recentes = stats.get('amados_recentes', [])
     odiados_recentes = stats.get('odiados_recentes', [])
     
-    prompt = f"""Atue como um psicanalista de cinema genial, elegante e ironico. Faça uma leitura dinâmica do gosto de: {username}.
+    prompt = f"""Atue como um crítico de cinema e psicanalista genial, elegante e ironicamente ácido. Faça uma leitura do gosto de: {username}.
     Bio: "{bio}". 
     Filmes que ama: {', '.join(filmes_amados) if filmes_amados else 'Nenhum'}. 
     Filmes que odiou (nota baixa): {', '.join(odiados_recentes) if odiados_recentes else 'Nenhum'}. 
     Média geral: {stats.get('media_notas', 0)}.
     
     REGRAS DE OURO DA REDAÇÃO (OBRIGATÓRIO):
-    1. LEITURA DINÂMICA: É ESTRITAMENTE PROIBIDO fazer "frases infinitas". Use PONTOS FINAIS. Cada parágrafo deve ter frases curtas, diretas e de fácil leitura.
-    2. NADA DE CLICHÊS: É PROIBIDO escolher Tyler Durden, Patrick Bateman ou Coringa como personagens. Escolha um personagem complexo ou irônico que combine com a "vibe" das escolhas da pessoa.
-    3. COTA DE EMOJIS: Use entre 6 e 10 emojis no texto todo. USE EXCLUSIVA E UNICAMENTE EMOJIS DESTA LISTA EXATA (NENHUM OUTRO É PERMITIDO): 🙈🤓😼🥺😿😻💋🫦🔥💅👍☠️💀😢😭😞😓😔🤤🙄
-    4. NUNCA explique os emojis.
-    5. EXPLICAÇÃO DO PERSONAGEM: No final do segundo parágrafo, explique brilhantemente (em uma frase curta) o porquê de ter escolhido aquele personagem para a pessoa.
+    1. RITMO E ELEGÂNCIA: Escreva um texto coeso, articulado e fluido com um vocabulário rico. É PROIBIDO falar igual robô, em tópicos ou fazer frases de três palavras. Seja um escritor debochado de alto nível.
+    2. PONTUAÇÃO: É PROIBIDO fazer "frases infinitas" com dezenas de vírgulas. Use pontos finais para dar respiro, mas mantenha a fluidez de uma crônica bem escrita.
+    3. NADA DE CLICHÊS: É PROIBIDO escolher Tyler Durden, Patrick Bateman ou Coringa. Escolha um personagem complexo e surpreendente que combine perfeitamente com a "vibe" das escolhas da pessoa.
+    4. COTA DE EMOJIS: Use de 4 a 6 emojis espalhados organicamente pelo texto. USE EXCLUSIVA E UNICAMENTE EMOJIS DESTA LISTA: 🙈🤓😼🥺😿😻💋🫦🔥💅👍☠️💀😢😭😞😓😔🤤🙄. Nunca justifique o uso deles.
+    5. EXPLICAÇÃO DO PERSONAGEM: A última frase do texto deve explicar de forma genial e sarcástica o porquê de ter escolhido esse personagem para representar o usuário.
     
-    Responda OBRIGATORIAMENTE em JSON:
-    {{ "titulo": "Rótulo Elegante", "personagem_referencia": "Nome do Personagem", "filme_referencia": "Filme Desse Personagem", "descricao": ["Parágrafo 1", "Parágrafo 2"] }}"""
+    Responda OBRIGATORIAMENTE no formato JSON abaixo:
+    {{ 
+        "titulo": "Crie um rótulo sarcástico, grandioso e criativo", 
+        "personagem_referencia": "Nome do Personagem Exato (Sem Tyler Durden)", 
+        "filme_referencia": "Nome do Filme Desse Personagem", 
+        "descricao": ["Seu primeiro parágrafo incrivelmente bem escrito e fluido aqui.", "Seu segundo parágrafo genial aqui, finalizando com a explicação do personagem."] 
+    }}"""
     
     try: 
         dados = gerar_resposta_ia(prompt)
-        if isinstance(dados.get("descricao"), list): dados["descricao"] = "\n\n".join(dados["descricao"])
+        
+        if not dados or "titulo" not in dados:
+            raise Exception("IA falhou ou retornou JSON invalido")
+            
+        # Se a IA retornou os parágrafos em lista como pedimos, junta com duas quebras de linha
+        if isinstance(dados.get("descricao"), list):
+            dados["descricao"] = "\n\n".join(dados["descricao"])
+            
         return jsonify(dados)
-    except Exception as e:
+    except Exception as e: 
+        print(f"Erro ao gerar perfil IA: {e}")
+        if "RATE_LIMIT" in str(e):
+            return jsonify({"erro": "RATE_LIMIT"})
+            
         return jsonify({
-            "titulo": "O Oráculo está Meditando... 🧘‍♂️", 
+            "titulo": "O Explorador Silencioso", 
             "personagem_referencia": "Driver", 
             "filme_referencia": "Drive", 
-            "descricao": f"Opa {username}, desculpa pae! As IAs do servidor derreteram com tanto acesso hoje. 💅\n\nMas ó, seu bom gosto é inquestionável. Enquanto a gente esfria os motores, aproveite pra ver onde assistir sua Watchlist na última aba! 🙄🍿"
+            "descricao": "O Oráculo está Meditando... 🧘‍♂️\n\nOpa, desculpa pae! As IAs do servidor derreteram com tanto acesso hoje. 💅\n\nMas ó, seu bom gosto é inquestionável. Enquanto a gente esfria os motores, aproveite pra ver onde assistir sua Watchlist ali na aba do lado! 🙄🍿"
         })
 
 @app.route('/oraculo', methods=['GET', 'POST'])
