@@ -22,7 +22,7 @@ load_dotenv()
 app = Flask(__name__)
 ARQUIVO_FRASES = "frases.txt" 
 
-# Limpeza agressiva das chaves para evitar erros de aspas invisíveis no Render
+# Limpeza agressiva das chaves
 NVIDIA_API_KEY = os.getenv("NVIDIA_API_KEY", "").replace('"', '').replace("'", "").strip()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "").replace('"', '').replace("'", "").strip()
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").replace('"', '').replace("'", "").strip()
@@ -32,9 +32,6 @@ DB_NAME = "oraculo.db"
 
 db_lock = threading.Lock()
 
-# ==========================================
-# CONFIGURAÇÃO DO BANCO DE DADOS SQLITE
-# ==========================================
 def check_db_health():
     if os.path.exists(DB_NAME):
         try:
@@ -51,8 +48,7 @@ def check_db_health():
 def get_db():
     conn = sqlite3.connect(DB_NAME, timeout=20, check_same_thread=False)
     conn.row_factory = sqlite3.Row
-    try: 
-        conn.execute('PRAGMA journal_mode=WAL')
+    try: conn.execute('PRAGMA journal_mode=WAL')
     except Exception as e: pass
     return conn
 
@@ -63,30 +59,19 @@ def init_db():
             with closing(get_db()) as conn:
                 with conn:
                     c = conn.cursor()
-                    c.execute('''CREATE TABLE IF NOT EXISTS sessions
-                                 (session_id TEXT PRIMARY KEY, vistos TEXT, amados TEXT, odiados TEXT, watchlist TEXT)''')
-                    c.execute('''CREATE TABLE IF NOT EXISTS progress
-                                 (session_id TEXT PRIMARY KEY, atual INTEGER, total INTEGER, finalizado INTEGER, filme_atual TEXT)''')
-                    c.execute('''CREATE TABLE IF NOT EXISTS credits
-                                 (ip TEXT PRIMARY KEY, creditos INTEGER)''')
-                    c.execute('''CREATE TABLE IF NOT EXISTS global_cache
-                                 (chave TEXT PRIMARY KEY, streamings TEXT)''')
-                    c.execute('''CREATE TABLE IF NOT EXISTS dados_finais
-                                 (session_id TEXT PRIMARY KEY, dados TEXT)''')
+                    c.execute('''CREATE TABLE IF NOT EXISTS sessions (session_id TEXT PRIMARY KEY, vistos TEXT, amados TEXT, odiados TEXT, watchlist TEXT)''')
+                    c.execute('''CREATE TABLE IF NOT EXISTS progress (session_id TEXT PRIMARY KEY, atual INTEGER, total INTEGER, finalizado INTEGER, filme_atual TEXT)''')
+                    c.execute('''CREATE TABLE IF NOT EXISTS credits (ip TEXT PRIMARY KEY, creditos INTEGER)''')
+                    c.execute('''CREATE TABLE IF NOT EXISTS global_cache (chave TEXT PRIMARY KEY, streamings TEXT)''')
+                    c.execute('''CREATE TABLE IF NOT EXISTS dados_finais (session_id TEXT PRIMARY KEY, dados TEXT)''')
         except Exception as e: pass
 
 init_db()
 
-# ==========================================
-# TRATAMENTO DE ERROS GLOBAIS DO SERVIDOR
-# ==========================================
 @app.errorhandler(Exception)
 def handle_exception(e):
     return jsonify({"erro": f"Erro interno do servidor: {str(e)}"}), 500
 
-# ==========================================
-# MOTOR HÍBRIDO DE INTELIGÊNCIA ARTIFICIAL
-# ==========================================
 def limpar_e_parsear_json(content):
     content = re.sub(r'^```json\s*', '', content, flags=re.MULTILINE|re.IGNORECASE)
     content = re.sub(r'^```\s*', '', content, flags=re.MULTILINE).strip()
@@ -95,13 +80,11 @@ def limpar_e_parsear_json(content):
     match = re.search(r'\{.*\}', content, re.DOTALL)
     
     if match:
-        try:
-            dados = json.loads(match.group(0), strict=False)
+        try: dados = json.loads(match.group(0), strict=False)
         except Exception as e: pass
             
     if not dados:
-        try:
-            dados = json.loads(content, strict=False)
+        try: dados = json.loads(content, strict=False)
         except Exception as e: return {}
 
     if isinstance(dados, dict):
@@ -118,7 +101,7 @@ def limpar_e_parsear_json(content):
     return dados
 
 def gerar_resposta_ia(prompt, max_tokens=1000):
-    # 1. TENTA NVIDIA (Motor Principal e Ultra Rápido)
+    # 1. NVIDIA (A mais poderosa)
     if NVIDIA_API_KEY:
         try:
             url_nv = "https://integrate.api.nvidia.com/v1/chat/completions"
@@ -130,16 +113,12 @@ def gerar_resposta_ia(prompt, max_tokens=1000):
                 "max_tokens": max_tokens,
                 "response_format": {"type": "json_object"} 
             }
-            # Timeout de 28 segundos para impedir que o Render dê SIGKILL no worker
-            res_nv = requests.post(url_nv, headers=headers_nv, json=payload_nv, timeout=28)
+            res_nv = requests.post(url_nv, headers=headers_nv, json=payload_nv, timeout=25)
             if res_nv.status_code == 200:
                 return limpar_e_parsear_json(res_nv.json()['choices'][0]['message']['content'])
-            else:
-                print(f"⚠️ NVIDIA falhou (Status {res_nv.status_code})")
-        except Exception as e: 
-            print(f"Erro NVIDIA: {e}")
+        except Exception as e: pass
 
-    # 2. TENTA GROQ (Reserva 1)
+    # 2. GROQ
     if GROQ_API_KEY:
         try:
             url_groq = "https://api.groq.com/openai/v1/chat/completions"
@@ -156,7 +135,7 @@ def gerar_resposta_ia(prompt, max_tokens=1000):
                 return limpar_e_parsear_json(res_groq.json()['choices'][0]['message']['content'])
         except Exception as e: pass
 
-    # 3. TENTA GEMINI (Reserva 2)
+    # 3. GEMINI
     if GEMINI_API_KEY:
         try:
             url_gemini = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={GEMINI_API_KEY}"
@@ -178,35 +157,30 @@ def set_progresso(session_id, atual, total, finalizado, filme_atual):
     with db_lock:
         try:
             with closing(get_db()) as conn:
-                with conn:
-                    conn.execute('''INSERT OR REPLACE INTO progress (session_id, atual, total, finalizado, filme_atual)
-                                    VALUES (?, ?, ?, ?, ?)''', (session_id, atual, total, int(finalizado), filme_atual))
-        except: pass
+                with conn: conn.execute('''INSERT OR REPLACE INTO progress (session_id, atual, total, finalizado, filme_atual) VALUES (?, ?, ?, ?, ?)''', (session_id, atual, total, int(finalizado), filme_atual))
+        except Exception as e: pass
 
 def get_progresso(session_id):
     try:
         with closing(get_db()) as conn:
             row = conn.execute('SELECT * FROM progress WHERE session_id = ?', (session_id,)).fetchone()
             if row: return {"atual": row['atual'], "total": row['total'], "finalizado": bool(row['finalizado']), "filme_atual": row['filme_atual']}
-    except: pass
+    except Exception as e: pass
     return {"atual": 0, "total": 0, "finalizado": False, "filme_atual": "Aguardando..."}
 
 def salvar_sessao(session_id, vistos, amados, odiados, watchlist):
     with db_lock:
         try:
             with closing(get_db()) as conn:
-                with conn:
-                    conn.execute('''INSERT OR REPLACE INTO sessions (session_id, vistos, amados, odiados, watchlist)
-                                    VALUES (?, ?, ?, ?, ?)''', 
-                                    (session_id, json.dumps(vistos), json.dumps(amados), json.dumps(odiados), json.dumps(watchlist)))
-        except: pass
+                with conn: conn.execute('''INSERT OR REPLACE INTO sessions (session_id, vistos, amados, odiados, watchlist) VALUES (?, ?, ?, ?, ?)''', (session_id, json.dumps(vistos), json.dumps(amados), json.dumps(odiados), json.dumps(watchlist)))
+        except Exception as e: pass
 
 def carregar_sessao(session_id):
     try:
         with closing(get_db()) as conn:
             row = conn.execute('SELECT * FROM sessions WHERE session_id = ?', (session_id,)).fetchone()
             if row: return {'vistos': json.loads(row['vistos']), 'amados': json.loads(row['amados']), 'odiados': json.loads(row['odiados']), 'watchlist': json.loads(row['watchlist'])}
-    except: pass
+    except Exception as e: pass
     return None
 
 def get_cache_streamings(chave):
@@ -214,31 +188,29 @@ def get_cache_streamings(chave):
         with closing(get_db()) as conn:
             row = conn.execute('SELECT streamings FROM global_cache WHERE chave = ?', (chave,)).fetchone()
             if row: return json.loads(row['streamings'])
-    except: pass
+    except Exception as e: pass
     return None
 
 def set_cache_streamings(chave, streamings):
     with db_lock:
         try:
             with closing(get_db()) as conn:
-                with conn:
-                    conn.execute('INSERT OR REPLACE INTO global_cache (chave, streamings) VALUES (?, ?)', (chave, json.dumps(streamings)))
-        except: pass
+                with conn: conn.execute('INSERT OR REPLACE INTO global_cache (chave, streamings) VALUES (?, ?)', (chave, json.dumps(streamings)))
+        except Exception as e: pass
 
 def salvar_dados_finais(session_id, dados):
     with db_lock:
         try:
             with closing(get_db()) as conn:
-                with conn:
-                    conn.execute('INSERT OR REPLACE INTO dados_finais (session_id, dados) VALUES (?, ?)', (session_id, json.dumps(dados)))
-        except: pass
+                with conn: conn.execute('INSERT OR REPLACE INTO dados_finais (session_id, dados) VALUES (?, ?)', (session_id, json.dumps(dados)))
+        except Exception as e: pass
 
 def get_dados_finais(session_id):
     try:
         with closing(get_db()) as conn:
             row = conn.execute('SELECT dados FROM dados_finais WHERE session_id = ?', (session_id,)).fetchone()
             if row: return json.loads(row['dados'])
-    except: pass
+    except Exception as e: pass
     return {"stats": {}, "watchlist": {}}
 
 def resolve_boxd_links(links_str):
@@ -253,7 +225,7 @@ def resolve_boxd_links(links_str):
                 slug = partes[partes.index('film') + 1]
                 slug = re.sub(r'-\d{4}$', '', slug)
                 filmes.append(slug.replace('-', ' ').title())
-        except: pass
+        except Exception as e: pass
     return filmes
 
 # ==========================================
@@ -261,10 +233,8 @@ def resolve_boxd_links(links_str):
 # ==========================================
 @app.route('/api/creditos', methods=['GET'])
 def check_creditos(): return jsonify({"creditos": 999})
-
 @app.route('/api/consumir_credito', methods=['POST'])
 def consume_credito(): return jsonify({"sucesso": True, "creditos": 999})
-
 @app.route('/api/adicionar_credito', methods=['POST'])
 def add_credito(): return jsonify({"sucesso": True, "creditos": 999})
 
@@ -278,7 +248,7 @@ def tmdb_search():
     try: 
         res = requests.get(url, timeout=10)
         return jsonify(res.json()) if res.status_code == 200 else jsonify({"results": []})
-    except: return jsonify({"results": []}), 200
+    except Exception as e: return jsonify({"results": []}), 200
 
 @app.route('/')
 def index(): return render_template('index.html')
@@ -288,7 +258,7 @@ def get_frases():
     try:
         with open(ARQUIVO_FRASES, 'r', encoding='utf-8') as f:
             return jsonify([linha.strip() for linha in f.readlines() if linha.strip()])
-    except: return jsonify(["Analisando a sua curadoria..."])
+    except Exception as e: return jsonify(["Analisando a sua curadoria..."])
 
 @app.route('/progress', methods=['GET'])
 def route_get_progress(): return jsonify(get_progresso(request.args.get('session_id', 'default')))
@@ -351,44 +321,43 @@ def gerar_perfil():
     username = stats.get('username', 'Usuário')
     bio = stats.get('bio', '')
     
-    filmes_amados = stats.get('profile_favorites', []) or [f['Name'] for f in stats.get('favoritos', [])[:5]]
+    profile_favs = stats.get('profile_favorites', [])
+    favoritos_calc = [f['Name'] for f in stats.get('favoritos', [])[:5]]
+    filmes_amados = profile_favs if profile_favs else favoritos_calc
+    
     amados_recentes = stats.get('amados_recentes', [])
     odiados_recentes = stats.get('odiados_recentes', [])
     
-    prompt = f"""Atue como um psicanalista de cinema genial, sincero e bem-humorado (estilo stand-up).
-    Sua vítima é: {username}.
-    Bio do Perfil: "{bio}".
-    Filmes que ama: {', '.join(filmes_amados)}.
-    Outros que deu nota alta: {', '.join(amados_recentes)}.
-    Filmes que odeia (nota baixa): {', '.join(odiados_recentes)}.
-    Média: {stats.get('media_notas', 0)}. Total de Filmes Avaliados: {stats.get('total_avaliados', 0)}.
+    prompt = f"""Atue como um psicanalista de cinema genial, bem-humorado e 100% sincero. Você está analisando o gosto de um cinéfilo.
+    Nome: {username}.
+    Bio: "{bio}".
+    Filmes que ama: {', '.join(filmes_amados) if filmes_amados else 'Nenhum'}.
+    Odeia: {', '.join(odiados_recentes) if odiados_recentes else 'Nenhum'}.
     
-    REGRAS VITAIS (SIGA OU SERÁ PUNIDO):
-    1. LEITURA DINÂMICA: É ESTRITAMENTE PROIBIDO usar "frases infinitas" cheias de vírgulas. USE PONTOS FINAIS SEMPRE. Faça frases curtas, diretas e que soem como um comediante falando. Pare de listar os filmes, critique a "vibe" das escolhas.
-    2. PROIBIDO PUXAR O SACO: É PROIBIDO usar palavras como "refinado", "fascinante", "complexo" ou "elegante". Seja 100% sincero e aponte as ironias no gosto da pessoa, mas sem ser um "cuzão". Zombe da bio dela se for engraçada.
-    3. PERSONAGEM REFERÊNCIA: Escolha um personagem que represente a "vibe" da pessoa. REGRA: É PROIBIDO ESCOLHER PERSONAGENS DE SÉRIES DE TV. Escolha APENAS de filmes de cinema. É PROIBIDO escolher Tyler Durden, Patrick Bateman ou Coringa.
-    4. EMOJIS: Use EXCLUSIVAMENTE estes emojis espalhados pelo texto: 🙈🤓😼🥺😿😻💋🫦🔥💅👍☠️💀😢😭😞😓😔🤤🙄. NUNCA faça uma lista explicando os emojis no final.
-    5. EXPLICAÇÃO: A última frase deve justificar de forma inteligente por que o personagem de cinema escolhido representa a pessoa.
-    6. ORTOGRAFIA: Mantenha os nomes dos filmes em inglês se não souber a tradução oficial. Não invente palavras.
+    REGRAS MÁXIMAS DE TOM E ESTILO:
+    1. SEJA SINCERO E DIVERTIDO: Nada de ser um "hater" insuportável, mas também É PROIBIDO PUXAR O SACO. Não use palavras como "refinado", "fascinante" ou "sofisticado". Aja como um amigo inteligente que saca as contradições do gosto da pessoa e brinca com isso de forma natural.
+    2. LEITURA DINÂMICA: É ESTRITAMENTE PROIBIDO escrever frases longas com muitas vírgulas. Use pontos finais constantes! Máximo de 3 a 5 frases CURTAS por parágrafo.
+    3. PERSONAGEM REFERÊNCIA (LIBERDADE TOTAL): Escolha o personagem que MELHOR represente a essência desse gosto. Pode ser Animação (ex: Sr. Raposo), CGI (ex: Thanos), Mascarado (ex: Darth Vader) ou Live-Action. Tente fugir dos clichês absolutos (Tyler Durden) SE houver uma opção mais criativa, mas se for perfeito pra pessoa, pode usar. 
+    4. ZERO REPETIÇÃO: No segundo parágrafo, explique a escolha do personagem em UMA OU DUAS frases diretas. Não fique repetindo "Você é como fulano...".
+    5. EMOJIS: Use EXCLUSIVAMENTE os emojis desta lista e nenhum outro: 🙈🤓😼🥺😿😻💋🫦🔥💅👍☠️💀😢😭😞😓😔🤤🙄. Use entre 4 a 6 deles espalhados soltos pelo texto. NUNCA crie lista explicando os emojis no final, só jogue eles no meio do texto com naturalidade.
     
     Responda EXATAMENTE neste JSON:
     {{ 
-        "titulo": "Rótulo Sarcástico do Usuário", 
-        "personagem_referencia": "Nome do Personagem Famoso (Apenas de FILMES)", 
-        "filme_referencia": "Nome do Filme de Cinema", 
-        "descricao": ["Primeiro parágrafo de análise usando os dados com pontos finais.", "Segundo parágrafo finalizando a análise e justificando o personagem em frases curtas."] 
+        "titulo": "Rótulo Sarcástico (Ex: O Caçador de Cults)", 
+        "personagem_referencia": "Nome do Personagem Fictício (Ex: Sr. Raposo)", 
+        "filme_referencia": "Nome do Filme Deste Personagem", 
+        "descricao": ["Primeiro parágrafo analisando o gosto e as contradições de forma leve e pontual.", "Segundo parágrafo dando o veredito final e justificando a escolha do personagem direto ao ponto."] 
     }}"""
     
     try: 
-        dados = gerar_resposta_ia(prompt, max_tokens=1000)
-        if not dados or "titulo" not in dados: raise Exception("IA falhou")
+        dados = gerar_resposta_ia(prompt, max_tokens=800)
+        if not dados or "titulo" not in dados: raise Exception("Falha JSON")
         if isinstance(dados.get("descricao"), list): dados["descricao"] = "\n\n".join(dados["descricao"])
         return jsonify(dados)
     except Exception as e: 
-        if "RATE_LIMIT" in str(e): return jsonify({"erro": "RATE_LIMIT"})
         return jsonify({
             "titulo": "O Explorador Silencioso", 
-            "personagem_referencia": "Driver", 
+            "personagem_referencia": "Driver",
             "filme_referencia": "Drive", 
             "descricao": "O Oráculo está Meditando... 🧘‍♂️\n\nOpa desculpa pae! As IAs do servidor derreteram com tanto acesso hoje e não conseguiram traduzir seu gosto peculiar.\n\nMas ó, aproveite pra ver onde assistir sua Watchlist na aba ao lado!"
         })
@@ -407,24 +376,21 @@ def oraculo():
         
         recs_finais = []
         tentativas_ia = 0
-        api_falhou = False
 
         while len(recs_finais) < 4 and tentativas_ia < 2:
             favoritos = request.json.get('favorites', [])
             blacklist_amostra = random.sample(list(blacklist_total), min(25, len(blacklist_total)))
 
-            prompt = f"""Atue como curador obscuro. Favoritos do usuário: {favoritos}.
-            Recomende EXATAMENTE 15 filmes Lado B, Cults, estrangeiros ou esquecidos.
+            prompt = f"""Atue como curador profissional. Favoritos do usuário: {favoritos}.
+            Recomende EXATAMENTE 15 filmes Lado B, Cults, estrangeiros ou filmes obscuros de festivais.
             
             ESQUEÇA ESTES: {', '.join(blacklist_amostra)}
-            Responda APENAS JSON:
-            {{ "recomendacoes": [ {{"rec_original": "TITULO ORIGINAL", "rec": "TITULO EM PT", "ano": 2000, "base": "GENERO", "desc": "Pequena sinopse."}} ] }}"""
+            Responda APENAS em JSON estrito:
+            {{ "recomendacoes": [ {{"rec_original": "TITULO ORIGINAL", "rec": "TITULO EM PT", "ano": 2000, "base": "GENERO", "desc": "Pequena sinopse magnética."}} ] }}"""
 
             try:
                 dados_json = gerar_resposta_ia(prompt, max_tokens=1000)
                 recs_ia = dados_json.get("recomendacoes", []) if dados_json else []
-                
-                if len(recs_ia) == 0: api_falhou = True
                 
                 for r in recs_ia:
                     nome = r.get('rec', '').strip().lower()
@@ -433,26 +399,14 @@ def oraculo():
                         if nome not in [rf['rec'].lower() for rf in recs_finais]:
                             recs_finais.append(r)
                             if len(recs_finais) >= 8: break 
-            except Exception as e:
-                api_falhou = True
+            except Exception as e: pass
             
             tentativas_ia += 1
             if len(recs_finais) < 4: time.sleep(0.5)
 
-        res_payload = {"recomendacoes": recs_finais[:4]} 
-        
-        if api_falhou and len(recs_finais) == 0:
-            return jsonify({"erro": "RATE_LIMIT", "recomendacoes": []})
-            
-        if len(recs_finais) < 4 and not api_falhou:
-            res_payload["terror_mode"] = True
-            if len(recs_finais) > 0:
-                res_payload["recomendacoes"][0]["base"] = "O REAL TERROR"
-                res_payload["recomendacoes"][0]["desc"] = "Sua lista é gigantesca. O Oráculo suou sangue pra achar isso e quase desistiu. Você zerou o cinema. 💀💅"
-
-        return jsonify(res_payload)
+        return jsonify({"recomendacoes": recs_finais[:4]})
     except Exception as e:
-        return jsonify({"erro": "RATE_LIMIT", "recomendacoes": []})
+        return jsonify({"erro": "Falha", "recomendacoes": []})
 
 def processar_em_segundo_plano(watchlist_data, sid):
     dados_filmes = {}
@@ -483,7 +437,7 @@ def processar_em_segundo_plano(watchlist_data, sid):
                         if cat in br:
                             for p in br[cat]:
                                 if p['provider_name'] not in streamings: streamings.append(p['provider_name'])
-        except: pass
+        except Exception as e: pass
             
         if not streamings: streamings.append("Não disponível")
         set_cache_streamings(chave, streamings)
@@ -498,9 +452,9 @@ def processar_em_segundo_plano(watchlist_data, sid):
                     dados_filmes[chave] = st
                     atual += 1
                     set_progresso(sid, atual, total, False, chave)
-                except: pass
+                except Exception as ex: pass
         salvar_dados_finais(sid, {"stats": {}, "watchlist": dados_filmes})
-    except: salvar_dados_finais(sid, {"stats": {}, "watchlist": dados_filmes})
+    except Exception as e: salvar_dados_finais(sid, {"stats": {}, "watchlist": dados_filmes})
     finally: set_progresso(sid, total, total, True, "Finalizado!")
 
 @app.route('/process_watchlist', methods=['POST'])
@@ -522,10 +476,863 @@ def liberar_porta(porta):
             res = subprocess.run(f'lsof -t -i:{porta}', shell=True, capture_output=True, text=True)
             for p in res.stdout.strip().split('\n'):
                 if p: os.system(f'kill -9 {p}')
-    except: pass
+    except Exception as e: pass
 
 if __name__ == '__main__':
     PORTA = 5000
     liberar_porta(PORTA)
     threading.Timer(1.5, lambda: webbrowser.open(f'http://127.0.0.1:{PORTA}')).start()
     app.run(port=PORTA, debug=False, threaded=True)
+```
+
+### 2. O Frontend "Caçador de Imagens" (index.html)
+A função `fetchCharacterAvatar` agora usa a API Oficial da **Wikipedia em Inglês** (`action=query`). 
+Se for Darth Vader, a Wiki entrega a capa dele na hora. Se for um obscuro que a Wiki não achar, ele pega o pôster do filme no TMDB e recorta no círculo para ficar estiloso.
+Apague tudo e cole:
+
+```html:Scannerbox Frontend:index (1).html
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scannerboxd</title>
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2220%22 cy=%2250%22 r=%2215%22 fill=%22%2300e054%22/><circle cx=%2250%22 cy=%2250%22 r=%2215%22 fill=%22%2340bcf4%22/><circle cx=%2280%22 cy=%2250%22 r=%2215%22 fill=%22%23ff8000%22/></svg>">
+    
+    <script>
+        const twScript = document.createElement('script');
+        twScript.src = "https://cdn.tailwindcss.com";
+        document.head.appendChild(twScript);
+    </script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&family=Space+Grotesk:wght@300;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif;
+            background-color: #0f1115;
+            color: #ffffff;
+            margin: 0; padding: 0;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, .space-font { font-family: 'Space Grotesk', sans-serif !important; }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f1115; }
+        ::-webkit-scrollbar-thumb { background: rgba(64, 188, 244, 0.3); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(64, 188, 244, 0.6); }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .fluent-glass {
+            background: rgba(24, 28, 33, 0.55) !important; 
+            backdrop-filter: blur(24px) saturate(150%) !important; 
+            -webkit-backdrop-filter: blur(24px) saturate(150%) !important;
+            border: 1px solid rgba(255, 255, 255, 0.04) !important; 
+            border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05) !important; 
+            border-radius: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .fluent-glass:hover {
+            background: rgba(30, 35, 42, 0.65) !important;
+            border-color: rgba(64, 188, 244, 0.2) !important;
+        }
+
+        .bottom-nav-dot {
+            width: 12px; height: 12px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5); 
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .bottom-nav-dot.active { transform: scale(1.6); z-index: 10; box-shadow: 0 0 12px currentColor; }
+        .dot-green { background-color: #00e054; color: #00e054; }
+        .dot-blue { background-color: #40bcf4; color: #40bcf4; }
+        .dot-orange { background-color: #ff8000; color: #ff8000; }
+
+        .movie-card { aspect-ratio: 2/3; position: relative; border-radius: 12px; overflow: hidden; background: transparent; transition: border 0.3s ease; }
+        
+        .ps-trophy {
+            position: fixed; top: 24px; right: -450px; width: 320px;
+            background: rgba(20, 24, 28, 0.95); border: 1px solid rgba(64, 188, 244, 0.4); border-radius: 12px; padding: 16px;
+            display: flex; align-items: center; gap: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8), inset 0 0 15px rgba(64,188,244,0.1);
+            z-index: 100000; transition: right 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .ps-trophy.show { right: 24px; }
+        @media (max-width: 640px) {
+            .ps-trophy { width: 90%; top: auto; bottom: 24px; right: -100%; }
+            .ps-trophy.show { right: 5%; }
+        }
+    </style>
+</head>
+<body class="text-white relative w-screen h-screen overflow-x-hidden">
+
+<div id="ps-trophy" class="ps-trophy">
+    <div class="w-12 h-12 rounded-full border-2 border-[#40bcf4] shadow-[0_0_15px_rgba(64,188,244,0.5)] flex items-center justify-center shrink-0 animate-pulse text-2xl">🏆</div>
+    <div>
+        <p class="text-[#40bcf4] text-[9px] font-black uppercase tracking-widest mb-0.5">Conquista Desbloqueada</p>
+        <h4 class="text-white font-bold text-sm leading-tight mb-1">O Terror do Letterboxd 💀</h4>
+        <p class="text-[#8c9bab] text-[10px] leading-snug">Você já assistiu a tudo! O Oráculo esgotou as opções e desistiu da busca.</p>
+    </div>
+</div>
+
+<div id="hero-bg-container" class="fixed inset-0 w-full h-full z-0 bg-[#0f1115] pointer-events-none transition-opacity duration-1000">
+    <img id="hero-backdrop-img" src="https://image.tmdb.org/t/p/original/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg" class="w-full h-full object-cover opacity-40 transition-opacity duration-1000 grayscale-[40%]">
+    <div class="absolute inset-0 bg-gradient-to-b from-[#0f1115]/60 via-[#0f1115]/30 to-[#0f1115] pointer-events-none"></div>
+</div>
+
+<header class="absolute top-6 left-6 md:top-8 md:left-8 flex items-center gap-3 z-40 pointer-events-auto">
+    <div class="flex items-center gap-1.5 cursor-pointer hover:scale-105 transition-transform" onclick="location.reload()">
+        <div class="w-3 h-3 rounded-full bg-[#00e054]"></div>
+        <div class="w-3 h-3 rounded-full bg-[#40bcf4]"></div>
+        <div class="w-3 h-3 rounded-full bg-[#ff8000]"></div>
+    </div>
+    <div class="flex flex-col">
+        <h1 class="text-xl font-bold tracking-widest text-white uppercase leading-none shadow-black drop-shadow-md space-font">Scanner<span class="text-[#40bcf4]">boxd</span></h1>
+        <p class="text-[8px] text-[#8c9bab] font-bold tracking-[0.3em] uppercase drop-shadow-md mt-1">v1.0.0 Oficial</p>
+    </div>
+</header>
+
+<div id="global-loading-phrase" class="fixed top-8 md:top-10 left-1/2 transform -translate-x-1/2 z-[60] transition-opacity duration-500 opacity-0 pointer-events-none hidden">
+    <p id="funny-text" class="text-white font-bold uppercase text-[9px] md:text-[10px] tracking-widest text-center drop-shadow-md">Iniciando processos...</p>
+</div>
+
+<div id="main-content" class="absolute inset-0 w-full z-20 flex flex-col pt-[30vh] px-4 md:px-8 overflow-y-auto pb-32 transition-transform duration-700 ease-in-out pointer-events-auto">
+    <div class="max-w-2xl mx-auto w-full">
+        
+        <div class="text-center space-y-2 mb-12">
+            <h2 class="text-4xl md:text-6xl font-black text-white leading-tight tracking-tighter drop-shadow-2xl space-font">
+                QUAL É O SEU PERFIL <br>
+                <span class="italic pr-2 text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]">CINEMATOGRÁFICO?</span>
+            </h2>
+            <p class="text-[#8c9bab] max-w-xl mx-auto text-sm md:text-base font-medium drop-shadow-md">Descubra a verdade sobre o seu gosto e encontre onde assistir a sua Watchlist.</p>
+        </div>
+
+        <div class="space-y-4 relative z-30">
+            <a href="https://letterboxd.com/data/export/" target="_blank" class="fluent-glass flex items-center gap-4 px-6 py-4 w-full group hover:border-[#40bcf4]/50 pointer-events-auto cursor-pointer">
+                <span class="bg-[#40bcf4]/20 text-[#40bcf4] w-7 h-7 rounded-full flex items-center justify-center text-xs font-black shrink-0 group-hover:bg-[#40bcf4] group-hover:text-[#0f1115] transition-colors">1</span>
+                <div class="text-left">
+                    <span class="font-bold text-sm tracking-wide block text-white drop-shadow-sm">Baixar arquivo .ZIP oficial</span>
+                    <span class="text-[9px] uppercase tracking-widest text-[#8c9bab] group-hover:text-[#40bcf4] transition-colors">Abre o Letterboxd em nova aba</span>
+                </div>
+                <svg class="w-5 h-5 text-[#40bcf4] ml-auto opacity-70 group-hover:opacity-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+            </a>
+
+            <div class="fluent-glass p-8 text-center border-dashed border-2 border-[#40bcf4]/30 hover:border-[#40bcf4]/60 transition-all group relative overflow-hidden pointer-events-auto">
+                <label for="csv-file" id="dropzone-label" class="cursor-pointer block w-full h-full">
+                    <div class="w-16 h-16 bg-[#40bcf4]/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-all border border-[#40bcf4]/30 shadow-inner">
+                        <svg class="w-8 h-8 text-[#40bcf4]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z"></path></svg>
+                    </div>
+                    <p class="text-xl md:text-2xl font-bold text-white mb-1 drop-shadow-sm space-font">Arraste seu arquivo <span class="text-[#40bcf4]">.zip</span> aqui</p>
+                    <p class="text-[9px] md:text-[10px] text-[#8c9bab] uppercase tracking-widest font-bold">Nenhum dado é salvo nos servidores</p>
+                </label>
+                <input type="file" id="csv-file" class="hidden" accept=".zip" onchange="fileSelected()">
+                
+                <div id="action-area" class="hidden mt-4 flex-col items-center gap-4 relative z-10">
+                    <div class="flex items-center gap-2 bg-[#0f1115]/40 px-4 py-3 rounded-lg border border-[#40bcf4]/20 w-full justify-center shadow-inner">
+                        <svg class="w-4 h-4 text-[#40bcf4]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <p id="file-name-display" class="text-[#40bcf4] font-mono text-sm truncate max-w-[250px] drop-shadow-md"></p>
+                    </div>
+                    <button id="btn-iniciar-real" onclick="handleFileUpload()" class="w-full bg-[#40bcf4] text-[#0f1115] font-black py-4 rounded-xl uppercase tracking-widest transition-all shadow-[0_0_20px_rgba(64,188,244,0.3)] hover:shadow-[0_0_35px_rgba(64,188,244,0.6)] flex items-center justify-center gap-2 hover:scale-[1.02]">
+                        <span id="btn-text-real">Iniciar Análise</span>
+                    </button>
+                    <button onclick="resetUpload()" class="text-[10px] text-[#8c9bab] hover:text-white uppercase tracking-widest underline decoration-dashed">Escolher outro arquivo</button>
+                </div>
+            </div>
+            
+            <div class="text-center pt-6 pb-10 pointer-events-auto">
+                <button onclick="iniciarMockupTeste()" class="text-[10px] text-[#40bcf4] font-bold uppercase tracking-widest underline decoration-dashed hover:text-white transition-colors opacity-50 hover:opacity-100 cursor-pointer">
+                    🧪 Testar Layout (Modo Mock)
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="custom-toast" class="fixed bottom-10 left-1/2 transform -translate-x-1/2 fluent-glass text-[#ff8000] px-5 py-3.5 rounded-2xl shadow-[0_10px_30px_rgba(255,128,0,0.15)] z-[100000] flex items-center gap-3 transition-all duration-500 opacity-0 pointer-events-none translate-y-10 max-w-[90vw] border border-[#ff8000]/50">
+    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+    <p id="custom-toast-msg" class="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-center">Erro.</p>
+</div>
+
+<div id="app-view" class="fixed inset-0 w-full h-full z-30 opacity-0 transition-opacity duration-700 hidden">
+    
+    <div id="carousel-wrapper" class="flex w-[300vw] h-full transition-transform duration-500 ease-in-out pointer-events-auto">
+        
+        <div class="w-[100vw] h-full overflow-y-auto pb-32 pt-28 px-4 sm:px-8 flex flex-col items-center">
+            <div class="max-w-2xl w-full space-y-6">
+                <div class="fluent-glass p-8 relative flex flex-col items-center text-center">
+                    <div id="profile-avatar" class="w-20 h-20 rounded-full border-2 border-[#00e054] bg-[#0f1115] mb-6 flex items-center justify-center overflow-hidden shadow-[0_0_20px_rgba(0,224,84,0.3)] shrink-0">
+                        <svg class="w-8 h-8 text-[#2c3440]" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                    </div>
+                    
+                    <h2 class="text-2xl md:text-3xl font-black text-white tracking-tighter mb-4 leading-tight space-font" id="roast-title">
+                        Analisando gosto... <svg class="animate-spin w-5 h-5 ml-2 text-[#00e054] inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                    </h2>
+                    
+                    <p class="text-gray-300 text-[12px] md:text-[13px] leading-loose px-2 md:px-6" id="roast-desc">
+                        Aguarde. O Oráculo está dissecando a sua alma cinematográfica.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="fluent-glass p-6 text-center">
+                        <span id="stat-total" class="space-font text-3xl font-black text-white block mb-1">0</span>
+                        <p class="text-[#00e054] text-[9px] font-black uppercase tracking-widest">Avaliados</p>
+                    </div>
+                    <div class="fluent-glass p-6 text-center">
+                        <span id="stat-avg" class="space-font text-3xl font-black text-white block mb-1">0.00</span>
+                        <p class="text-[#00e054] text-[9px] font-black uppercase tracking-widest">Sua Média</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="w-[100vw] h-full overflow-y-auto pb-32 pt-28 px-4 sm:px-8">
+            <div class="max-w-4xl mx-auto">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-black text-white uppercase tracking-tighter space-font">O Oráculo</h2>
+                    <p class="text-[#40bcf4] text-[10px] font-bold tracking-widest uppercase">Escondidos no catálogo</p>
+                </div>
+
+                <div id="oracle-loading" class="flex flex-col items-center justify-center mt-20">
+                    <div class="w-14 h-14 border-2 border-[#40bcf4]/20 border-t-[#40bcf4] rounded-full animate-spin"></div>
+                    <p class="text-[#40bcf4] text-[10px] uppercase tracking-widest font-bold mt-6 animate-pulse">Escavando lado B...</p>
+                </div>
+
+                <div id="oracle-grid" class="hidden grid grid-cols-2 md:grid-cols-4 gap-4"></div>
+                
+                <div id="oracle-actions" class="hidden mt-8 flex-col sm:flex-row justify-center items-center gap-4 z-40 relative">
+                    <button onclick="abrirTutorial()" id="btn-export-desktop" class="fluent-glass px-6 py-3 text-[#40bcf4] text-[10px] font-black uppercase tracking-widest hover:bg-[#40bcf4]/20 transition-all cursor-pointer">
+                        EXPORTAR SELECIONADOS
+                    </button>
+                    <button onclick="carregarMaisSugestoes()" id="btn-descobrir-mais" class="fluent-glass px-6 py-3 text-white text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all flex items-center gap-2 cursor-pointer">
+                        <svg id="load-more-spinner" class="w-3 h-3 animate-spin hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                        Descobrir Mais
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="w-[100vw] h-full overflow-y-auto pb-32 pt-28 px-4 sm:px-8">
+            <div class="max-w-4xl mx-auto h-full flex flex-col items-center">
+                
+                <div class="text-center mb-8 shrink-0">
+                    <h2 class="text-3xl font-black text-white uppercase tracking-tighter space-font">O Catálogo</h2>
+                    <p class="text-[#ff8000] text-[10px] font-bold tracking-widest uppercase">Onde assistir sua Watchlist</p>
+                </div>
+
+                <div id="watchlist-loading" class="flex flex-col items-center justify-center mt-10 w-full max-w-lg fluent-glass p-10">
+                    <div class="w-16 h-16 rounded-full border-2 border-transparent border-t-[#ff8000] border-l-[#ff8000] animate-spin mb-6"></div>
+                    <span id="load-percent" class="space-font text-5xl font-black text-white tracking-tighter mb-4">0%</span>
+                </div>
+
+                <div id="watchlist-content" class="hidden w-full space-y-4">
+                    <div class="fluent-glass p-2 shrink-0 relative flex items-center z-50">
+                        <svg class="w-4 h-4 text-[#8c9bab] ml-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        <input type="text" id="search-input" oninput="handleSearch()" placeholder="Procurar filme..." class="w-full bg-transparent border-none text-white px-3 py-2 focus:outline-none text-sm">
+                        
+                        <button id="filter-btn-icon" onclick="toggleFilterDropdown(event)" class="text-[#ff8000] hover:text-white p-2 rounded transition-colors cursor-pointer relative">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+                            <span id="filter-active-dot" class="hidden absolute top-1 right-1 w-2 h-2 bg-[#ff8000] rounded-full border border-[#14181c]"></span>
+                        </button>
+
+                        <div id="filter-dropdown" class="hidden absolute right-0 top-[110%] w-64 fluent-glass p-2 flex flex-col gap-1 max-h-72 overflow-y-auto no-scrollbar shadow-2xl border border-[#ff8000]/30 z-[100]">
+                        </div>
+                    </div>
+                    
+                    <ul id="results" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mt-4"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex items-center justify-center gap-3">
+        <div class="bottom-nav-dot dot-green active" onclick="slideTo(0)" title="Perfil"></div>
+        <div class="bottom-nav-dot dot-blue" id="tab-oracle" onclick="slideTo(1)" title="Oráculo"></div>
+        <div class="bottom-nav-dot dot-orange" id="tab-watch" onclick="slideTo(2)" title="Watchlist"></div>
+    </div>
+</div>
+
+<div id="tutorial-modal" class="fixed inset-0 bg-[#0f1115]/90 z-[10000] hidden items-center justify-center p-4 opacity-0 transition-opacity duration-300 pointer-events-auto">
+    <div class="fluent-glass p-6 md:p-8 max-w-lg w-full relative flex flex-col shadow-2xl border border-[#40bcf4]/30">
+        <button onclick="fecharTutorial()" class="absolute top-4 right-5 text-[#8c9bab] hover:text-white text-3xl font-light cursor-pointer">&times;</button>
+        
+        <div class="text-center mb-6">
+            <h3 class="text-xl md:text-2xl font-black text-white uppercase tracking-tighter space-font">Exportar para o Letterboxd</h3>
+            <p class="text-[#8c9bab] text-xs md:text-sm mt-2">Adicione as recomendações à sua Watchlist.</p>
+        </div>
+
+        <div class="space-y-4 mb-8">
+            <div class="bg-[#14181c]/50 p-4 rounded-xl border border-white/5">
+                <h5 class="text-white font-bold text-xs uppercase tracking-widest mb-2 flex items-center gap-2">
+                    <span class="text-[#40bcf4]">1.</span> Baixe o Arquivo
+                </h5>
+                <button onclick="baixarWatchlistCompleta()" class="w-full bg-[#40bcf4] text-[#0f1115] font-black py-3 rounded-lg uppercase tracking-widest transition-all hover:bg-[#2ba8e0] text-xs shadow-md cursor-pointer">
+                    Baixar .CSV
+                </button>
+            </div>
+
+            <div class="bg-[#14181c]/50 p-4 rounded-xl border border-white/5 space-y-2">
+                <h5 class="text-white font-bold text-xs uppercase tracking-widest flex items-center gap-2">
+                    <span class="text-[#40bcf4]">2.</span> Importar no PC
+                </h5>
+                <p class="text-xs text-gray-300">Vá na sua <strong class="text-white">Watchlist</strong> no site do Letterboxd e clique em <strong class="text-white">Import films to watchlist</strong>.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let sessionId = localStorage.getItem('oraculo_session_id') || crypto.randomUUID();
+    localStorage.setItem('oraculo_session_id', sessionId);
+    let statsData = {};
+    let rawDatabase = {};
+    let oraculoRecomendacoesGlobais = []; 
+    let filmesSelecionados = new Set();
+    
+    let activeFilters = new Set();
+    let streamingCountsGlobais = {};
+
+    let fraseTimerInterval;
+    let frasesAleatorias = [];
+
+    const iconicMovies = [
+        "https://image.tmdb.org/t/p/original/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg",
+        "https://image.tmdb.org/t/p/original/nMKdUUepR0i5zn0y1T4CsSB5chy.jpg", 
+        "https://image.tmdb.org/t/p/original/suaEOtk1N1sgg2MTM7oZd2cfVp3.jpg"  
+    ];
+    let currentBgIdx = 0;
+    let bgInterval;
+
+    function startBgSlideshow() {
+        const heroImg = document.getElementById('hero-backdrop-img');
+        if (!heroImg) return;
+        bgInterval = setInterval(() => {
+            currentBgIdx = (currentBgIdx + 1) % iconicMovies.length;
+            heroImg.style.opacity = '0'; 
+            setTimeout(() => { heroImg.src = iconicMovies[currentBgIdx]; heroImg.style.opacity = '0.4'; }, 1000);
+        }, 6000);
+    }
+    document.addEventListener('DOMContentLoaded', startBgSlideshow);
+
+    fetch('/frases').then(res => res.json()).then(data => { if(data.length>0) frasesAleatorias = data; }).catch(e => {});
+
+    function iniciarCicloDeFrases() {
+        const p = document.getElementById('global-loading-phrase');
+        const t = document.getElementById('funny-text');
+        if(!p || !t) return;
+        p.classList.remove('hidden');
+        setTimeout(()=> p.classList.remove('opacity-0', 'pointer-events-none'), 50);
+
+        if(frasesAleatorias.length > 0) t.innerText = frasesAleatorias[0];
+        
+        if(fraseTimerInterval) clearInterval(fraseTimerInterval);
+        fraseTimerInterval = setInterval(() => {
+            if(frasesAleatorias.length > 0) {
+                t.style.opacity = '0';
+                setTimeout(() => {
+                    t.innerText = frasesAleatorias[Math.floor(Math.random() * frasesAleatorias.length)];
+                    t.style.opacity = '1';
+                }, 500);
+            }
+        }, 4000);
+    }
+    
+    function pararCicloDeFrases() {
+        if(fraseTimerInterval) clearInterval(fraseTimerInterval);
+        const p = document.getElementById('global-loading-phrase');
+        if(p) {
+            p.classList.add('opacity-0');
+            setTimeout(()=> p.classList.add('hidden'), 500);
+        }
+    }
+
+    function mostrarErro(mensagem) {
+        const toast = document.getElementById('custom-toast');
+        const msgEl = document.getElementById('custom-toast-msg');
+        msgEl.innerText = mensagem;
+        toast.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-10');
+        setTimeout(() => { toast.classList.add('opacity-0', 'pointer-events-none', 'translate-y-10'); }, 4000);
+    }
+
+    let currentSlide = 0;
+    const totalSlides = 3;
+    function slideTo(index) {
+        const wrapper = document.getElementById('carousel-wrapper');
+        const tabs = document.querySelectorAll('.bottom-nav-dot');
+        if (!wrapper || tabs.length === 0) return;
+        currentSlide = index;
+        wrapper.style.transform = `translateX(-${index * 100}vw)`;
+        tabs.forEach((t, i) => { t.classList.toggle('active', i === index); });
+    }
+
+    let startX = 0; let endX = 0;
+    const wrapper = document.getElementById('carousel-wrapper');
+    if (wrapper) {
+        wrapper.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, {passive: true});
+        wrapper.addEventListener('touchend', e => {
+            endX = e.changedTouches[0].clientX;
+            if(startX - endX > 50 && currentSlide < totalSlides - 1) slideTo(currentSlide + 1); 
+            if(endX - startX > 50 && currentSlide > 0) slideTo(currentSlide - 1); 
+        });
+    }
+
+    function fileSelected() {
+        const file = document.getElementById('csv-file')?.files[0];
+        if(file) {
+            document.getElementById('file-name-display').innerText = file.name;
+            document.getElementById('dropzone-label').classList.add('hidden');
+            document.getElementById('action-area').classList.remove('hidden');
+            document.getElementById('action-area').classList.add('flex');
+        }
+    }
+
+    function resetUpload() {
+        if(document.getElementById('csv-file')) document.getElementById('csv-file').value = '';
+        document.getElementById('dropzone-label').classList.remove('hidden');
+        document.getElementById('action-area').classList.add('hidden');
+        document.getElementById('action-area').classList.remove('flex');
+    }
+
+    async function handleFileUpload() {
+        const file = document.getElementById('csv-file')?.files[0];
+        if(!file) return;
+
+        const btn = document.getElementById('btn-iniciar-real');
+        btn.innerHTML = `<svg class="animate-spin w-5 h-5 text-[#0f1115]" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Lendo...`;
+        btn.disabled = true;
+
+        const fd = new FormData();
+        fd.append("file", file);
+        fd.append("session_id", sessionId);
+
+        try {
+            const res = await fetch('/upload_profile', { method: 'POST', body: fd });
+            if (!res.ok) throw new Error("Upload falhou");
+            statsData = (await res.json()).stats;
+            iniciarAppReal();
+        } catch(e) {
+            mostrarErro("Erro ao ler o ZIP. A rede bloqueou ou o arquivo tá corrompido.");
+            btn.innerHTML = `Iniciar Análise`;
+            btn.disabled = false;
+        }
+    }
+
+    function iniciarAppReal() {
+        clearInterval(bgInterval);
+        document.getElementById('hero-bg-container').classList.add('opacity-0');
+        document.getElementById('main-content').style.transform = 'translateY(-100vh)';
+        
+        setTimeout(() => {
+            document.getElementById('main-content').classList.add('hidden');
+            const appView = document.getElementById('app-view');
+            appView.classList.remove('hidden');
+            void appView.offsetWidth;
+            appView.classList.remove('opacity-0');
+            
+            document.getElementById('stat-total').innerText = statsData.total_avaliados || 0;
+            document.getElementById('stat-avg').innerText = (statsData.media_notas || 0).toFixed(2);
+
+            iniciarCicloDeFrases();
+            gerarPerfilIA();
+            iniciarFluxoWatchlist();
+            setTimeout(() => { carregarOraculo(); }, 6000); 
+        }, 700);
+    }
+
+    // O CÉREBRO DA WIKIPEDIA! Caçador de Personagens.
+    async function fetchCharacterImage(charName, movieName, id) {
+        const cont = document.getElementById(id);
+        if (!cont) return;
+
+        try {
+            const wikiRes = await fetch(`https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(charName)}|${encodeURIComponent(charName + ' (character)')}&prop=pageimages&format=json&pithumbsize=500&origin=*`);
+            const wData = await wikiRes.json();
+            let imgUrl = null;
+            if (wData.query && wData.query.pages) {
+                for (let p in wData.query.pages) {
+                    if (wData.query.pages[p].thumbnail) { 
+                        imgUrl = wData.query.pages[p].thumbnail.source; 
+                        break; 
+                    }
+                }
+            }
+
+            if (imgUrl) {
+                cont.innerHTML = `<img src="${imgUrl}" class="w-full h-full object-cover">`;
+                return;
+            }
+
+            const tmdbRes = await fetch(`/api/tmdb/search?query=${encodeURIComponent(movieName)}`);
+            const tData = await tmdbRes.json();
+            if (tData.results && tData.results.length > 0 && tData.results[0].poster_path) {
+                imgUrl = `https://image.tmdb.org/t/p/w500${tData.results[0].poster_path}`;
+                cont.innerHTML = `<img src="${imgUrl}" class="w-full h-full object-cover">`;
+            }
+        } catch(e) {}
+    }
+
+    async function fetchPosterFallback(title, year, id) {
+        try {
+            let res = await fetch(`/api/tmdb/search?query=${encodeURIComponent(title)}&year=${year}`);
+            let d = await res.json();
+            
+            if(!d.results || d.results.length === 0) {
+                res = await fetch(`/api/tmdb/search?query=${encodeURIComponent(title)}`);
+                d = await res.json();
+            }
+
+            let imgUrl = null;
+            if(d.results?.[0]?.poster_path) {
+                imgUrl = `https://image.tmdb.org/t/p/w500${d.results[0].poster_path}`;
+            } else {
+                try {
+                    let wRes = await fetch(`https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(title + ' (film)')}|${encodeURIComponent(title)}&prop=pageimages&format=json&pithumbsize=500&origin=*`);
+                    let wData = await wRes.json();
+                    let pages = wData.query.pages;
+                    for (let p in pages) {
+                        if (pages[p].thumbnail) { imgUrl = pages[p].thumbnail.source; break; }
+                    }
+                } catch(e) {}
+            }
+
+            const card = document.getElementById(id);
+            if(card) {
+                if (imgUrl) {
+                    card.insertAdjacentHTML('beforeend', `<img class="fav-poster absolute inset-0 w-full h-full object-cover z-10 transition-opacity duration-700 opacity-0" src="${imgUrl}" onload="this.style.opacity='1'">`);
+                } else {
+                    card.insertAdjacentHTML('beforeend', `<div class="absolute inset-0 w-full h-full bg-[#14181c] z-10 flex items-center justify-center p-4 text-center border-2 border-[#2c3440]"><h3 class="text-[#8c9bab] font-black uppercase tracking-widest text-sm space-font">${title}</h3></div>`);
+                }
+            }
+        } catch(e) {}
+    }
+
+    async function gerarPerfilIA() {
+        const tt=document.getElementById('roast-title'), td=document.getElementById('roast-desc');
+        try {
+            const res = await fetch('/gerar_perfil', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({stats: statsData}) });
+            if(res.ok) {
+                const data = await res.json();
+                if(data.erro === "RATE_LIMIT") throw new Error("Limit");
+                if(!data.erro) {
+                    if(tt) tt.innerHTML = data.titulo; 
+                    if(td) td.innerHTML = data.descricao.replace(/\n/g, '<br><br>'); 
+                    if(data.personagem_referencia) fetchCharacterImage(data.personagem_referencia, data.filme_referencia, 'profile-avatar');
+                    return;
+                }
+            } throw new Error();
+        } catch(e) {
+            if(tt) tt.innerHTML = "O Explorador Silencioso"; 
+            if(td) td.innerHTML = "O Oráculo está Meditando... 🧘‍♂️<br><br>Opa desculpa pae! As IAs do servidor derreteram com tanto acesso hoje e não conseguiram traduzir seu gosto peculiar.<br><br>Mas ó, aproveite pra ver onde assistir sua Watchlist na aba ao lado!";
+            fetchCharacterImage("Driver", "Drive", 'profile-avatar');
+        }
+    }
+
+    function renderizarOraculoCards(recs, startIdx) {
+        const grid = document.getElementById('oracle-grid');
+        recs.forEach((r, i) => {
+            const idx = startIdx + i;
+            const id = `oracle-card-${idx}`;
+            
+            grid.insertAdjacentHTML('beforeend', `
+                <div id="${id}" class="fluent-glass movie-card group cursor-pointer border-transparent border-2 relative overflow-hidden transition-all duration-300 hover:scale-[1.02]" onclick="toggleSelecao(${idx})">
+                    <div id="check-${idx}" class="absolute top-2 right-2 z-40 bg-[#40bcf4] text-[#14181c] rounded-full p-1 transition-all scale-0 shadow-lg">
+                        <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                    </div>
+                    
+                    <div class="absolute bottom-0 left-0 w-full p-3 z-20 text-center bg-gradient-to-t from-[#0f1115] via-[#0f1115]/80 to-transparent pointer-events-none">
+                        <span class="text-[#40bcf4] text-[8px] font-black uppercase border border-[#40bcf4]/30 px-1 py-0.5 rounded bg-[#14181c]/80">${r.base}</span>
+                        <h5 class="text-white font-bold text-[10px] sm:text-xs line-clamp-2 mt-1 drop-shadow-md">${r.rec}</h5>
+                    </div>
+
+                    <div class="absolute inset-0 bg-[#14181c]/95 z-30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col p-4 text-center justify-center items-center pointer-events-none"> 
+                        <p class="text-[10px] text-gray-300 line-clamp-6 leading-relaxed">"${r.desc}"</p>
+                        <span class="text-[8px] text-[#40bcf4] font-black mt-auto">CLIQUE P/ SELECIONAR</span> 
+                    </div>
+                </div>
+            `);
+            
+            fetchPosterFallback(r.rec, r.ano, id);
+        });
+    }
+
+    async function buscarAteQuatroIneditos(excluidos = []) {
+        const reqBody = JSON.stringify({ favorites: statsData.profile_favorites || [], exclude: excluidos });
+        try {
+            const res = await fetch(`/oraculo?session_id=${sessionId}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: reqBody });
+            const r = await res.json();
+            return { filmes: r.recomendacoes || [], terror: r.terror_mode || false, rateLimit: r.erro === "RATE_LIMIT" };
+        } catch(e) {
+            return { filmes: [], terror: false, rateLimit: true };
+        }
+    }
+
+    async function carregarOraculo() {
+        const result = await buscarAteQuatroIneditos([]);
+        const grid = document.getElementById('oracle-grid');
+        grid.innerHTML = ''; 
+
+        document.getElementById('oracle-loading').classList.add('hidden');
+        grid.classList.remove('hidden');
+        document.getElementById('oracle-actions').classList.remove('hidden');
+        document.getElementById('oracle-actions').classList.add('flex');
+
+        if (result.rateLimit && result.filmes.length === 0) {
+            grid.innerHTML = `
+                <div class="col-span-full text-center p-8 bg-[#1c2228] border border-[#2c3440] rounded-xl mx-2 shadow-lg mt-4">
+                    <div class="w-12 h-12 bg-[#40bcf4]/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-[#40bcf4]/30">
+                        <span class="text-xl">🛠️</span>
+                    </div>
+                    <h4 class="text-white font-black text-sm uppercase tracking-widest mb-3">Servidores Sobrecarregados</h4>
+                    <p class="text-[#8c9bab] text-xs leading-relaxed">
+                        Opa, desculpa pae! As IAs fritaram com o tanto de gente acessando. 💀<br><br>
+                        Mas não perde a viagem: <strong class="text-[#40bcf4]">deslize a tela pro lado e aproveite para ver onde assistir a sua Watchlist!</strong> 🍿
+                    </p>
+                </div>
+            `;
+            document.getElementById('btn-descobrir-mais').classList.add('hidden');
+            document.getElementById('btn-export-desktop').classList.add('hidden');
+            return; 
+        }
+
+        if(result.filmes.length > 0) {
+            oraculoRecomendacoesGlobais = result.filmes; 
+            filmesSelecionados.clear(); 
+            renderizarOraculoCards(result.filmes, 0);
+            
+            if (result.terror) {
+                const trophy = document.getElementById('ps-trophy');
+                if (trophy) { trophy.classList.add('show'); setTimeout(() => trophy.classList.remove('show'), 5000); }
+                document.getElementById('btn-descobrir-mais').classList.add('hidden');
+            }
+        } else if (result.terror) {
+            const trophy = document.getElementById('ps-trophy');
+            if (trophy) { trophy.classList.add('show'); setTimeout(() => trophy.classList.remove('show'), 5000); }
+            grid.innerHTML = `
+                <div class="col-span-full text-center p-8 bg-[#1c2228] border border-[#2c3440] rounded-xl mx-2 shadow-lg mt-4">
+                    <div class="w-12 h-12 bg-[#ff8000]/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-[#ff8000]/30">
+                        <span class="text-xl">🏆</span>
+                    </div>
+                    <h4 class="text-white font-black text-sm uppercase tracking-widest mb-3">Você Zerou o Cinema</h4>
+                    <p class="text-[#8c9bab] text-xs leading-relaxed">
+                        Sua lista é tão colossal que a IA não conseguiu achar obras obscuras inéditas pra você. 💀<br><br>
+                        <strong class="text-[#40bcf4]">Deslize a tela pro lado e veja onde assistir a sua Watchlist!</strong> 🍿
+                    </p>
+                </div>
+            `;
+            document.getElementById('btn-descobrir-mais').classList.add('hidden');
+            document.getElementById('btn-export-desktop').classList.add('hidden');
+        }
+    }
+
+    async function carregarMaisSugestoes() {
+        document.getElementById('load-more-spinner').classList.remove('hidden');
+        
+        const excl = [...oraculoRecomendacoesGlobais.map(x => x.rec)];
+        const result = await buscarAteQuatroIneditos(excl);
+        
+        if (result.rateLimit) {
+            mostrarErro("As APIs estão superlotadas no momento! Aguarde 1 minuto.");
+        } else {
+            if(result.filmes.length > 0) {
+                const s = oraculoRecomendacoesGlobais.length; 
+                oraculoRecomendacoesGlobais.push(...result.filmes);
+                renderizarOraculoCards(result.filmes, s);
+            }
+            
+            if (result.terror || (result.filmes.length === 0 && !result.rateLimit)) {
+                const trophy = document.getElementById('ps-trophy');
+                if (trophy && !trophy.classList.contains('show')) {
+                    trophy.classList.add('show');
+                    setTimeout(() => trophy.classList.remove('show'), 5000); 
+                }
+                document.getElementById('btn-descobrir-mais').classList.add('hidden');
+            }
+        }
+        
+        document.getElementById('load-more-spinner').classList.add('hidden');
+    }
+
+    function toggleSelecao(idx) {
+        const card = document.getElementById(`oracle-card-${idx}`);
+        const check = document.getElementById(`check-${idx}`);
+        if(filmesSelecionados.has(idx)) { 
+            filmesSelecionados.delete(idx); card.classList.remove('border-[#40bcf4]'); card.classList.add('border-transparent'); check.classList.add('scale-0'); 
+        } else { 
+            filmesSelecionados.add(idx); card.classList.add('border-[#40bcf4]'); card.classList.remove('border-transparent'); check.classList.remove('scale-0'); 
+        }
+        const txt = filmesSelecionados.size > 0 ? `EXPORTAR (${filmesSelecionados.size})` : "EXPORTAR SELECIONADOS";
+        document.getElementById('btn-export-desktop').innerText = txt;
+    }
+
+    function abrirTutorial() {
+        if(filmesSelecionados.size === 0) { mostrarErro("Selecione pelo menos um filme clicando nos cartazes!"); return; }
+        const modal = document.getElementById('tutorial-modal');
+        modal.classList.remove('hidden'); modal.classList.add('flex');
+        setTimeout(() => modal.classList.remove('opacity-0'), 50);
+    }
+    
+    function fecharTutorial() {
+        const modal = document.getElementById('tutorial-modal');
+        modal.classList.add('opacity-0');
+        setTimeout(() => { modal.classList.add('hidden'); modal.classList.remove('flex'); }, 300);
+    }
+    
+    function baixarWatchlistCompleta() {
+        let c = "Title,Year\n"; filmesSelecionados.forEach(i => { c += `"${oraculoRecomendacoesGlobais[i].rec.replace(/"/g,'""')}",${oraculoRecomendacoesGlobais[i].ano}\n`; });
+        const a = document.createElement('a'); a.href = window.URL.createObjectURL(new Blob([c], {type:'text/csv'})); a.download = "oraculo.csv"; a.click(); fecharTutorial();
+    }
+
+    async function iniciarFluxoWatchlist() {
+        try {
+            await fetch('/process_watchlist', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({session_id: sessionId}) });
+            const iv = setInterval(async () => {
+                const res = await fetch(`/progress?session_id=${sessionId}`);
+                const p = await res.json();
+                if(p.total > 0) {
+                    document.getElementById('load-percent').innerText = Math.floor((p.atual / p.total) * 100) + '%';
+                    if(p.finalizado) {
+                        clearInterval(iv); pararCicloDeFrases();
+                        document.getElementById('watchlist-loading').classList.add('hidden'); document.getElementById('watchlist-content').classList.remove('hidden');
+                        const finalRes = await fetch(`/dados?session_id=${sessionId}`);
+                        rawDatabase = (await finalRes.json()).watchlist;
+                        gerarFiltrosEWatchlist(rawDatabase);
+                    }
+                }
+            }, 2500); 
+        } catch(e) {}
+    }
+
+    function toggleFilterDropdown(event) {
+        if(event) event.stopPropagation();
+        document.getElementById('filter-dropdown').classList.toggle('hidden');
+    }
+
+    document.addEventListener('click', function(event) {
+        const dropdown = document.getElementById('filter-dropdown');
+        const btn = document.getElementById('filter-btn-icon');
+        if (dropdown && !dropdown.classList.contains('hidden')) {
+            if (!dropdown.contains(event.target) && (!btn || !btn.contains(event.target))) {
+                dropdown.classList.add('hidden');
+            }
+        }
+    });
+
+    function aplicarFiltro(plataforma, event) {
+        if(event) event.stopPropagation();
+        if (plataforma === 'Todos') {
+            activeFilters.clear();
+        } else {
+            if (activeFilters.has(plataforma)) {
+                activeFilters.delete(plataforma);
+            } else {
+                activeFilters.add(plataforma);
+            }
+        }
+        
+        const dot = document.getElementById('filter-active-dot');
+        if(activeFilters.size > 0) dot.classList.remove('hidden');
+        else dot.classList.add('hidden');
+
+        renderDropdown();
+        handleSearch(); 
+    }
+
+    function gerarFiltrosEWatchlist(db) {
+        streamingCountsGlobais = {};
+        for(const [f, streamings] of Object.entries(db)) {
+            streamings.forEach(s => { 
+                if(s !== 'Não disponível') streamingCountsGlobais[s] = (streamingCountsGlobais[s] || 0) + 1; 
+            });
+        }
+        renderDropdown();
+        handleSearch(); 
+    }
+
+    function renderDropdown() {
+        const drop = document.getElementById('filter-dropdown');
+        const isAll = activeFilters.size === 0;
+        
+        let html = `<button onclick="aplicarFiltro('Todos', event)" class="w-full text-left px-3 py-2 text-xs font-bold transition border-b border-[#ff8000]/20 mb-1 flex items-center justify-between ${isAll ? 'text-[#ff8000] bg-white/5' : 'text-white hover:bg-white/10'} cursor-pointer">
+            <span>Todas as Plataformas</span>
+            ${isAll ? `<svg class="w-3 h-3 text-[#ff8000]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>` : ''}
+        </button>`;
+
+        Object.entries(streamingCountsGlobais).sort((a,b)=>b[1]-a[1]).forEach(([n, count]) => {
+            const isActive = activeFilters.has(n);
+            html += `
+                <button onclick="aplicarFiltro('${n}', event)" class="w-full flex items-center justify-between px-3 py-2 transition text-left ${isActive ? 'bg-white/10' : 'hover:bg-white/5'} cursor-pointer">
+                    <div class="flex items-center gap-2 overflow-hidden">
+                        <div class="w-3 h-3 rounded-sm border ${isActive ? 'bg-[#ff8000] border-[#ff8000]' : 'border-gray-500'} flex items-center justify-center shrink-0">
+                            ${isActive ? `<svg class="w-2 h-2 text-[#14181c]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7"></path></svg>` : ''}
+                        </div>
+                        <span class="text-xs font-bold ${isActive ? 'text-[#ff8000]' : 'text-gray-300'} truncate">${n}</span>
+                    </div>
+                    <span class="text-[10px] ${isActive ? 'text-[#ff8000] bg-[#ff8000]/20' : 'text-gray-400 bg-white/5'} font-black px-1.5 py-0.5 rounded ml-2 shrink-0">${count}</span>
+                </button>
+            `;
+        });
+        drop.innerHTML = html;
+    }
+
+    function handleSearch() {
+        const q = document.getElementById('search-input').value.toLowerCase();
+        const res = document.getElementById('results'); res.innerHTML = '';
+        
+        for(const [filme, streamings] of Object.entries(rawDatabase)) {
+            const match = filme.match(/(.*)\s\((\d{4})\)$/);
+            const titulo = match ? match[1] : filme, ano = match ? match[2] : "";
+            
+            if (activeFilters.size > 0) {
+                const temNaPlataforma = streamings.some(s => activeFilters.has(s));
+                if (!temNaPlataforma) continue;
+            }
+
+            if (q && !titulo.toLowerCase().includes(q)) continue;
+            if (activeFilters.size === 0 && !q && streamings[0] === "Não disponível") continue;
+            
+            const plats = streamings.map(s => {
+                const isHighlight = activeFilters.size > 0 && activeFilters.has(s);
+                return `<span class="bg-[#14181c] border ${isHighlight ? 'border-[#ff8000] text-[#ff8000]' : 'border-[#ff8000]/30 text-[#ff8000]/70'} text-[8px] px-2 py-1 rounded font-black uppercase shadow-sm transition-colors">${s}</span>`;
+            }).join(' ');
+            
+            res.innerHTML += `<li class="fluent-glass p-4 border-l-4 border-l-[#ff8000] flex flex-col justify-between gap-3 hover:scale-[1.02] transition-transform"><div class="min-w-0"><span class="text-white font-bold text-sm block truncate">${titulo}</span><span class="text-[#8c9bab] text-[10px] block mt-0.5">${ano}</span></div><div class="flex gap-1.5 flex-wrap">${plats}</div></li>`;
+        }
+    }
+
+    function iniciarMockupTeste() {
+        clearInterval(bgInterval); document.getElementById('hero-bg-container').classList.add('opacity-0'); document.getElementById('main-content').style.transform = 'translateY(-100vh)';
+        setTimeout(() => {
+            document.getElementById('main-content').classList.add('hidden');
+            const appView = document.getElementById('app-view'); appView.classList.remove('hidden'); void appView.offsetWidth; appView.classList.remove('opacity-0');
+            document.getElementById('stat-total').innerText = "487"; document.getElementById('stat-avg').innerText = "4.09";
+            document.getElementById('roast-title').innerText = "O Explorador"; document.getElementById('roast-desc').innerHTML = "Você é um verdadeiro cinéfilo. 🤓🍿";
+            iniciarCicloDeFrases();
+            setTimeout(() => {
+                document.getElementById('oracle-loading').classList.add('hidden'); document.getElementById('oracle-grid').classList.remove('hidden'); document.getElementById('oracle-actions').classList.remove('hidden'); document.getElementById('oracle-actions').classList.add('flex');
+                oraculoRecomendacoesGlobais = [
+                    { rec: "Interstellar", ano: 2014, base: "Sci-Fi", desc: "Clássico espacial." }, { rec: "Fight Club", ano: 1999, base: "Drama", desc: "Clássico cult." },
+                    { rec: "Parasite", ano: 2019, base: "Thriller", desc: "Obra prima coreana." }, { rec: "The Matrix", ano: 1999, base: "Ação", desc: "Revolucionário." }
+                ];
+                renderizarOraculoCards(oraculoRecomendacoesGlobais, 0);
+            }, 2000);
+            let pct = 0; const watchInt = setInterval(() => {
+                pct += 25; document.getElementById('load-percent').innerText = pct + '%';
+                if(pct >= 100) {
+                    clearInterval(watchInt); pararCicloDeFrases();
+                    document.getElementById('watchlist-loading').classList.add('hidden'); document.getElementById('watchlist-content').classList.remove('hidden');
+                    rawDatabase = { "Clube da Luta (1999)": ["Max", "Prime Video"], "Interstellar (2014)": ["Max"] }; gerarFiltrosEWatchlist(rawDatabase);
+                }
+            }, 800);
+        }, 700);
+    }
+</script>
+</body>
+</html>
