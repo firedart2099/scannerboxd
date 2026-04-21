@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Scannerboxd</title>
     
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2220%22 cy=%2250%22 r=%2215%22 fill=%22%2300e054%22/><circle cx=%2250%22 cy=%2250%22 r=%2215%22 fill=%22%2340bcf4%22/><circle cx=%2280%22 cy=%2250%22 r=%2215%22 fill=%22%23ff8000%22/></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2220%22 cy=%2250%22 r=%2215%22 fill=%22%2300e054%22/><circle cx=%2250%22 cy=%2250%22 r=%2215%22 r=%2215%22 fill=%22%2340bcf4%22/><circle cx=%2280%22 cy=%2250%22 r=%2215%22 fill=%22%23ff8000%22/></svg>">
     
     <!-- SISTEMA ANTI-TRAVAMENTO DE FIREWALL CORPORATIVO -->
     <script>
@@ -704,36 +704,16 @@
         }, 700);
     }
 
-    // API DA WIKIPEDIA / MEDIAWIKI
-    async function fetchCharacterImage(charName, movieName) {
-        // Tenta buscar a foto da "Entidade Personagem" na Wikipedia em inglês primeiro (A mais completa)
+    async function fetchPersonagemOuAtor(atorNome) {
+        if(!atorNome) return null;
         try {
-            const query = `${charName} (${movieName})`; // Ex: Tyler Durden (Fight Club)
-            const url = `https://en.wikipedia.org/w/api.php?action=query&prop=pageimages&format=json&piprop=original&titles=${encodeURIComponent(query)}&origin=*`;
-            
-            const res = await fetch(url);
-            const data = await res.json();
-            const pages = data.query.pages;
-            const pageId = Object.keys(pages)[0];
-            
-            if (pageId !== "-1" && pages[pageId].original) {
-                return pages[pageId].original.source; // Achou a foto real do personagem!
-            }
-        } catch (e) {}
-
-        // Tenta só o nome do personagem (se for muito famoso, ex: Darth Vader)
-        try {
-            const url = `https://en.wikipedia.org/w/api.php?action=query&prop=pageimages&format=json&piprop=original&titles=${encodeURIComponent(charName)}&origin=*`;
-            const res = await fetch(url);
-            const data = await res.json();
-            const pages = data.query.pages;
-            const pageId = Object.keys(pages)[0];
-            
-            if (pageId !== "-1" && pages[pageId].original) {
-                return pages[pageId].original.source; 
+            // Busca a foto do ATOR real no TMDB (Rosto garantido de aparecer sem máscara)
+            let res = await fetch(`/api/tmdb/person?query=${encodeURIComponent(atorNome)}`);
+            let d = await res.json();
+            if(d.results && d.results.length > 0 && d.results[0].profile_path) {
+                return `https://image.tmdb.org/t/p/w500${d.results[0].profile_path}`;
             }
         } catch(e) {}
-
         return null;
     }
 
@@ -748,28 +728,15 @@
                 document.getElementById('roast-title').innerHTML = data.titulo;
                 document.getElementById('roast-desc').innerHTML = data.descricao.replace(/\n/g, '<br><br>');
                 
-                if(data.personagem_referencia) {
-                    const av = document.getElementById('profile-avatar');
-                    const fb = document.getElementById('profile-avatar-fallback');
-                    
-                    // 1. TENTA A WIKIPEDIA PARA ACHAR A FOTO DO PERSONAGEM EXATO
-                    let charImgUrl = await fetchCharacterImage(data.personagem_referencia, data.filme_referencia);
-                    
-                    if(charImgUrl) {
-                        fb.classList.add('hidden');
-                        av.innerHTML = `<img src="${charImgUrl}" class="w-full h-full object-cover absolute inset-0 rounded-full">`;
-                    } else {
-                        // 2. FALLBACK CHIQUE: O PÔSTER DO FILME CORTADO REDONDO
-                        try {
-                            const resTmdb = await fetch(`/api/tmdb/search?query=${encodeURIComponent(data.filme_referencia)}`);
-                            const tmdbData = await resTmdb.json();
-                            if(tmdbData.results && tmdbData.results.length > 0 && tmdbData.results[0].poster_path) {
-                                const posterUrl = `https://image.tmdb.org/t/p/w500${tmdbData.results[0].poster_path}`;
-                                fb.classList.add('hidden');
-                                av.innerHTML = `<img src="${posterUrl}" class="w-full h-full object-cover absolute inset-0 rounded-full" style="object-position: top;">`;
-                            }
-                        } catch(e) {}
-                    }
+                const av = document.getElementById('profile-avatar');
+                const fb = document.getElementById('profile-avatar-fallback');
+                
+                // Tenta puxar o ROSTO do ator!
+                let imgUrl = await fetchPersonagemOuAtor(data.ator_referencia);
+                
+                if(imgUrl) {
+                    fb.classList.add('hidden');
+                    av.innerHTML = `<img src="${imgUrl}" class="w-full h-full object-cover absolute inset-0 rounded-full" style="object-position: top;">`;
                 }
             } else {
                 throw new Error("Limites");
@@ -824,7 +791,7 @@
 
             if(data.recomendacoes && data.recomendacoes.length > 0) {
                 oraculoBuffer = data.recomendacoes; 
-                let batch = oraculoBuffer.splice(0, 4); 
+                let batch = oraculoBuffer.splice(0, Math.min(4, oraculoBuffer.length)); 
                 renderizarOraculoCards(batch, 0);
             }
         } catch(e) {}
@@ -833,14 +800,16 @@
     async function carregarMaisSugestoes() {
         const btnSpinner = document.getElementById('load-more-spinner');
         const btnText = document.getElementById('btn-descobrir-mais');
-        
-        if(oraculoBuffer.length > 0) {
+
+        // Se o buffer invisível ainda tem 4 filmes de estoque, ele só cospe na tela imediatamente!
+        if(oraculoBuffer.length >= 4) {
             let batch = oraculoBuffer.splice(0, 4);
             const startIdx = document.querySelectorAll('.movie-card').length;
             renderizarOraculoCards(batch, startIdx);
             return;
         }
 
+        // Se a gente esgotou o buffer, temos que ir lá no servidor buscar mais.
         btnSpinner.classList.remove('hidden');
         btnText.disabled = true;
         
@@ -852,13 +821,22 @@
             const data = await res.json();
             
             if(data.erro === "RATE_LIMIT") {
-                mostrarErro("As APIs estão superlotadas. Aguarde 1 minuto e tente novamente!");
+                // Se a API bateu no limite, mas eu tenho 2 ou 3 filmes sobrando na gaveta, eu jogo eles na tela.
+                if (oraculoBuffer.length > 0) {
+                    let batch = oraculoBuffer.splice(0, oraculoBuffer.length);
+                    renderizarOraculoCards(batch, document.querySelectorAll('.movie-card').length);
+                } else {
+                    mostrarErro("As APIs estão superlotadas. Aguarde 1 minuto e tente novamente!");
+                }
             } else if(data.recomendacoes && data.recomendacoes.length > 0) {
-                oraculoBuffer = data.recomendacoes;
-                let batch = oraculoBuffer.splice(0, 4);
-                const startIdx = document.querySelectorAll('.movie-card').length;
-                renderizarOraculoCards(batch, startIdx);
+                oraculoBuffer.push(...data.recomendacoes);
+                let batch = oraculoBuffer.splice(0, Math.min(4, oraculoBuffer.length));
+                renderizarOraculoCards(batch, document.querySelectorAll('.movie-card').length);
             } else if (data.terror_mode) {
+                if (oraculoBuffer.length > 0) {
+                    let batch = oraculoBuffer.splice(0, oraculoBuffer.length);
+                    renderizarOraculoCards(batch, document.querySelectorAll('.movie-card').length);
+                }
                 const trophy = document.getElementById('ps-trophy');
                 if (trophy) {
                     trophy.classList.add('show');
