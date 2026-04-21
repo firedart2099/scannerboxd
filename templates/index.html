@@ -64,7 +64,7 @@
             }
         }
 
-        .glass-panel:hover { border-color: rgba(64, 188, 244, 0.4); }
+        .glass-panel:hover { border-color: rgba(0, 224, 84, 0.4); }
 
         #countdown-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -118,15 +118,16 @@
 
         .profile-card-ref {
             background: var(--bg-panel);
-            border: 1px solid var(--lb-blue); 
-            border-radius: 12px;
-            padding: 20px;
+            border: 1px solid var(--lb-green); 
+            border-radius: 16px;
+            padding: 24px;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 20px;
+            text-align: center;
+            gap: 16px;
         }
-        @media (min-width: 768px) { .profile-card-ref { padding: 30px; gap: 30px; } }
-        @media (max-width: 768px) { .profile-card-ref { flex-direction: column; text-align: center; } }
+        @media (min-width: 768px) { .profile-card-ref { padding: 40px; gap: 24px; } }
 
         .animate-fade-in-fast { animation: fadeInFast 0.2s ease-out forwards; }
         @keyframes fadeInFast {
@@ -146,52 +147,66 @@
         }
         @media (min-width: 768px) { .ps-trophy { backdrop-filter: blur(10px); } }
         .ps-trophy.show { right: 24px; }
-        @media (max-width: 640px) { .ps-trophy { width: 90%; top: auto; bottom: 80px; right: -100%; } .ps-trophy.show { right: 5%; } }
+        @media (max-width: 640px) { .ps-trophy { width: 90%; top: auto; bottom: 100px; right: -100%; } .ps-trophy.show { right: 5%; } }
 
         /* CIRCULAR PROGRESS MINIMALISTA */
         .minimal-spinner {
             width: 120px; height: 120px; border-radius: 50%;
             border: 3px solid rgba(44, 52, 64, 0.5);
-            border-top-color: var(--lb-green);
+            border-top-color: var(--lb-orange);
             animation: spin 1s linear infinite;
         }
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
-        /* DOTS DE NAVEGAÇÃO CUSTOMIZADOS */
-        .nav-dot {
-            width: 44px; height: 44px; border-radius: 50%;
-            background: #14181c; border: 2px solid #2c3440;
+        /* TAB BAR INFERIOR - ESTILO LETTERBOXD */
+        .bottom-tab-bar {
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 80px;
+            background: rgba(20, 24, 28, 0.95);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border-color);
+            z-index: 1000;
             display: flex; align-items: center; justify-content: center;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative; cursor: pointer;
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.8);
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform: translateY(100%);
         }
-        .nav-dot.active { transform: scale(1.15); box-shadow: 0 0 15px rgba(0,0,0,0.5); }
-        .nav-dot.active-0 { border-color: var(--lb-blue); }
-        .nav-dot.active-1 { border-color: var(--lb-orange); }
-        .nav-dot.active-2 { border-color: var(--lb-green); }
-        
-        .nav-dot-inner { width: 10px; height: 10px; border-radius: 50%; background: #2c3440; transition: all 0.3s; }
-        .nav-dot.active-0 .nav-dot-inner, .nav-dot.ready-0 .nav-dot-inner { background: var(--lb-blue); box-shadow: 0 0 8px var(--lb-blue); }
-        .nav-dot.active-1 .nav-dot-inner, .nav-dot.ready-1 .nav-dot-inner { background: var(--lb-orange); box-shadow: 0 0 8px var(--lb-orange); }
-        .nav-dot.active-2 .nav-dot-inner, .nav-dot.ready-2 .nav-dot-inner { background: var(--lb-green); box-shadow: 0 0 8px var(--lb-green); }
+        .bottom-tab-bar.show { transform: translateY(0); }
 
-        .loading-ring {
-            position: absolute; inset: -4px; border-radius: 50%;
-            border: 2px solid transparent; animation: spin 1.5s linear infinite; opacity: 0; transition: opacity 0.3s;
+        .nav-dot-btn {
+            width: 50px; height: 50px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            position: relative; cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
-        .nav-dot.loading-1 .loading-ring { border-top-color: var(--lb-orange); opacity: 1; }
-        .nav-dot.loading-2 .loading-ring { border-top-color: var(--lb-green); opacity: 1; }
+        .nav-dot-circle {
+            width: 22px; height: 22px; border-radius: 50%;
+            transition: all 0.4s; box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+            border: 2px solid rgba(20, 24, 28, 0.5);
+        }
+        
+        .nav-dot-btn.active { transform: scale(1.4) translateY(-12px); z-index: 50 !important; }
+        .nav-dot-btn.active .nav-dot-circle { box-shadow: 0 10px 20px rgba(0,0,0,0.8); border-color: #14181c; }
+
+        .nav-dot-ring {
+            position: absolute; inset: 4px; border-radius: 50%;
+            border: 2px solid transparent; animation: spin 1.5s linear infinite;
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .nav-dot-btn.loading .nav-dot-ring { opacity: 1; }
+        .nav-dot-btn#dot-1.loading .nav-dot-ring { border-top-color: var(--lb-blue); }
+        .nav-dot-btn#dot-2.loading .nav-dot-ring { border-top-color: var(--lb-orange); }
+
     </style>
 </head>
 <body class="p-0 min-h-screen relative">
 
-<div id="custom-toast" class="fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-[#1c2228]/95 backdrop-blur-md border border-[#ff8000]/50 text-[#ff8000] px-5 py-3.5 rounded-2xl shadow-[0_10px_30px_rgba(255,128,0,0.15)] z-[100000] flex items-center gap-3 transition-all duration-500 opacity-0 pointer-events-none translate-y-10 max-w-[90vw]">
+<div id="custom-toast" class="fixed top-24 left-1/2 transform -translate-x-1/2 bg-[#1c2228]/95 backdrop-blur-md border border-[#ff8000]/50 text-[#ff8000] px-6 py-4 rounded-2xl shadow-[0_20px_40px_rgba(0,0,0,0.8)] z-[100000] flex items-center gap-3 transition-all duration-500 opacity-0 pointer-events-none -translate-y-10 max-w-[90vw]">
     <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-    <p id="custom-toast-msg" class="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-center">Erro.</p>
+    <p id="custom-toast-msg" class="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-center leading-relaxed">Erro.</p>
 </div>
 
 <div id="ps-trophy" class="ps-trophy">
-    <div class="trophy-icon">🏆</div>
+    <div class="trophy-icon text-2xl">🏆</div>
     <div>
         <p class="text-[#40bcf4] text-[9px] font-black uppercase tracking-widest mb-0.5">Conquista Desbloqueada</p>
         <h4 class="text-white font-bold text-sm leading-tight mb-1">O Terror do Letterboxd 💀</h4>
@@ -199,18 +214,18 @@
     </div>
 </div>
 
-<div class="fixed top-0 left-0 w-full h-[50vh] md:h-[80vh] -z-10 pointer-events-none">
-    <img id="hero-backdrop-img" src="" class="w-full h-full object-cover opacity-0 transition-opacity duration-500 grayscale-[20%]" style="-webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.5) 40%, rgba(0,0,0,0) 100%); mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.5) 40%, rgba(0,0,0,0) 100%);">
+<div class="fixed top-0 left-0 w-full h-[50vh] md:h-[70vh] -z-10 pointer-events-none">
+    <img id="hero-backdrop-img" src="" class="w-full h-full object-cover opacity-0 transition-opacity duration-500 grayscale-[20%]" style="-webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0) 100%); mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0) 100%);">
 </div>
 
 <div id="countdown-overlay">
     <div id="countdown-text" class="countdown-number">3</div>
 </div>
 
-<div class="absolute top-0 left-0 w-full px-4 sm:px-8 pt-4 sm:pt-8 z-30 pointer-events-none">
+<div class="absolute top-0 left-0 w-full px-4 sm:px-8 pt-6 z-50 pointer-events-none">
     <header class="max-w-5xl mx-auto flex justify-between items-start md:items-center">
-        <div class="flex items-start sm:items-center gap-2 sm:gap-4 pointer-events-auto cursor-pointer" onclick="location.reload()">
-            <div class="flex items-center gap-1.5 transition-transform mt-1.5 sm:mt-0">
+        <div class="flex items-start sm:items-center gap-2 sm:gap-4 pointer-events-auto cursor-pointer group" onclick="location.reload()">
+            <div class="flex items-center gap-1.5 transition-transform group-hover:scale-110 mt-1.5 sm:mt-0">
                 <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[#00e054]"></div>
                 <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[#40bcf4]"></div>
                 <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[#ff8000]"></div>
@@ -230,66 +245,64 @@
     </header>
 </div>
 
-<!-- PÍLULA GLOBAL DE LOADING (Fica no topo enquanto carrega coisas no fundo) -->
-<div id="global-loading-pill" class="fixed top-20 sm:top-6 left-1/2 transform -translate-x-1/2 z-[100] flex-col items-center transition-all duration-500 opacity-0 pointer-events-none hidden">
-    <div class="bg-[#1c2228]/95 backdrop-blur-md border border-[#40bcf4]/30 px-5 py-2.5 rounded-full shadow-[0_10px_30px_rgba(0,0,0,0.5)] flex items-center gap-3">
-        <svg class="animate-spin w-4 h-4 text-[#40bcf4]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-        <span id="funny-text" class="text-white text-[10px] font-bold uppercase tracking-widest">Iniciando motores...</span>
+<div id="global-loading-pill" class="fixed top-24 left-1/2 transform -translate-x-1/2 z-[100] w-11/12 max-w-md bg-[#1c2228]/95 backdrop-blur-xl border border-[#2c3440] rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.8)] p-5 flex flex-col items-center text-center transition-all duration-500 opacity-0 pointer-events-none hidden translate-y-4">
+    <div class="flex items-center gap-3 mb-2">
+        <svg class="animate-spin w-5 h-5 text-[#00e054]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+        <span id="funny-text" class="text-white text-xs font-black uppercase tracking-widest">Iniciando motores...</span>
     </div>
-    <span class="text-[8px] text-[#8c9bab] mt-2 uppercase tracking-widest font-bold bg-[#14181c]/80 px-2 py-1 rounded-md text-center max-w-[250px] leading-tight">
-        A curadoria pode demorar um pouco. <br>Deslize a tela para explorar o que já está pronto.
-    </span>
+    <p class="text-[10px] text-[#8c9bab] uppercase tracking-widest font-bold leading-relaxed max-w-[280px]">
+        O Oráculo está escavando a internet.<br>Leia seu Raio-X enquanto isso.
+    </p>
 </div>
 
-<!-- TELA INICIAL (UPLOAD) -->
-<div id="main-content" class="w-full h-screen flex flex-col justify-center px-4 sm:px-8 absolute inset-0 z-20">
-    <div class="max-w-2xl mx-auto w-full mt-10">
-        <div class="text-center space-y-3 sm:space-y-4 mb-8 sm:mb-12">
-            <h2 class="text-3xl sm:text-4xl md:text-6xl font-black text-white leading-tight tracking-tighter drop-shadow-lg">QUAL É O SEU PERFIL <br><span class="text-[#40bcf4] italic">CINEMATOGRÁFICO?</span></h2>
-            <p class="text-[#8c9bab] max-w-xl mx-auto text-sm sm:text-base md:text-lg font-medium px-2">Descubra a verdade sobre o seu gosto e encontre onde assistir a sua Watchlist.</p>
+<div id="main-content" class="w-full min-h-screen flex flex-col pt-[35vh] pb-20 px-4 sm:px-8 absolute inset-0 z-20 overflow-y-auto no-scrollbar">
+    <div class="max-w-2xl mx-auto w-full">
+        <div class="text-center space-y-4 mb-10">
+            <h2 class="text-3xl sm:text-4xl md:text-6xl font-black text-white leading-tight tracking-tighter drop-shadow-2xl">QUAL É O SEU PERFIL <br><span class="text-[#00e054] italic">CINEMATOGRÁFICO?</span></h2>
+            <p class="text-[#8c9bab] max-w-xl mx-auto text-sm sm:text-base md:text-lg font-medium px-2 drop-shadow-md">Descubra a verdade sobre o seu gosto e encontre onde assistir a sua Watchlist.</p>
         </div>
 
-        <div class="space-y-4">
+        <div class="space-y-4 relative z-30">
             <div class="flex justify-center">
-                <a href="https://letterboxd.com/data/export/" target="_blank" class="hidden sm:flex items-center gap-4 bg-[#1c2228] border border-[#2c3440] hover:border-[#40bcf4] text-[#8c9bab] hover:text-white px-6 py-4 rounded-xl transition-all w-full shadow-md group">
-                    <span class="bg-[#40bcf4]/20 text-[#40bcf4] w-6 h-6 rounded-full flex items-center justify-center text-xs font-black shrink-0 group-hover:bg-[#40bcf4] group-hover:text-[#14181c] transition-colors">1</span>
+                <a href="https://letterboxd.com/data/export/" target="_blank" class="hidden sm:flex items-center gap-4 bg-[#1c2228]/90 backdrop-blur-md border border-[#2c3440] hover:border-[#00e054] text-[#8c9bab] hover:text-white px-6 py-4 rounded-xl transition-all w-full shadow-xl group">
+                    <span class="bg-[#00e054]/20 text-[#00e054] w-6 h-6 rounded-full flex items-center justify-center text-xs font-black shrink-0 group-hover:bg-[#00e054] group-hover:text-[#14181c] transition-colors">1</span>
                     <span class="font-bold text-sm tracking-wide">Baixar arquivo .ZIP oficial</span>
-                    <svg class="w-5 h-5 text-[#40bcf4] ml-auto opacity-70 group-hover:opacity-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    <svg class="w-5 h-5 text-[#00e054] ml-auto opacity-70 group-hover:opacity-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                 </a>
-                <div class="sm:hidden w-full bg-[#1c2228] border border-[#2c3440] p-4 rounded-xl shadow-md text-left">
+                <div class="sm:hidden w-full bg-[#1c2228]/95 backdrop-blur-md border border-[#2c3440] p-4 rounded-xl shadow-xl text-left">
                     <p class="text-white text-[12px] font-bold uppercase tracking-widest mb-2 flex items-center gap-2">
-                        <span class="bg-[#40bcf4]/20 text-[#40bcf4] w-5 h-5 rounded-full flex items-center justify-center text-[9px] shrink-0">1</span>
+                        <span class="bg-[#00e054]/20 text-[#00e054] w-5 h-5 rounded-full flex items-center justify-center text-[9px] shrink-0">1</span>
                         Baixar arquivo .ZIP
                     </p>
-                    <div class="flex items-center gap-2 bg-[#14181c] p-1.5 rounded-lg border border-[#40bcf4]/30">
-                        <input type="text" id="export-link-input-main" readonly value="https://letterboxd.com/data/export/" class="flex-1 bg-transparent text-[#40bcf4] text-[10px] font-mono outline-none px-2 w-full min-w-0">
-                        <button id="copy-link-btn-main" onclick="copyMainExportLink()" class="bg-[#40bcf4] text-[#14181c] text-[10px] font-black px-3 py-2 rounded transition-colors uppercase tracking-widest shrink-0">Copiar</button>
+                    <div class="flex items-center gap-2 bg-[#14181c] p-1.5 rounded-lg border border-[#00e054]/30">
+                        <input type="text" id="export-link-input-main" readonly value="https://letterboxd.com/data/export/" class="flex-1 bg-transparent text-[#00e054] text-[10px] font-mono outline-none px-2 w-full min-w-0">
+                        <button id="copy-link-btn-main" onclick="copyMainExportLink()" class="bg-[#00e054] text-[#14181c] text-[10px] font-black px-3 py-2 rounded transition-colors uppercase tracking-widest shrink-0">Copiar</button>
                     </div>
                 </div>
             </div>
 
-            <div class="glass-panel p-6 md:p-10 text-center border-dashed border-2 border-[#2c3440] hover:border-[#40bcf4]/50 transition-all group" id="upload-container">
+            <div class="glass-panel p-6 md:p-10 text-center border-dashed border-2 border-[#2c3440] hover:border-[#00e054]/50 transition-all group bg-[#1c2228]/90 backdrop-blur-md shadow-xl" id="upload-container">
                 <label for="csv-file" id="dropzone-label" class="cursor-pointer group block">
                     <div class="flex items-center justify-center gap-2 mb-6">
                         <p class="text-white font-bold text-sm tracking-wide">Carregar no Scannerboxd</p>
                     </div>
-                    <div class="w-16 h-16 sm:w-20 sm:h-20 bg-[#40bcf4]/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform border border-[#40bcf4]/20">
-                        <svg class="w-8 h-8 sm:w-10 sm:h-10 text-[#40bcf4]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v16m8-8H4"></path></svg>
+                    <div class="w-16 h-16 sm:w-20 sm:h-20 bg-[#00e054]/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform border border-[#00e054]/20">
+                        <svg class="w-8 h-8 sm:w-10 sm:h-10 text-[#00e054]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v16m8-8H4"></path></svg>
                     </div>
                     <p class="text-lg sm:text-2xl font-bold text-white mb-2">
-                        <span class="hidden sm:inline">Arraste seu arquivo <span class="text-[#40bcf4]">.zip</span> aqui</span>
-                        <span class="sm:hidden">Selecione o arquivo <span class="text-[#40bcf4]">.zip</span></span>
+                        <span class="hidden sm:inline">Arraste seu arquivo <span class="text-[#00e054]">.zip</span> aqui</span>
+                        <span class="sm:hidden">Selecione o arquivo <span class="text-[#00e054]">.zip</span></span>
                     </p>
                     <p class="text-[9px] sm:text-[11px] text-[#8c9bab] uppercase tracking-widest font-bold">Nenhum dado é salvo nos servidores</p>
                 </label>
                 <input type="file" id="csv-file" class="hidden" accept=".zip" onchange="fileSelected()">
                 
                 <div id="action-area" class="hidden mt-4 flex-col items-center gap-4 bg-[#14181c] p-6 rounded-xl border border-[#2c3440]">
-                    <div class="flex items-center justify-center gap-2 bg-[#1c2228] border border-[#40bcf4]/30 px-4 py-2.5 rounded-lg w-full">
-                        <svg class="w-4 h-4 text-[#40bcf4] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                        <p id="file-name-display" class="text-[#40bcf4] font-mono text-xs sm:text-sm truncate"></p>
+                    <div class="flex items-center justify-center gap-2 bg-[#1c2228] border border-[#00e054]/30 px-4 py-2.5 rounded-lg w-full">
+                        <svg class="w-4 h-4 text-[#00e054] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <p id="file-name-display" class="text-[#00e054] font-mono text-xs sm:text-sm truncate"></p>
                     </div>
-                    <button id="btn-start-analysis" onclick="handleFileUpload()" class="w-full bg-gradient-to-r from-[#40bcf4] to-[#2ba8e0] text-[#14181c] font-black py-3.5 sm:py-4 px-8 rounded-xl uppercase tracking-widest transition-all shadow-lg flex items-center justify-center gap-2 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 text-xs sm:text-sm">
+                    <button id="btn-start-analysis" onclick="handleFileUpload()" class="w-full bg-gradient-to-r from-[#00e054] to-[#00b040] text-[#14181c] font-black py-3.5 sm:py-4 px-8 rounded-xl uppercase tracking-widest transition-all shadow-lg flex items-center justify-center gap-2 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 text-xs sm:text-sm">
                         <svg id="btn-spinner" class="animate-spin hidden w-5 h-5 text-[#14181c]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                         <span id="btn-text">Iniciar Análise</span>
                     </button>
@@ -300,34 +313,38 @@
     </div>
 </div>
 
-<!-- CARROSSEL DE 3 TELAS (Deslize para os lados) -->
-<div id="carousel-wrapper" class="hidden fixed inset-0 z-20 pt-20 sm:pt-28 pb-20 overflow-hidden">
+<div id="carousel-wrapper" class="hidden fixed inset-0 z-20 pt-20 sm:pt-28 pb-24 overflow-hidden">
     <div id="carousel-track" class="flex h-full w-[300vw] transition-transform duration-500 ease-out" style="transform: translateX(0%);">
         
-        <!-- TELA 1: PERFIL (AZUL) -->
+        <!-- TELA 1: PERFIL (AGORA VERDE) -->
         <div class="w-screen h-full overflow-y-auto no-scrollbar px-4 sm:px-8 pb-10">
-            <div class="max-w-3xl mx-auto space-y-6 sm:space-y-8 animate-fade-in-fast">
-                <div class="text-center flex justify-center items-center gap-2">
-                    <svg class="w-5 h-5 text-[#40bcf4]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                    <h2 id="profile-greeting" class="text-xl md:text-2xl font-bold text-[#40bcf4] tracking-tighter drop-shadow-md">O Seu Perfil de Crítico</h2>
+            <div class="max-w-3xl mx-auto animate-fade-in-fast">
+                
+                <!-- GREETING FORA DO CARD (E DESTAQUE GIGANTE) -->
+                <div class="text-center mb-8">
+                    <h2 id="profile-greeting" class="text-3xl md:text-5xl font-black text-white tracking-tighter drop-shadow-xl leading-tight">
+                        E aí!
+                    </h2>
                 </div>
 
-                <div class="profile-card-ref relative overflow-hidden shadow-xl p-5 md:p-8">
-                    <div class="w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 shrink-0 relative rounded-full border-4 border-[#40bcf4] overflow-hidden bg-[#14181c] flex items-center justify-center mx-auto md:mx-0">
+                <div class="profile-card-ref relative overflow-hidden shadow-2xl mb-6">
+                    <!-- FOTO MENOR E CENTRALIZADA -->
+                    <div class="w-16 h-16 sm:w-20 sm:h-20 shrink-0 relative rounded-full border-2 border-[#00e054] overflow-hidden bg-[#14181c] flex items-center justify-center">
                         <div id="profile-pulse-loader" class="w-full h-full bg-[#1c2228] animate-pulse absolute inset-0"></div>
                         <img id="profile-img-element" src="" loading="lazy" class="w-full h-full object-cover hidden transition-opacity duration-500 relative z-10">
                     </div>
                     
-                    <div class="flex-1 space-y-2 md:space-y-3 min-w-0 mt-4 md:mt-0">
-                        <div class="flex items-center gap-2 flex-wrap justify-center md:justify-start">
-                            <h3 id="roast-title" class="text-lg sm:text-2xl md:text-3xl font-black text-white tracking-tighter flex items-center gap-2 text-center md:text-left leading-tight">
-                                Analisando o gosto... 
-                                <svg class="animate-spin w-4 h-4 text-[#40bcf4] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                    <div class="flex-1 space-y-4 min-w-0 w-full">
+                        <div class="flex flex-col items-center justify-center gap-2">
+                            <h3 id="roast-title" class="text-xl sm:text-2xl md:text-3xl font-black text-white tracking-tighter flex items-center justify-center gap-2 text-center leading-tight">
+                                Lendo sua mente... 
+                                <svg class="animate-spin w-5 h-5 text-[#00e054] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                             </h3>
                         </div>
-                        <p id="roast-desc" class="text-gray-300 text-xs md:text-sm leading-relaxed font-light whitespace-pre-line">Processando avaliações...</p>
-                        <div class="pt-1 flex flex-col items-center md:items-start gap-2">
-                            <span id="roast-vibe" class="text-[9px] md:text-xs text-[#14181c] font-black uppercase tracking-widest bg-[#40bcf4] px-2 py-1 rounded-sm truncate max-w-full inline-block">CALCULANDO...</span>
+                        <p id="roast-desc" class="text-gray-300 text-sm md:text-base leading-relaxed font-light whitespace-pre-line text-left md:text-center px-2">Analisando milhares de avaliações...</p>
+                        
+                        <div class="pt-2 flex flex-col items-center justify-center gap-3">
+                            <span id="roast-vibe" class="text-[10px] md:text-xs text-[#14181c] font-black uppercase tracking-widest bg-[#00e054] px-3 py-1.5 rounded truncate max-w-full inline-block shadow-md">CALCULANDO...</span>
                             
                             <button id="btn-retry-profile" onclick="tentarRefazerPerfil()" class="hidden mt-2 text-[9px] sm:text-[10px] bg-[#ff8000]/10 text-[#ff8000] border border-[#ff8000]/30 px-3 py-1.5 rounded uppercase tracking-widest font-black flex items-center gap-1.5 transition-all w-fit">
                                 <svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
@@ -338,19 +355,19 @@
                 </div>
 
                 <div class="grid grid-cols-2 gap-3 sm:gap-6 pb-8">
-                    <div class="glass-panel p-4 md:p-8 text-center">
-                        <span id="stat-total" class="text-3xl sm:text-5xl font-black text-[#40bcf4] block mb-1 md:mb-2">0</span>
-                        <p class="text-[#8c9bab] text-[8px] sm:text-xs font-black uppercase tracking-widest">Avaliados</p>
+                    <div class="glass-panel p-5 md:p-8 text-center border-[#00e054]/30">
+                        <span id="stat-total" class="text-4xl sm:text-6xl font-black text-[#00e054] block mb-1 md:mb-2 drop-shadow-md">0</span>
+                        <p class="text-[#8c9bab] text-[9px] sm:text-xs font-black uppercase tracking-widest">Avaliados</p>
                     </div>
-                    <div class="glass-panel p-4 md:p-8 text-center">
-                        <span id="stat-avg" class="text-3xl sm:text-5xl font-black text-[#00e054] block mb-1 md:mb-2">0.00</span>
-                        <p class="text-[#8c9bab] text-[8px] sm:text-xs font-black uppercase tracking-widest">Média</p>
+                    <div class="glass-panel p-5 md:p-8 text-center border-[#40bcf4]/30">
+                        <span id="stat-avg" class="text-4xl sm:text-6xl font-black text-[#40bcf4] block mb-1 md:mb-2 drop-shadow-md">0.00</span>
+                        <p class="text-[#8c9bab] text-[9px] sm:text-xs font-black uppercase tracking-widest">Média</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- TELA 2: ORÁCULO (LARANJA) -->
+        <!-- TELA 2: ORÁCULO (AGORA AZUL) -->
         <div class="w-screen h-full overflow-y-auto no-scrollbar px-4 sm:px-8 pb-10 relative">
             <div class="max-w-4xl mx-auto space-y-6 animate-fade-in-fast">
                 
@@ -358,9 +375,9 @@
                 <div id="oracle-loading-overlay" class="absolute inset-0 z-30 flex flex-col items-center pt-20 bg-[#14181c]">
                     <div class="relative w-16 h-16 mb-6">
                         <div class="absolute inset-0 border-2 border-[#2c3440] rounded-full"></div>
-                        <div class="absolute inset-0 border-2 border-[#ff8000] rounded-full border-t-transparent animate-spin"></div>
+                        <div class="absolute inset-0 border-2 border-[#40bcf4] rounded-full border-t-transparent animate-spin"></div>
                     </div>
-                    <h3 class="text-[#ff8000] font-black uppercase tracking-widest text-sm mb-2">Oráculo Pensando</h3>
+                    <h3 class="text-[#40bcf4] font-black uppercase tracking-widest text-sm mb-2">Oráculo Pensando</h3>
                     <p class="text-[#8c9bab] text-xs font-medium text-center max-w-xs px-4">Procurando os filmes mais obscuros que você ainda não viu...</p>
                 </div>
 
@@ -368,12 +385,12 @@
                     <div class="flex flex-col md:flex-row items-center justify-between px-1 mb-2 gap-4 text-center md:text-left">
                         <div>
                             <div class="flex items-center justify-center md:justify-start gap-2">
-                                <svg class="w-5 h-5 text-[#ff8000] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"></path></svg>
+                                <svg class="w-5 h-5 text-[#40bcf4] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"></path></svg>
                                 <h4 class="text-white font-bold text-lg sm:text-2xl drop-shadow-md">Oráculo de Recomendações</h4>
                             </div>
-                            <p class="text-[#8c9bab] text-[10px] md:text-xs mt-1 px-2 md:px-0">Cruzamos o seu histórico. <br class="sm:hidden"><strong class="text-[#ff8000]">Toque nos cartazes para exportar.</strong></p>
+                            <p class="text-[#8c9bab] text-[10px] md:text-xs mt-1 px-2 md:px-0">Cruzamos o seu histórico. <br class="sm:hidden"><strong class="text-[#40bcf4]">Toque nos cartazes para exportar.</strong></p>
                         </div>
-                        <button id="btn-export-desktop" onclick="abrirTutorial()" class="hidden md:flex items-center gap-1.5 px-6 py-3 bg-[#ff8000]/20 text-[#ff8000] border border-[#ff8000]/50 rounded-lg font-black text-[10px] uppercase tracking-widest hover:bg-[#ff8000] hover:text-[#14181c] transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                        <button id="btn-export-desktop" onclick="abrirTutorial()" class="hidden md:flex items-center gap-1.5 px-6 py-3 bg-[#40bcf4]/20 text-[#40bcf4] border border-[#40bcf4]/50 rounded-lg font-black text-[10px] uppercase tracking-widest hover:bg-[#40bcf4] hover:text-[#14181c] transition-all disabled:opacity-50 disabled:cursor-not-allowed">
                             EXPORTAR SELECIONADOS (4)
                         </button>
                     </div>
@@ -385,12 +402,12 @@
                     <div id="oracle-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6 px-1 md:px-2"></div>
 
                     <div class="flex flex-col items-center gap-3 px-1 pb-8">
-                        <button id="btn-load-more" onclick="carregarMaisSugestoes()" class="w-full md:w-auto px-6 py-3.5 md:py-3 bg-[#1c2228] text-[#ff8000] border border-[#2c3440] rounded-xl font-black text-[10px] sm:text-xs uppercase tracking-widest transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50">
+                        <button id="btn-load-more" onclick="carregarMaisSugestoes()" class="w-full md:w-auto px-6 py-3.5 md:py-3 bg-[#1c2228] text-[#40bcf4] border border-[#2c3440] rounded-xl font-black text-[10px] sm:text-xs uppercase tracking-widest transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50">
                             <svg id="load-more-spinner" class="w-4 h-4 animate-spin hidden shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                             <svg id="load-more-icon" class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                             <span>Descobrir Mais</span>
                         </button>
-                        <button id="btn-export-mobile" onclick="abrirTutorial()" class="md:hidden w-full flex items-center justify-center gap-1.5 px-6 py-3.5 bg-[#ff8000]/20 text-[#ff8000] border border-[#ff8000]/50 rounded-xl font-black text-[10px] uppercase tracking-widest disabled:opacity-50 disabled:cursor-not-allowed">
+                        <button id="btn-export-mobile" onclick="abrirTutorial()" class="md:hidden w-full flex items-center justify-center gap-1.5 px-6 py-3.5 bg-[#40bcf4]/20 text-[#40bcf4] border border-[#40bcf4]/50 rounded-xl font-black text-[10px] uppercase tracking-widest disabled:opacity-50 disabled:cursor-not-allowed">
                             EXPORTAR SELECIONADOS (4)
                         </button>
                     </div>
@@ -398,7 +415,7 @@
             </div>
         </div>
 
-        <!-- TELA 3: WATCHLIST / STREAMING (VERDE) -->
+        <!-- TELA 3: WATCHLIST / STREAMING (AGORA LARANJA) -->
         <div class="w-screen h-full overflow-y-auto no-scrollbar px-4 sm:px-8 pb-10 relative">
             <div class="max-w-5xl mx-auto space-y-6 animate-fade-in-fast h-full">
                 
@@ -413,22 +430,22 @@
 
                 <div id="watchlist-content" class="hidden flex-col space-y-6 md:space-y-10 pb-8">
                     <div class="text-center pt-2">
-                        <h2 class="text-3xl md:text-5xl font-black text-white tracking-tighter uppercase mb-1 drop-shadow-lg">A Sua <span class="text-[#00e054]">Watchlist</span></h2>
+                        <h2 class="text-3xl md:text-5xl font-black text-white tracking-tighter uppercase mb-1 drop-shadow-lg">A Sua <span class="text-[#ff8000]">Watchlist</span></h2>
                         <p class="text-[#8c9bab] font-bold uppercase tracking-widest text-[9px] md:text-xs">Pronta para dar play</p>
                     </div>
 
                     <div id="dynamic-podium" class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8"></div>
 
-                    <div class="glass-panel p-4 md:p-8 space-y-4 md:space-y-6 mt-4">
+                    <div class="glass-panel p-4 md:p-8 space-y-4 md:space-y-6 mt-4 border-[#ff8000]/20">
                         <div class="flex flex-col md:flex-row items-center justify-between gap-4">
                             <div class="flex items-center gap-3 w-full md:w-auto">
-                                <span class="text-[#00e054] bg-[#00e054]/10 p-2.5 rounded-xl border border-[#00e054]/20 shrink-0">
+                                <span class="text-[#ff8000] bg-[#ff8000]/10 p-2.5 rounded-xl border border-[#ff8000]/20 shrink-0">
                                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                                 </span>
                                 <h3 class="text-white font-bold text-base md:text-xl tracking-tighter uppercase truncate">O Catálogo</h3>
                             </div>
                             <div class="w-full md:w-1/3 relative shrink-0">
-                                <input type="text" id="search-input" oninput="handleSearch()" placeholder="Procurar filme..." class="w-full bg-[#14181c] border border-[#2c3440] text-white pl-4 pr-10 py-2.5 rounded-xl focus:outline-none focus:border-[#00e054] text-xs sm:text-sm">
+                                <input type="text" id="search-input" oninput="handleSearch()" placeholder="Procurar filme..." class="w-full bg-[#14181c] border border-[#2c3440] text-white pl-4 pr-10 py-2.5 rounded-xl focus:outline-none focus:border-[#ff8000] text-xs sm:text-sm">
                                 <svg class="w-4 h-4 absolute right-3 top-3 text-[#8c9bab]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                             </div>
                         </div>
@@ -443,7 +460,7 @@
                         <div class="flex justify-between items-center bg-[#1c2228] p-3 sm:p-6 rounded-xl border border-[#2c3440] gap-3 flex-col sm:flex-row">
                             <div class="flex items-center gap-2 min-w-0 w-full justify-between sm:justify-start">
                                 <h3 class="text-white font-bold text-sm sm:text-xl tracking-tighter uppercase truncate">Resultados</h3>
-                                <span id="movie-counter" class="bg-[#14181c] px-2 py-1 rounded text-[9px] font-black text-[#00e054] border border-[#00e054]/20 shrink-0">0 FILMES</span>
+                                <span id="movie-counter" class="bg-[#14181c] px-2 py-1 rounded text-[9px] font-black text-[#ff8000] border border-[#ff8000]/20 shrink-0">0 FILMES</span>
                             </div>
                         </div>
                         <ul id="results" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></ul>
@@ -454,25 +471,26 @@
     </div>
 </div>
 
-<!-- BOLINHAS DE NAVEGAÇÃO INFERIOR -->
-<div id="bottom-nav-dots" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-[#1c2228]/80 backdrop-blur-lg border border-[#2c3440] px-5 py-3 rounded-full gap-5 z-50 transition-all duration-500 opacity-0 pointer-events-none hidden shadow-[0_10px_40px_rgba(0,0,0,0.8)]">
-    
-    <button id="dot-0" onclick="goToSlide(0)" class="nav-dot active active-0 ready-0">
-        <div class="nav-dot-inner"></div>
-    </button>
-
-    <button id="dot-1" onclick="goToSlide(1)" class="nav-dot loading-1">
-        <div class="loading-ring"></div>
-        <div class="nav-dot-inner"></div>
-    </button>
-
-    <button id="dot-2" onclick="goToSlide(2)" class="nav-dot loading-2">
-        <div class="loading-ring"></div>
-        <div class="nav-dot-inner"></div>
-    </button>
+<div id="bottom-tab-bar" class="bottom-tab-bar">
+    <div class="flex items-center relative">
+        <!-- Dot 0: Perfil (Verde) -->
+        <button id="dot-0" onclick="goToSlide(0)" class="nav-dot-btn group z-10 active ready-0">
+            <div class="nav-dot-circle bg-[#00e054]"></div>
+            <div class="nav-dot-ring border-t-[#00e054]"></div>
+        </button>
+        <!-- Dot 1: Oráculo (Azul) - Sobrepõe a Verde -->
+        <button id="dot-1" onclick="goToSlide(1)" class="nav-dot-btn group z-20 -ml-4 loading">
+            <div class="nav-dot-circle bg-[#40bcf4]"></div>
+            <div class="nav-dot-ring border-t-[#40bcf4]"></div>
+        </button>
+        <!-- Dot 2: Watchlist (Laranja) - Sobrepõe a Azul -->
+        <button id="dot-2" onclick="goToSlide(2)" class="nav-dot-btn group z-30 -ml-4 loading">
+            <div class="nav-dot-circle bg-[#ff8000]"></div>
+            <div class="nav-dot-ring border-t-[#ff8000]"></div>
+        </button>
+    </div>
 </div>
 
-<!-- MODAIS DE TUTORIAL E DOAÇÃO (Mantidos exatamente iguais) -->
 <div id="tutorial-modal" class="fixed inset-0 bg-[#14181c]/90 z-[10000] hidden items-center justify-center backdrop-blur-sm p-4">
     <div class="bg-[#1c2228] border border-[#40bcf4]/30 rounded-2xl p-6 md:p-8 max-w-lg w-full shadow-2xl relative animate-fade-in-fast max-h-[90vh] flex flex-col">
         <button onclick="fecharTutorial()" class="absolute top-4 right-5 text-[#8c9bab] hover:text-white text-3xl font-light z-10">&times;</button>
@@ -555,11 +573,7 @@
         { Name: "The Dark Knight", Year: 2008, backdrop: "https://image.tmdb.org/t/p/original/nMKdUUepR0i5zn0y1T4CsSB5chy.jpg" },
         { Name: "Spirited Away", Year: 2001, backdrop: "https://image.tmdb.org/t/p/original/2w11gS27aB60hZ1yDk8nO8J1O1O.jpg" },
         { Name: "Pulp Fiction", Year: 1994, backdrop: "https://image.tmdb.org/t/p/original/suaEOtk1N1sgg2MTM7oZd2cfVp3.jpg" },
-        { Name: "Everything Everywhere All at Once", Year: 2022, backdrop: "https://image.tmdb.org/t/p/original/wPU78OPN4BYEgWYdXy7wMqwqFDb.jpg" },
-        { Name: "The Matrix", Year: 1999, backdrop: "https://image.tmdb.org/t/p/original/ncEsesgOJDNrTUED89hYbA117wo.jpg" },
-        { Name: "Blade Runner 2049", Year: 2017, backdrop: "https://image.tmdb.org/t/p/original/ilRyazdndIGMqWhH2tYdK0mHihM.jpg" },
-        { Name: "Goodfellas", Year: 1990, backdrop: "https://image.tmdb.org/t/p/original/sw7mordbZxgITU877yTpZCud90M.jpg" },
-        { Name: "Inception", Year: 2010, backdrop: "https://image.tmdb.org/t/p/original/8ZTVqvKDQ8emSGUEMjsS4yHAwrp.jpg" }
+        { Name: "Everything Everywhere All at Once", Year: 2022, backdrop: "https://image.tmdb.org/t/p/original/wPU78OPN4BYEgWYdXy7wMqwqFDb.jpg" }
     ];
     let currentIconicIdx = Math.floor(Math.random() * iconicMovies.length);
 
@@ -567,16 +581,16 @@
         const toast = document.getElementById('custom-toast');
         const msgEl = document.getElementById('custom-toast-msg');
         msgEl.innerText = mensagem;
-        toast.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-10');
-        setTimeout(() => toast.classList.add('opacity-0', 'pointer-events-none', 'translate-y-10'), 4000);
+        toast.classList.remove('opacity-0', 'pointer-events-none', '-translate-y-10');
+        setTimeout(() => toast.classList.add('opacity-0', 'pointer-events-none', '-translate-y-10'), 4000);
     }
 
     function copyMainExportLink() {
         const input = document.getElementById('export-link-input-main');
         input.select(); document.execCommand('copy');
         const btn = document.getElementById('copy-link-btn-main');
-        btn.innerText = 'Copiado! Cole no Navegador'; btn.classList.add('bg-[#00e054]'); btn.classList.remove('bg-[#40bcf4]');
-        setTimeout(() => { btn.innerText = 'Copiar'; btn.classList.remove('bg-[#00e054]'); btn.classList.add('bg-[#40bcf4]'); }, 4000);
+        btn.innerText = 'Copiado! Cole no Navegador'; btn.classList.add('bg-[#14181c]', 'text-[#00e054]'); btn.classList.remove('bg-[#00e054]', 'text-[#14181c]');
+        setTimeout(() => { btn.innerText = 'Copiar'; btn.classList.remove('bg-[#14181c]', 'text-[#00e054]'); btn.classList.add('bg-[#00e054]', 'text-[#14181c]'); }, 4000);
     }
 
     const updateSlideInfo = (movie) => {
@@ -594,35 +608,32 @@
         const heroImg = document.getElementById('hero-backdrop-img'); const slideInfo = document.getElementById('slideshow-info');
         if (!heroImg) return;
         const startMovie = iconicMovies[currentIconicIdx]; heroImg.src = startMovie.backdrop; updateSlideInfo(startMovie);
-        heroImg.onload = () => { heroImg.style.opacity = '0.3'; if(slideInfo) slideInfo.style.opacity = '1'; };
+        heroImg.onload = () => { heroImg.style.opacity = '0.4'; if(slideInfo) slideInfo.style.opacity = '1'; };
         initialBackdropInterval = setInterval(() => {
             currentIconicIdx = (currentIconicIdx + 1) % iconicMovies.length; const nextMovie = iconicMovies[currentIconicIdx];
             const tempImg = new Image();
             tempImg.onload = () => {
                 heroImg.style.opacity = '0'; if(slideInfo) slideInfo.style.opacity = '0';
-                setTimeout(() => { heroImg.src = nextMovie.backdrop; updateSlideInfo(nextMovie); heroImg.style.opacity = '0.3'; if(slideInfo) slideInfo.style.opacity = '1'; }, 500);
+                setTimeout(() => { heroImg.src = nextMovie.backdrop; updateSlideInfo(nextMovie); heroImg.style.opacity = '0.4'; if(slideInfo) slideInfo.style.opacity = '1'; }, 500);
             };
             tempImg.src = nextMovie.backdrop;
         }, 5000);
     }
     document.addEventListener('DOMContentLoaded', startInitialSlideshow);
 
-    // LOGICA DO CARROSSEL E BOLINHAS
     function goToSlide(index) {
         currentSlideIndex = index;
         const track = document.getElementById('carousel-track');
         track.style.transform = `translateX(-${index * 33.333}%)`;
         
-        // Atualiza estilo visual das bolinhas
         for(let i=0; i<3; i++) {
             const dot = document.getElementById(`dot-${i}`);
-            dot.classList.remove('active', 'active-0', 'active-1', 'active-2');
+            dot.classList.remove('active');
         }
         const activeDot = document.getElementById(`dot-${index}`);
-        activeDot.classList.add('active', `active-${index}`);
+        activeDot.classList.add('active');
     }
 
-    // Gestos de Deslizar (Swipe) para Mobile
     let touchStartX = 0; let touchEndX = 0;
     document.getElementById('carousel-wrapper').addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, {passive: true});
     document.getElementById('carousel-wrapper').addEventListener('touchend', e => { 
@@ -632,16 +643,16 @@
 
     function handleSwipe() {
         const diff = touchStartX - touchEndX;
-        if (Math.abs(diff) > 50) { // Tolerância de arrasto
-            if (diff > 0 && currentSlideIndex < 2) goToSlide(currentSlideIndex + 1); // Desliza pra esquerda -> Próximo
-            else if (diff < 0 && currentSlideIndex > 0) goToSlide(currentSlideIndex - 1); // Desliza pra direita -> Anterior
+        if (Math.abs(diff) > 50) { 
+            if (diff > 0 && currentSlideIndex < 2) goToSlide(currentSlideIndex + 1); 
+            else if (diff < 0 && currentSlideIndex > 0) goToSlide(currentSlideIndex - 1); 
         }
     }
 
     function checkGlobalLoadingState() {
         if(isOracleReady && isWatchlistReady) {
             pararCicloDeFrases();
-            document.getElementById('global-loading-pill').classList.add('opacity-0', 'pointer-events-none', '-translate-y-4');
+            document.getElementById('global-loading-pill').classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
         }
     }
 
@@ -663,7 +674,7 @@
     function iniciarCicloDeFrases() {
         const t = document.getElementById('funny-text'); const pill = document.getElementById('global-loading-pill');
         if(!t || !pill) return;
-        pill.classList.remove('hidden', 'opacity-0', 'pointer-events-none');
+        pill.classList.remove('hidden', 'opacity-0', 'pointer-events-none', 'translate-y-4');
         
         if(frasesAleatorias.length > 0) t.innerText = frasesAleatorias[0];
         if(fraseTimerInterval) clearInterval(fraseTimerInterval);
@@ -723,21 +734,17 @@
             await consumirCredito();
             
             countdown("INICIANDO MOTOR...", () => {
-                // Esconde Main, Mostra Carrossel
                 document.getElementById('main-content')?.classList.add('hidden');
                 document.getElementById('carousel-wrapper')?.classList.remove('hidden');
                 
-                // Exibe as Bolinhas e a Pílula do Topo
-                document.getElementById('bottom-nav-dots').classList.remove('hidden');
-                setTimeout(()=> document.getElementById('bottom-nav-dots').classList.remove('opacity-0', 'pointer-events-none'), 100);
+                document.getElementById('bottom-tab-bar').classList.add('show');
                 iniciarCicloDeFrases();
                 
-                goToSlide(0); // Força tela inicial (Perfil)
+                goToSlide(0); 
                 
-                exibirRaioX(); // Perfil -> Dispara na hora
-                iniciarFluxoWatchlist(); // Watchlist -> Trabalha no fundo
+                exibirRaioX(); 
+                iniciarFluxoWatchlist(); 
                 
-                // Oráculo -> Efeito cascata para não engarrafar a API
                 setTimeout(() => { carregarOraculo(); }, 6000);
             });
         } catch(e) { 
@@ -751,7 +758,7 @@
         document.getElementById('stat-avg').innerText = (statsData?.media_notas || 0).toFixed(2);
         
         const greeting = document.getElementById('profile-greeting');
-        if (greeting && statsData.username) greeting.innerHTML = `E aí, <span class="text-white">${statsData.username}</span>! O Seu Perfil:`;
+        if (greeting && statsData.username) greeting.innerHTML = `E aí, <span class="text-[#00e054]">${statsData.username}</span>!`;
         
         gerarPerfilIA();
 
@@ -782,7 +789,7 @@
                     setTimeout(() => {
                         if(heroImg) heroImg.src = validSlides[0].url;
                         if (slideInfo) updateSlideInfo(validSlides[0].movie);
-                        if(heroImg) heroImg.onload = () => { heroImg.style.opacity = '0.4'; if(slideInfo) slideInfo.style.opacity = '1'; };
+                        if(heroImg) heroImg.onload = () => { heroImg.style.opacity = '0.5'; if(slideInfo) slideInfo.style.opacity = '1'; };
                     }, 500);
 
                     if (validSlides.length > 1) {
@@ -793,7 +800,7 @@
                                 if(heroImg) heroImg.style.opacity = '0'; if(slideInfo) slideInfo.style.opacity = '0';
                                 setTimeout(() => {
                                     if(heroImg) heroImg.src = nextSlide.url; if(slideInfo) updateSlideInfo(nextSlide.movie); currentIdx = nextIdx;
-                                    if(heroImg) heroImg.style.opacity = '0.4'; if(slideInfo) slideInfo.style.opacity = '1';
+                                    if(heroImg) heroImg.style.opacity = '0.5'; if(slideInfo) slideInfo.style.opacity = '1';
                                 }, 500);
                             };
                             tempImg.onerror = () => { currentIdx = nextIdx; }; tempImg.src = nextSlide.url;
@@ -811,7 +818,7 @@
 
         if (retryBtn) retryBtn.classList.add('hidden');
         ti?.classList.add('hidden'); pl?.classList.remove('hidden');
-        if(tt) tt.innerHTML = `Analisando gosto... <svg class="animate-spin w-4 h-4 ml-1 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>`;
+        if(tt) tt.innerHTML = `Lendo sua mente... <svg class="animate-spin w-5 h-5 shrink-0 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>`;
         
         try {
             const res = await fetch('/gerar_perfil', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({stats: statsData}) });
@@ -841,15 +848,15 @@
     function ativarCooldownRetry() {
         const btn = document.getElementById('btn-retry-profile'), textSpan = document.getElementById('retry-btn-text');
         if (!btn || !textSpan) return;
-        btn.classList.remove('hidden'); btn.disabled = true; btn.classList.add('opacity-50', 'cursor-not-allowed', 'hover:bg-[#ff8000]/10', 'hover:text-[#ff8000]');
+        btn.classList.remove('hidden'); btn.disabled = true; btn.classList.add('opacity-50', 'cursor-not-allowed', 'hover:bg-[#00e054]/10', 'hover:text-[#00e054]');
         let timeLeft = 60; textSpan.innerText = `Aguarde ${timeLeft}s...`;
         if (retryProfileInterval) clearInterval(retryProfileInterval);
         retryProfileInterval = setInterval(() => {
             timeLeft--; textSpan.innerText = `Aguarde ${timeLeft}s...`;
             if (timeLeft <= 0) {
                 clearInterval(retryProfileInterval); btn.disabled = false;
-                btn.classList.remove('opacity-50', 'cursor-not-allowed', 'hover:bg-[#ff8000]/10', 'hover:text-[#ff8000]');
-                btn.classList.add('hover:bg-[#ff8000]', 'hover:text-[#14181c]'); textSpan.innerText = "Refazer Análise";
+                btn.classList.remove('opacity-50', 'cursor-not-allowed', 'hover:bg-[#00e054]/10', 'hover:text-[#00e054]');
+                btn.classList.add('hover:bg-[#00e054]', 'hover:text-[#14181c]'); textSpan.innerText = "Refazer Análise";
             }
         }, 1000);
     }
@@ -857,8 +864,8 @@
 
     async function carregarOraculo() {
         const f = await buscarAteQuatroIneditos();
-        document.getElementById('oracle-loading-overlay').classList.add('hidden'); // Esconde loading central do oraculo
-        document.getElementById('oracle-content').classList.remove('hidden'); // Mostra a grid do oraculo
+        document.getElementById('oracle-loading-overlay').classList.add('hidden'); 
+        document.getElementById('oracle-content').classList.remove('hidden'); 
         document.getElementById('oracle-content').classList.add('flex');
         
         const grid = document.getElementById('oracle-grid');
@@ -867,13 +874,11 @@
             oraculoRecomendacoesGlobais = f; f.forEach((_,i)=>filmesSelecionados.add(i));
             renderizarOraculoCards(f, 0);
         } else {
-            grid.innerHTML = `<div class="col-span-full text-center p-6 bg-[#ff8000]/10 border border-[#ff8000]/30 rounded-xl mx-2"><p class="text-[#ff8000] text-xs font-bold leading-relaxed">Oráculo engarrafado 💀.<br>Tente novamente mais tarde.</p></div>`;
+            grid.innerHTML = `<div class="col-span-full text-center p-6 bg-[#40bcf4]/10 border border-[#40bcf4]/30 rounded-xl mx-2"><p class="text-[#40bcf4] text-xs font-bold leading-relaxed">Oráculo engarrafado 💀.<br>Tente novamente mais tarde.</p></div>`;
         }
         
-        // Finaliza o estado da bolinha Laranja
         isOracleReady = true;
-        document.getElementById('dot-1').classList.remove('loading-1');
-        document.getElementById('dot-1').classList.add('ready-1');
+        document.getElementById('dot-1').classList.remove('loading');
         checkGlobalLoadingState();
     }
 
@@ -932,11 +937,11 @@
                     <div id="check-${idx}" class="absolute top-2 right-2 z-40 bg-[#40bcf4] text-[#14181c] rounded-full p-1 transition-all"><svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg></div>
                     <img class="fav-poster absolute inset-0 w-full h-full object-cover z-10" src="" loading="lazy">
                     <div class="card-info z-20 pb-2 px-2 sm:pb-3 sm:px-3">
-                        <span class="text-[#ff8000] text-[7px] sm:text-[8px] font-black uppercase bg-[#14181c]/90 px-1 py-0.5 rounded inline-block truncate max-w-full mb-1 border border-[#ff8000]/30">${r.base}</span>
+                        <span class="text-[#40bcf4] text-[7px] sm:text-[8px] font-black uppercase bg-[#14181c]/90 px-1 py-0.5 rounded inline-block truncate max-w-full mb-1 border border-[#40bcf4]/30">${r.base}</span>
                         <h5 class="text-white font-bold text-[10px] sm:text-xs line-clamp-2 leading-tight drop-shadow-md">${r.rec}</h5>
                     </div>
                     <div class="absolute inset-0 bg-[#14181c]/95 z-30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col p-3 sm:p-4 text-center justify-center items-center"> 
-                        <svg class="w-6 h-6 sm:w-8 sm:h-8 mb-1.5 sm:mb-2 text-[#ff8000] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                        <svg class="w-6 h-6 sm:w-8 sm:h-8 mb-1.5 sm:mb-2 text-[#40bcf4] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                         <div class="w-full flex-1 overflow-y-auto no-scrollbar flex flex-col justify-center items-center mb-1">
                             <p class="text-[9px] sm:text-[11px] text-gray-300 leading-snug sm:leading-relaxed line-clamp-6">"${r.desc}"</p>
                         </div>
@@ -963,7 +968,6 @@
 
     function abrirTutorial() { document.getElementById('tutorial-modal').classList.remove('hidden'); document.getElementById('tutorial-modal').classList.add('flex'); }
     function fecharTutorial() { document.getElementById('tutorial-modal').classList.add('hidden'); document.getElementById('tutorial-modal').classList.remove('flex'); }
-    function toggleImportTutorial() { document.getElementById('import-tutorial').classList.toggle('hidden'); }
     function baixarWatchlistCompleta() {
         let c = "Title,Year\n"; filmesSelecionados.forEach(i => { c += `"${oraculoRecomendacoesGlobais[i].rec.replace(/"/g,'""')}",${oraculoRecomendacoesGlobais[i].ano}\n`; });
         const a = document.createElement('a'); a.href = window.URL.createObjectURL(new Blob([c], {type:'text/csv'})); a.download = "oraculo.csv"; a.click(); fecharTutorial();
@@ -1016,10 +1020,8 @@
                             }
                         } catch(e) {}
                         
-                        // Finaliza o estado da bolinha Verde
                         isWatchlistReady = true;
-                        document.getElementById('dot-2').classList.remove('loading-2');
-                        document.getElementById('dot-2').classList.add('ready-2');
+                        document.getElementById('dot-2').classList.remove('loading');
                         checkGlobalLoadingState();
                     }
                 }
@@ -1061,9 +1063,9 @@
         const srt = Object.entries(c).sort((a,b)=>b[1]-a[1]);
         
         document.getElementById('dynamic-podium').innerHTML = srt.slice(0,2).map((x,i) => `
-            <div class="glass-panel p-6 text-center border-[#00e054]/20 relative">
-                <div class="absolute top-0 left-0 w-full h-1 bg-[#00e054]"></div>
-                <h3 class="text-[#00e054] font-black text-[9px] uppercase mb-2">${i+1}º Recomendação</h3>
+            <div class="glass-panel p-6 text-center border-[#ff8000]/20 relative">
+                <div class="absolute top-0 left-0 w-full h-1 bg-[#ff8000]"></div>
+                <h3 class="text-[#ff8000] font-black text-[9px] uppercase mb-2">${i+1}º Recomendação</h3>
                 <h1 class="font-black text-2xl text-white mb-1 truncate">${x[0].toUpperCase()}</h1>
                 <p class="text-[#8c9bab] font-bold uppercase text-[10px]">${x[1]} Filmes</p>
             </div>
@@ -1090,8 +1092,8 @@
     function renderMovies() {
         const q = document.getElementById('search-input').value.toLowerCase();
         document.querySelectorAll('.filter-btn').forEach(b => {
-            b.classList.remove('border-[#00e054]');
-            if((activePlatformFilters.size===0 && b.innerText==='Todos') || activePlatformFilters.has(b.getAttribute('data-platform'))) b.classList.add('border-[#00e054]');
+            b.classList.remove('border-[#ff8000]');
+            if((activePlatformFilters.size===0 && b.innerText==='Todos') || activePlatformFilters.has(b.getAttribute('data-platform'))) b.classList.add('border-[#ff8000]');
         });
 
         let html = '', count = 0;
@@ -1103,7 +1105,7 @@
             
             count++; 
             html += `
-                <li class="glass-panel p-3.5 flex flex-col border-l-2 border-l-[#00e054] gap-2 h-full"> 
+                <li class="glass-panel p-3.5 flex flex-col border-l-2 border-l-[#ff8000] gap-2 h-full"> 
                     <div class="w-full">
                         <span class="text-white font-bold text-sm leading-tight line-clamp-2" title="${t}">${t}</span>
                         <span class="text-[10px] text-[#8c9bab] block mt-1">${y}</span>
