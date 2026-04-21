@@ -407,7 +407,7 @@ def gerar_perfil():
     amados_recentes = stats.get('amados_recentes', [])
     odiados_recentes = stats.get('odiados_recentes', [])
     
-    prompt = f"""Atue como um psicanalista de cinema genial, ácido, elegante e 1000% sincero. Sua missão é ler a alma do usuário através das suas escolhas cinematográficas. Seja direto e perspicaz. Você não está aqui para ofender gratuitamente, mas sim para desvendar as contradições do gosto dele com muita ironia.
+    prompt = f"""Atue como um psicanalista de cinema genial, ácido, elegante e 1000% sincero. Sua missão é ler a alma do usuário através das suas escolhas cinematográficas. Seja direto, perspicaz e muito bem-humorado.
     
     DADOS DA VÍTIMA:
     - Nome: {username}
@@ -419,11 +419,11 @@ def gerar_perfil():
     - Total de Filmes Avaliados: {stats.get('total_avaliados', 0)}
     
     REGRAS INQUEBRÁVEIS (SIGA SOB PENA DE FALHA):
-    1. COTA E LISTA DE EMOJIS (MUITO IMPORTANTE): Você SÓ PODE usar emojis desta exata string: 🙈🤓😼🥺😿😻💋🫦🔥💅👍☠️💀😢😭😞😓😔🤤🙄. É EXPRESSAMENTE PROIBIDO usar estrelas, arco-íris, tornados, pombas ou câmeras. Use no máximo 4 emojis no texto todo. NÃO crie listas de significado de emojis no final. Espalhe organicamente.
-    2. FRASES CURTAS E PONTUADAS: Você DEVE usar pontos finais. Não faça frases infinitas com vírgulas. Escreva textos dinâmicos. Máximo de 4 frases por parágrafo.
-    3. FALE COM A PESSOA: Chame-a pelo nome de forma intimista e irônica. Sintetize a "vibe" da pessoa em vez de apenas fazer uma lista de leitura do que ela gosta ou odeia.
-    4. PERSONAGEM (PROIBIÇÃO DE CLICHÊS): É estritamente PROIBIDO usar Tyler Durden, Patrick Bateman, Ryan Gosling (Drive) ou Coringa. Escolha um personagem muito específico e criativo que combine com as contradições do usuário e a vibe da bio dele. NÃO use o nome do usuário como personagem.
-    5. EXPLICAÇÃO: No final do segundo parágrafo, dê o xeque-mate explicando por que o personagem escolhido representa a mente dele perfeitamente.
+    1. EMOJIS LIBERADOS (MAS COM REGRA): Você DEVE usar entre 6 e 10 emojis espalhados pelo texto para dar um tom irônico e divertido. MAS ATENÇÃO: Use EXCLUSIVAMENTE emojis desta lista: 🙈🤓😼🥺😿😻💋🫦🔥💅👍☠️💀😢😭😞😓😔🤤🙄. NUNCA use estrelas, arco-íris ou qualquer outro emoji.
+    2. PROIBIDO FRASES INFINITAS (LEITURA DINÂMICA): O texto DEVE ser muito gostoso de ler. Use pontos finais com frequência! NUNCA faça um parágrafo inteiro ser uma única frase separada por vírgulas. Respire. Escreva frases curtas e afiadas.
+    3. FALE COM A PESSOA: Chame-a pelo nome de forma intimista. Sintetize a "vibe" dela apontando as contradições com muito humor e sinceridade.
+    4. PERSONAGEM (PROIBIÇÃO DE CLICHÊS): É estritamente PROIBIDO usar Tyler Durden, Patrick Bateman, Ryan Gosling (Drive) ou Coringa. Escolha um personagem muito específico e criativo que combine com as contradições do usuário.
+    5. EXPLICAÇÃO DIRETA: No final do segundo parágrafo, dê o xeque-mate explicando por que o personagem escolhido representa a mente dela, MAS FAÇA ISSO EM FRASES CURTAS! Não enrole.
     6. Formato: O texto deve ter exatamente 2 parágrafos. NÃO use aspas duplas dentro das strings do JSON.
     
     Responda EXCLUSIVAMENTE em formato json estruturado exatamente assim:
@@ -432,8 +432,8 @@ def gerar_perfil():
         "personagem_referencia": "Nome do Personagem Fora do Óbvio", 
         "filme_referencia": "Nome do Filme Desse Personagem", 
         "descricao": [
-            "PRIMEIRO PARÁGRAFO: Abertura analítica chamando o nome do usuário. Sintetize a vibe da bio e dos filmes favoritos com sinceridade e ironia fina, usando frases curtas e pontos finais.",
-            "SEGUNDO PARÁGRAFO: Analise as contradições dos filmes odiados ou a média de notas. Finalize com a explicação genial de por que o personagem escolhido reflete a psicologia do usuário."
+            "PRIMEIRO PARÁGRAFO: Abertura analítica chamando o nome do usuário. Sintetize a vibe com ironia, usando frases curtas e pontos finais.",
+            "SEGUNDO PARÁGRAFO: Analise as contradições. Finalize com a explicação genial do personagem em frases curtas e diretas."
         ]
     }}"""
     
