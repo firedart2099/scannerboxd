@@ -39,7 +39,6 @@
 
         h1, h2, h3, .space-font { font-family: 'Space Grotesk', sans-serif !important; }
 
-        /* Custom Scrollbar Elegante */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #0f1115; }
         ::-webkit-scrollbar-thumb { background: rgba(64, 188, 244, 0.3); border-radius: 10px; }
@@ -96,14 +95,12 @@
         }
         
         /* Checkbox Customizado do Filtro */
-        .custom-checkbox {
-            transition: all 0.2s;
-        }
+        .custom-checkbox { transition: all 0.2s; }
     </style>
 </head>
 <body class="text-white relative w-screen h-screen overflow-x-hidden">
 
-<!-- Troféu de Conquista -->
+<!-- Troféu de Conquista Real -->
 <div id="ps-trophy" class="ps-trophy">
     <div class="w-12 h-12 rounded-full border-2 border-[#40bcf4] shadow-[0_0_15px_rgba(64,188,244,0.5)] flex items-center justify-center shrink-0 animate-pulse text-2xl">🏆</div>
     <div>
@@ -193,7 +190,7 @@
     </div>
 </div>
 
-<!-- TOAST DE ERRO LARANJA -->
+<!-- TOAST DE AVISOS -->
 <div id="custom-toast" class="fixed bottom-10 left-1/2 transform -translate-x-1/2 fluent-glass text-[#ff8000] px-5 py-3.5 rounded-2xl shadow-[0_10px_30px_rgba(255,128,0,0.15)] z-[100000] flex items-center gap-3 transition-all duration-500 opacity-0 pointer-events-none translate-y-10 max-w-[90vw] border border-[#ff8000]/50">
     <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
     <p id="custom-toast-msg" class="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-center">Erro.</p>
@@ -276,14 +273,12 @@
                 </div>
 
                 <div id="watchlist-content" class="hidden w-full space-y-4">
-                    <!-- Barra de Pesquisa e Filtro Minimalista -->
                     <div class="fluent-glass p-2 shrink-0 relative flex items-center z-50">
                         <svg class="w-4 h-4 text-[#8c9bab] ml-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                         <input type="text" id="search-input" oninput="handleSearch()" placeholder="Procurar filme..." class="w-full bg-transparent border-none text-white px-3 py-2 focus:outline-none text-sm">
                         
                         <button id="filter-btn-icon" onclick="toggleFilterDropdown(event)" class="text-[#ff8000] hover:text-white p-2 rounded transition-colors cursor-pointer relative">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
-                            <!-- Ponto indicador de filtro ativo -->
                             <span id="filter-active-dot" class="hidden absolute top-1 right-1 w-2 h-2 bg-[#ff8000] rounded-full border border-[#14181c]"></span>
                         </button>
 
@@ -344,14 +339,12 @@
     let oraculoRecomendacoesGlobais = []; 
     let filmesSelecionados = new Set();
     
-    // SISTEMA DE FILTRO MULTIPLO
     let activeFilters = new Set();
     let streamingCountsGlobais = {};
 
     let fraseTimerInterval;
     let frasesAleatorias = [];
 
-    // Fundo Rotativo
     const iconicMovies = [
         "https://image.tmdb.org/t/p/original/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg",
         "https://image.tmdb.org/t/p/original/nMKdUUepR0i5zn0y1T4CsSB5chy.jpg", 
@@ -371,7 +364,6 @@
     }
     document.addEventListener('DOMContentLoaded', startBgSlideshow);
 
-    // Carrega as frases zueiras
     fetch('/frases').then(res => res.json()).then(data => { if(data.length>0) frasesAleatorias = data; }).catch(e => {});
 
     function iniciarCicloDeFrases() {
@@ -423,7 +415,6 @@
         tabs.forEach((t, i) => { t.classList.toggle('active', i === index); });
     }
 
-    // Touch Swipe
     let startX = 0; let endX = 0;
     const wrapper = document.getElementById('carousel-wrapper');
     if (wrapper) {
@@ -498,8 +489,22 @@
         }, 700);
     }
 
-    // Caçador de Poster Definitivo
-    async function fetchPosterFallback(title, year, id, isAvatar = false) {
+    // Busca o rosto do ATOR no TMDB
+    async function fetchPersonFallback(actorName, id) {
+        if (!actorName) return;
+        try {
+            let res = await fetch(`/api/tmdb/person?query=${encodeURIComponent(actorName)}`);
+            let d = await res.json();
+            if(d.results?.[0]?.profile_path) {
+                const imgUrl = `https://image.tmdb.org/t/p/w500${d.results[0].profile_path}`;
+                const cont = document.getElementById(id);
+                if(cont) cont.innerHTML = `<img src="${imgUrl}" class="w-full h-full object-cover">`;
+            }
+        } catch(e) {}
+    }
+
+    // Caçador de Poster TRIPLO
+    async function fetchPosterFallback(title, year, id) {
         try {
             let res = await fetch(`/api/tmdb/search?query=${encodeURIComponent(title)}&year=${year}`);
             let d = await res.json();
@@ -523,24 +528,18 @@
                 } catch(e) {}
             }
 
-            if(isAvatar) {
-                const cont = document.getElementById(id);
-                if(cont && imgUrl) cont.innerHTML = `<img src="${imgUrl}" class="w-full h-full object-cover">`;
-            } else {
-                const card = document.getElementById(id);
-                if(card) {
-                    if (imgUrl) {
-                        card.insertAdjacentHTML('beforeend', `<img class="fav-poster absolute inset-0 w-full h-full object-cover z-10 transition-opacity duration-700 opacity-0" src="${imgUrl}" onload="this.style.opacity='1'">`);
-                    } else {
-                        // Poster Tipográfico (Último recurso)
-                        card.insertAdjacentHTML('beforeend', `<div class="absolute inset-0 w-full h-full bg-[#14181c] z-10 flex items-center justify-center p-4 text-center border-2 border-[#2c3440]"><h3 class="text-[#8c9bab] font-black uppercase tracking-widest text-sm space-font">${title}</h3></div>`);
-                    }
+            const card = document.getElementById(id);
+            if(card) {
+                if (imgUrl) {
+                    card.insertAdjacentHTML('beforeend', `<img class="fav-poster absolute inset-0 w-full h-full object-cover z-10 transition-opacity duration-700 opacity-0" src="${imgUrl}" onload="this.style.opacity='1'">`);
+                } else {
+                    card.insertAdjacentHTML('beforeend', `<div class="absolute inset-0 w-full h-full bg-[#14181c] z-10 flex items-center justify-center p-4 text-center border-2 border-[#2c3440]"><h3 class="text-[#8c9bab] font-black uppercase tracking-widest text-sm space-font">${title}</h3></div>`);
                 }
             }
         } catch(e) {}
     }
 
-    async function gerarPerfilIA(isRetry = false) {
+    async function gerarPerfilIA() {
         const tt=document.getElementById('roast-title'), td=document.getElementById('roast-desc');
         try {
             const res = await fetch('/gerar_perfil', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({stats: statsData}) });
@@ -550,14 +549,14 @@
                 if(!data.erro) {
                     if(tt) tt.innerHTML = data.titulo; 
                     if(td) td.innerHTML = data.descricao.replace(/\n/g, '<br><br>'); 
-                    if(data.filme_referencia) fetchPosterFallback(data.filme_referencia, "", 'profile-avatar', true);
+                    if(data.ator_referencia) fetchPersonFallback(data.ator_referencia, 'profile-avatar');
                     return;
                 }
             } throw new Error();
         } catch(e) {
             if(tt) tt.innerHTML = "O Explorador Silencioso"; 
             if(td) td.innerHTML = "O Oráculo está Meditando... 🧘‍♂️<br><br>Opa desculpa pae! As IAs do servidor derreteram com tanto acesso hoje e não conseguiram traduzir seu gosto peculiar.<br><br>Mas ó, aproveite pra ver onde assistir sua Watchlist na aba ao lado!";
-            fetchPosterFallback("Drive", "2011", 'profile-avatar', true);
+            fetchPersonFallback("Ryan Gosling", 'profile-avatar');
         }
     }
 
@@ -589,102 +588,99 @@
         });
     }
 
-    async function carregarOraculo() {
-        const reqBody = JSON.stringify({ favorites: statsData.profile_favorites || [], exclude: [] });
-        
+    async function buscarAteQuatroIneditos(excluidos = []) {
+        const reqBody = JSON.stringify({ favorites: statsData.profile_favorites || [], exclude: excluidos });
         try {
             const res = await fetch(`/oraculo?session_id=${sessionId}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: reqBody });
             const r = await res.json();
-            
-            const grid = document.getElementById('oracle-grid');
-            grid.innerHTML = ''; 
+            return { filmes: r.recomendacoes || [], terror: r.terror_mode || false, rateLimit: r.erro === "RATE_LIMIT" };
+        } catch(e) {
+            return { filmes: [], terror: false, rateLimit: true };
+        }
+    }
 
-            document.getElementById('oracle-loading').classList.add('hidden');
-            grid.classList.remove('hidden');
-            document.getElementById('oracle-actions').classList.remove('hidden');
-            document.getElementById('oracle-actions').classList.add('flex');
+    async function carregarOraculo() {
+        const result = await buscarAteQuatroIneditos([]);
+        const grid = document.getElementById('oracle-grid');
+        grid.innerHTML = ''; 
 
-            if (r.erro === "RATE_LIMIT") {
-                grid.innerHTML = `
-                    <div class="col-span-full text-center p-8 bg-[#1c2228] border border-[#2c3440] rounded-xl mx-2 shadow-lg mt-4">
-                        <div class="w-12 h-12 bg-[#40bcf4]/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-[#40bcf4]/30">
-                            <span class="text-xl">🛠️</span>
-                        </div>
-                        <h4 class="text-white font-black text-sm uppercase tracking-widest mb-3">Servidores Sobrecarregados</h4>
-                        <p class="text-[#8c9bab] text-xs leading-relaxed">
-                            Opa, desculpa pae! As IAs fritaram com o tanto de gente acessando. 💀<br><br>
-                            Mas não perde a viagem: <strong class="text-[#40bcf4]">deslize a tela pro lado e aproveite para ver onde assistir a sua Watchlist!</strong> 🍿
-                        </p>
+        document.getElementById('oracle-loading').classList.add('hidden');
+        grid.classList.remove('hidden');
+        document.getElementById('oracle-actions').classList.remove('hidden');
+        document.getElementById('oracle-actions').classList.add('flex');
+
+        if (result.rateLimit && result.filmes.length === 0) {
+            grid.innerHTML = `
+                <div class="col-span-full text-center p-8 bg-[#1c2228] border border-[#2c3440] rounded-xl mx-2 shadow-lg mt-4">
+                    <div class="w-12 h-12 bg-[#40bcf4]/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-[#40bcf4]/30">
+                        <span class="text-xl">🛠️</span>
                     </div>
-                `;
-                document.getElementById('btn-descobrir-mais').classList.add('hidden');
-                document.getElementById('btn-export-desktop').classList.add('hidden');
-                return; 
-            }
+                    <h4 class="text-white font-black text-sm uppercase tracking-widest mb-3">Servidores Sobrecarregados</h4>
+                    <p class="text-[#8c9bab] text-xs leading-relaxed">
+                        Opa, desculpa pae! As IAs fritaram com o tanto de gente acessando. 💀<br><br>
+                        Mas não perde a viagem: <strong class="text-[#40bcf4]">deslize a tela pro lado e aproveite para ver onde assistir a sua Watchlist!</strong> 🍿
+                    </p>
+                </div>
+            `;
+            document.getElementById('btn-descobrir-mais').classList.add('hidden');
+            document.getElementById('btn-export-desktop').classList.add('hidden');
+            return; 
+        }
 
-            if(r.recomendacoes && r.recomendacoes.length > 0) {
-                oraculoRecomendacoesGlobais = r.recomendacoes; 
-                filmesSelecionados.clear(); 
-                renderizarOraculoCards(r.recomendacoes, 0);
-                
-                if (r.terror_mode) {
-                    const trophy = document.getElementById('ps-trophy');
-                    if (trophy) { trophy.classList.add('show'); setTimeout(() => trophy.classList.remove('show'), 5000); }
-                    document.getElementById('btn-descobrir-mais').classList.add('hidden');
-                }
-            } else if (r.terror_mode || r.recomendacoes.length === 0) {
+        if(result.filmes.length > 0) {
+            oraculoRecomendacoesGlobais = result.filmes; 
+            filmesSelecionados.clear(); 
+            renderizarOraculoCards(result.filmes, 0);
+            
+            if (result.terror) {
                 const trophy = document.getElementById('ps-trophy');
                 if (trophy) { trophy.classList.add('show'); setTimeout(() => trophy.classList.remove('show'), 5000); }
-                grid.innerHTML = `
-                    <div class="col-span-full text-center p-8 bg-[#1c2228] border border-[#2c3440] rounded-xl mx-2 shadow-lg mt-4">
-                        <div class="w-12 h-12 bg-[#ff8000]/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-[#ff8000]/30">
-                            <span class="text-xl">🏆</span>
-                        </div>
-                        <h4 class="text-white font-black text-sm uppercase tracking-widest mb-3">Você Zerou o Cinema</h4>
-                        <p class="text-[#8c9bab] text-xs leading-relaxed">
-                            Sua lista de filmes vistos e Watchlist é tão colossal que a IA não conseguiu achar obras obscuras inéditas pra você. 💀<br><br>
-                            <strong class="text-[#40bcf4]">Deslize a tela pro lado e aproveite para ver onde assistir a sua Watchlist!</strong> 🍿
-                        </p>
-                    </div>
-                `;
                 document.getElementById('btn-descobrir-mais').classList.add('hidden');
-                document.getElementById('btn-export-desktop').classList.add('hidden');
             }
-        } catch(e) {
-            console.error("Erro ao carregar Oráculo", e);
+        } else if (result.terror) {
+            const trophy = document.getElementById('ps-trophy');
+            if (trophy) { trophy.classList.add('show'); setTimeout(() => trophy.classList.remove('show'), 5000); }
+            grid.innerHTML = `
+                <div class="col-span-full text-center p-8 bg-[#1c2228] border border-[#2c3440] rounded-xl mx-2 shadow-lg mt-4">
+                    <div class="w-12 h-12 bg-[#ff8000]/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-[#ff8000]/30">
+                        <span class="text-xl">🏆</span>
+                    </div>
+                    <h4 class="text-white font-black text-sm uppercase tracking-widest mb-3">Você Zerou o Cinema</h4>
+                    <p class="text-[#8c9bab] text-xs leading-relaxed">
+                        Sua lista é tão colossal que a IA não conseguiu achar obras obscuras inéditas pra você. 💀<br><br>
+                        <strong class="text-[#40bcf4]">Deslize a tela pro lado e veja onde assistir a sua Watchlist!</strong> 🍿
+                    </p>
+                </div>
+            `;
+            document.getElementById('btn-descobrir-mais').classList.add('hidden');
+            document.getElementById('btn-export-desktop').classList.add('hidden');
         }
     }
 
     async function carregarMaisSugestoes() {
         document.getElementById('load-more-spinner').classList.remove('hidden');
         
-        try {
-            const excl = [...oraculoRecomendacoesGlobais.map(x => x.rec)];
-            const reqBody = JSON.stringify({ favorites: statsData.profile_favorites || [], exclude: excl });
-            const res = await fetch(`/oraculo?session_id=${sessionId}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: reqBody });
-            const r = await res.json();
-            
-            if (r.erro === "RATE_LIMIT") {
-                mostrarErro("As APIs estão superlotadas no momento! Aguarde 1 minuto.");
-            } else {
-                if(r.recomendacoes && r.recomendacoes.length > 0) {
-                    const s = oraculoRecomendacoesGlobais.length; 
-                    oraculoRecomendacoesGlobais.push(...r.recomendacoes);
-                    renderizarOraculoCards(r.recomendacoes, s);
-                }
-                
-                if (r.terror_mode || (r.recomendacoes && r.recomendacoes.length === 0)) {
-                    const trophy = document.getElementById('ps-trophy');
-                    if (trophy && !trophy.classList.contains('show')) {
-                        trophy.classList.add('show');
-                        setTimeout(() => trophy.classList.remove('show'), 5000); 
-                    }
-                    mostrarErro("O Oráculo esgotou! Você zerou os filmes obscuros.");
-                    document.getElementById('btn-descobrir-mais').classList.add('hidden');
-                }
+        const excl = [...oraculoRecomendacoesGlobais.map(x => x.rec)];
+        const result = await buscarAteQuatroIneditos(excl);
+        
+        if (result.rateLimit) {
+            mostrarErro("As APIs estão superlotadas no momento! Aguarde 1 minuto.");
+        } else {
+            if(result.filmes.length > 0) {
+                const s = oraculoRecomendacoesGlobais.length; 
+                oraculoRecomendacoesGlobais.push(...result.filmes);
+                renderizarOraculoCards(result.filmes, s);
             }
-        } catch(e) {
-            mostrarErro("Erro de rede ao buscar mais sugestões.");
+            
+            // Vitória do usuário sobre a IA
+            if (result.terror || (result.filmes.length === 0 && !result.rateLimit)) {
+                const trophy = document.getElementById('ps-trophy');
+                if (trophy && !trophy.classList.contains('show')) {
+                    trophy.classList.add('show');
+                    setTimeout(() => trophy.classList.remove('show'), 5000); 
+                }
+                document.getElementById('btn-descobrir-mais').classList.add('hidden');
+            }
         }
         
         document.getElementById('load-more-spinner').classList.add('hidden');
@@ -746,7 +742,6 @@
         document.getElementById('filter-dropdown').classList.toggle('hidden');
     }
 
-    // Close dropdown when clicking outside
     document.addEventListener('click', function(event) {
         const dropdown = document.getElementById('filter-dropdown');
         const btn = document.getElementById('filter-btn-icon');
@@ -823,7 +818,6 @@
             const match = filme.match(/(.*)\s\((\d{4})\)$/);
             const titulo = match ? match[1] : filme, ano = match ? match[2] : "";
             
-            // Check Multi-Platform
             if (activeFilters.size > 0) {
                 const temNaPlataforma = streamings.some(s => activeFilters.has(s));
                 if (!temNaPlataforma) continue;
