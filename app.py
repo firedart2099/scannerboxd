@@ -5,6 +5,8 @@ import pandas as pd
 import zipfile
 import random
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 import re
 import threading
 import subprocess
@@ -31,6 +33,11 @@ TMDB_API_KEY = os.getenv("TMDB_API_KEY", "").replace('"', '').replace("'", "").s
 DB_NAME = "oraculo.db"
 
 db_lock = threading.Lock()
+
+# TÚNEL DE ALTA VELOCIDADE PARA O TMDB (Watchlist Turbo)
+tmdb_session = requests.Session()
+retries = Retry(total=3, backoff_factor=0.1, status_forcelist=[ 500, 502, 503, 504 ])
+tmdb_session.mount('https://', HTTPAdapter(pool_connections=30, pool_maxsize=30, max_retries=retries))
 
 # ==========================================
 # CONFIGURAÇÃO DO BANCO DE DADOS SQLITE
@@ -76,7 +83,7 @@ def handle_exception(e):
     return jsonify({"erro": f"Erro interno: {str(e)}"}), 500
 
 # ==========================================
-# MOTOR HÍBRIDO DE IA (NVIDIA -> GROQ -> GEMINI)
+# MOTOR HÍBRIDO DE IA
 # ==========================================
 def limpar_e_parsear_json(content):
     content = re.sub(r'^```json\s*', '', content, flags=re.MULTILINE|re.IGNORECASE)
@@ -103,8 +110,8 @@ def limpar_e_parsear_json(content):
                         rec[k] = v.replace('"', '').replace('*', '').strip()
     return dados
 
-def gerar_resposta_ia(prompt, max_tokens=1000):
-    timeout_nv = 25 # Respiração aumentada da NVIDIA
+def gerar_resposta_ia(prompt, max_tokens=2500):
+    timeout_nv = 25 
     
     if NVIDIA_API_KEY:
         try:
@@ -227,7 +234,6 @@ def resolve_boxd_links(links_str):
         except Exception: pass
     return filmes
 
-# Função Exterminadora de Duplicatas e Letras perdidas
 def normalize_title(title):
     if not isinstance(title, str): return ""
     t = title.lower().strip()
@@ -258,55 +264,6 @@ def tmdb_search():
         res = requests.get(url, timeout=10)
         return jsonify(res.json()) if res.status_code == 200 else jsonify({"results": []})
     except Exception: return jsonify({"results": []}), 200
-
-# ==========================================
-# O CAÇADOR DE CENAS (MOVIE STILLS) 
-# ==========================================
-@app.route('/api/tmdb/character_image', methods=['GET'])
-def get_character_image():
-    movie_name = request.args.get('movie', '')
-    char_name = request.args.get('character', '')
-    
-    if not TMDB_API_KEY or not movie_name: 
-        return jsonify({"url": None})
-
-    try:
-        # 1. Pega o ID do Filme
-        res_movie = requests.get(f'https://api.themoviedb.org/3/search/movie?api_key={TMDB_API_KEY}&query={quote(movie_name)}', timeout=5)
-        if res_movie.status_code != 200 or not res_movie.json().get('results'): return jsonify({"url": None})
-        movie_id = res_movie.json()['results'][0]['id']
-        movie_poster = res_movie.json()['results'][0].get('poster_path')
-
-        # 2. Puxa o Elenco para achar o Ator
-        res_credits = requests.get(f'https://api.themoviedb.org/3/movie/{movie_id}/credits?api_key={TMDB_API_KEY}', timeout=5)
-        if res_credits.status_code != 200: return jsonify({"url": None})
-        
-        cast = res_credits.json().get('cast', [])
-        if not cast: return jsonify({"url": None})
-
-        person_id = None
-        if char_name:
-            for actor in cast:
-                if char_name.lower() in actor.get('character', '').lower():
-                    person_id = actor['id']
-                    break
-        
-        if not person_id: person_id = cast[0]['id']
-
-        # 3. O Pulo do Gato: Tagged Images do Ator só naquele filme!
-        res_images = requests.get(f'https://api.themoviedb.org/3/person/{person_id}/tagged_images?api_key={TMDB_API_KEY}', timeout=5)
-        if res_images.status_code == 200:
-            tagged = res_images.json().get('results', [])
-            for img in tagged:
-                if img.get('media', {}).get('id') == movie_id:
-                    return jsonify({"url": f"https://image.tmdb.org/t/p/w500{img['file_path']}"})
-        
-        # Fallback: Pega o poster
-        if movie_poster:
-            return jsonify({"url": f"https://image.tmdb.org/t/p/w500{movie_poster}"})
-
-    except Exception as e: pass
-    return jsonify({"url": None})
 
 @app.route('/')
 def index(): return render_template('index.html')
@@ -385,45 +342,43 @@ def gerar_perfil():
     
     emojis_permitidos = "🙈🤓😼🥺😿😻💋🫦🔥💅👍☠️💀😢😭😞😓😔🤤🙄"
 
-    prompt = f"""Atue como um psicanalista de cinema sagaz, perspicaz e irônico. Seu objetivo é fazer uma leitura de alma do gosto cinematográfico do usuário. Esqueça textos robóticos de "ele gosta, ele odeia". Escreva como uma crônica envolvente e fluida.
+    prompt = f"""Atue como um psicanalista de cinema sagaz, perspicaz e com um humor afiado, mas sofisticado. O seu objetivo é fazer uma crônica da personalidade cinematográfica do usuário. 
     
     DADOS DA VÍTIMA:
     - Nome: {username}
-    - Bio do Perfil: "{bio}"
-    - Favoritos Absolutos: {', '.join(filmes_amados) if filmes_amados else 'Nenhum'}
-    - Outros filmes que amou: {', '.join(amados_recentes) if amados_recentes else 'Nenhum'}
-    - Filmes que odiou: {', '.join(odiados_recentes) if odiados_recentes else 'Nenhum'}
+    - Bio: "{bio}"
+    - Filmes favoritos/amados: {', '.join(filmes_amados)}, {', '.join(amados_recentes)}
+    - Filmes odiados: {', '.join(odiados_recentes)}
     
-    REGRAS DA MISSÃO:
-    1. FLUIDEZ: É PROIBIDO usar estruturas repetitivas como "{username} gosta de X". Seja literário, construa frases coesas e bem amarradas, mas use PONTOS FINAIS. Frases curtas e impacto alto.
-    2. SINCERIDADE: Seja 100% sincero e analítico. PROIBIDO ser bajulador ou puxa-saco. PROIBIDO ser grosseiro de forma gratuita. Analise as contradições do gosto dele com ironia.
-    3. TÍTULOS EM INGLÊS: Mantenha os nomes dos filmes em INGLÊS para evitar erros gramaticais.
-    4. EMOJIS: Use EXCLUSIVAMENTE estes emojis: {emojis_permitidos}. Espalhe de forma natural (entre 5 e 8 no total). É PROIBIDO criar listas explicando emojis no final.
-    5. PERSONAGEM E EXPLICAÇÃO: Escolha um personagem de FILME que represente a personalidade das notas dele. É PROIBIDO escolher personagens de livros, séries, animações ou CGI. É PROIBIDO usar Tyler Durden, Coringa ou Patrick Bateman. Na última frase do texto, explique por que esse personagem faz sentido de forma inteligente.
-    6. TÍTULO: Dê um título sarcástico, mas É PROIBIDO usar o termo "O Caçador de Contradições".
+    REGRAS INQUEBRÁVEIS:
+    1. LEITURA DINÂMICA: É ESTRITAMENTE PROIBIDO escrever parágrafos blocados ou frases que não terminam. Você DEVE usar pontos finais constantes. Máximo de 3 a 4 frases curtas e diretas por parágrafo.
+    2. TOM: Seja cínico e elegante. Questione as escolhas dele sem ser grosso. É PROIBIDO ofender a pessoa ou dizer "Luizasas gosta / Luizasas odeia". Construa uma análise coesa.
+    3. O PERSONAGEM: Pense na vibe da pessoa com base nas contradições do gosto dela e escolha um personagem do cinema. A ESCOLHA É LIVRE, pode ser animação, vilão ou herói. O que importar é a energia bater.
+    4. EMOJIS: Use EXCLUSIVAMENTE estes emojis: {emojis_permitidos}. Use uns 6 no meio do texto, com naturalidade. NUNCA crie uma lista de emojis no final.
+    5. ZERO REPETIÇÃO DE FILME. Fale de vários filmes da lista, não do mesmo 3 vezes. Mantenha títulos em INGLÊS para evitar erros.
     
     Responda OBRIGATORIAMENTE em JSON válido:
     {{ 
-        "titulo": "Rótulo Sarcástico Original", 
+        "titulo": "O Rótulo Criativo", 
         "personagem_referencia": "Nome do Personagem", 
-        "filme_referencia": "Nome do Filme Original (Em Inglês)", 
+        "filme_referencia": "Nome do Filme do Personagem (Inglês)", 
         "descricao": [
-            "Primeiro parágrafo fluido com a psicanálise profunda dos filmes.",
-            "Segundo parágrafo aprofundando as contradições e finalizando com a justificativa brilhante do personagem."
+            "Primeiro parágrafo de análise psicológica ácida com frases curtas e pontos finais.",
+            "Segundo parágrafo expondo as contradições. Na última frase, justifique por que esse personagem o representa, direto ao ponto."
         ]
     }}"""
     
     try: 
-        dados = gerar_resposta_ia(prompt, max_tokens=1000)
+        dados = gerar_resposta_ia(prompt, max_tokens=1500)
         if not dados or "titulo" not in dados: raise Exception("Falha JSON")
         if isinstance(dados.get("descricao"), list): dados["descricao"] = "\n\n".join(dados["descricao"])
         return jsonify(dados)
     except Exception as e: 
         return jsonify({
-            "titulo": "O Explorador Silencioso", 
+            "titulo": "O Explorador Silencioso 🧘‍♂️", 
             "personagem_referencia": "Driver",
             "filme_referencia": "Drive",
-            "descricao": "O Oráculo está Meditando... 🧘‍♂️\n\nOpa desculpa pae! As IAs do servidor derreteram com tanto acesso hoje e não conseguiram decifrar seu gosto peculiar.\n\nMas ó, aproveite pra ver onde assistir sua Watchlist ali na aba do lado! 🍿"
+            "descricao": "Opa, desculpa pae! A Inteligência Artificial fritou os circuitos com tanta informação.\n\nMas ó, deslize pra aba do lado e aproveite pra ver onde assistir sua Watchlist ali na última aba! 🍿"
         })
 
 @app.route('/oraculo', methods=['POST'])
@@ -456,7 +411,7 @@ def oraculo():
             Responda OBRIGATORIAMENTE em JSON:
             {{ "recomendacoes": [ {{"rec_original": "TITLE", "rec": "TITLE", "ano": 2000, "base": "GENERO", "desc": "Pequena sinopse."}} ] }}"""
 
-            dados_json = gerar_resposta_ia(prompt, max_tokens=1000)
+            dados_json = gerar_resposta_ia(prompt, max_tokens=2500)
             recs_ia = dados_json.get("recomendacoes", []) if dados_json else []
             
             for r in recs_ia:
@@ -506,11 +461,11 @@ def processar_em_segundo_plano(watchlist_data, sid):
         try:
             url = f"https://api.themoviedb.org/3/search/movie?api_key={TMDB_API_KEY}&query={quote(filme)}&language=pt-BR"
             if ano and str(ano).isdigit(): url += f"&year={int(float(ano))}"
-            res = requests.get(url, timeout=10)
+            res = tmdb_session.get(url, timeout=5)
             if res.status_code == 200 and res.json().get('results'):
                 mid = res.json()['results'][0]['id']
                 p_url = f"https://api.themoviedb.org/3/movie/{mid}/watch/providers?api_key={TMDB_API_KEY}"
-                p_res = requests.get(p_url, timeout=10)
+                p_res = tmdb_session.get(p_url, timeout=5)
                 if p_res.status_code == 200:
                     br = p_res.json().get('results', {}).get('BR', {})
                     for cat in ['flatrate', 'free', 'ads']:
@@ -524,7 +479,6 @@ def processar_em_segundo_plano(watchlist_data, sid):
         return chave, streamings
     
     try:
-        # Aumentado para 20 workers simultâneos para não dar gargalo no loading
         with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
             futures = {executor.submit(fetch_movie, row): row for row in watchlist_data}
             for future in concurrent.futures.as_completed(futures):
@@ -532,7 +486,9 @@ def processar_em_segundo_plano(watchlist_data, sid):
                     chave, st = future.result()
                     dados_filmes[chave] = st
                     atual += 1
-                    set_progresso(sid, atual, total, False, chave)
+                    # Aceleração monstruosa: só escreve no disco a cada 5 filmes!
+                    if atual % 5 == 0 or atual == total:
+                        set_progresso(sid, atual, total, False, chave)
                 except Exception: pass
         salvar_dados_finais(sid, {"stats": {}, "watchlist": dados_filmes})
     except Exception: salvar_dados_finais(sid, {"stats": {}, "watchlist": dados_filmes})
