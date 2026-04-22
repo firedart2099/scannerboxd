@@ -531,7 +531,7 @@
             if (!res.ok) throw new Error("Upload falhou");
             statsData = (await res.json()).stats;
             iniciarAppReal();
-            iniciarFluxoWatchlist(); // CHAMA INSTANTANEAMENTE
+            iniciarFluxoWatchlist(); // CHAMA INSTANTANEAMENTE SEM CASCATA
         } catch(e) {
             mostrarErro("Erro ao ler o ZIP. Tente de novo.");
             btn.innerHTML = `<span id="btn-text-real">Iniciar Análise</span>`;
@@ -680,7 +680,7 @@
             }
         } catch(e) {
             document.getElementById('roast-title').innerHTML = "O Explorador Silencioso 🧘‍♂️";
-            document.getElementById('roast-desc').innerHTML = "Opa, desculpa pae! As IAs do servidor derreteram com tanto acesso hoje e não conseguiram decifrar seu gosto peculiar.<br><br>Mas ó, deslize pra aba do lado e aproveite pra ver onde assistir sua Watchlist ali na última aba! 🍿";
+            document.getElementById('roast-desc').innerHTML = "Opa, desculpa pae! A Inteligência Artificial fritou os circuitos com tanta informação.\n\nMas ó, deslize pra aba do lado e aproveite pra ver onde assistir sua Watchlist ali na última aba! 🍿";
         }
     }
 
@@ -693,7 +693,7 @@
             
             document.getElementById('oracle-loading').classList.add('hidden');
             
-            if(data.erro === "RATE_LIMIT") {
+            if(data.erro === "RATE_LIMIT" || data.erro === "Falha" || (!data.recomendacoes && !data.terror_mode)) {
                 document.getElementById('oracle-grid').innerHTML = `
                     <div class="col-span-full text-center p-8 fluent-glass border border-[#40bcf4]/30 rounded-xl shadow-lg mt-4 w-full">
                         <div class="w-12 h-12 bg-[#40bcf4]/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-[#40bcf4]/30">
@@ -701,7 +701,7 @@
                         </div>
                         <h4 class="text-white font-black text-sm uppercase tracking-widest mb-3">Servidores Sobrecarregados</h4>
                         <p class="text-[#8c9bab] text-xs leading-relaxed">
-                            Opa, desculpa pae! As IAs fritaram com o tanto de gente acessando. 💀<br><br>
+                            Opa, desculpa pae! A IA gaguejou com o limite de acesso ou o JSON quebrou. 💀<br><br>
                             Mas não perde a viagem: <strong class="text-[#40bcf4]">deslize a tela pro lado e aproveite para ver onde assistir a sua Watchlist!</strong> 🍿
                         </p>
                     </div>
@@ -749,8 +749,8 @@
             });
             const data = await res.json();
             
-            if(data.erro === "RATE_LIMIT") {
-                mostrarErro("As APIs estão superlotadas. Aguarde 1 minuto e tente novamente!");
+            if(data.erro === "RATE_LIMIT" || data.erro === "Falha") {
+                mostrarErro("O Oráculo falhou ou atingiu o limite. Tente de novo em instantes!");
             } else if(data.recomendacoes && data.recomendacoes.length > 0) {
                 data.recomendacoes.forEach(novo_rec => {
                     const tituloLimpo = novo_rec.rec.toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -924,7 +924,7 @@
                         gerarFiltrosEWatchlist(rawDatabase);
                     }
                 }
-            }, 1000); // <-- ACELERADO AQUI (1 Segundo de update visual)
+            }, 1000); 
         } catch(e) {}
     }
 
