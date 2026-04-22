@@ -215,10 +215,12 @@
             <div class="max-w-2xl w-full space-y-6">
                 <div class="fluent-glass p-8 relative flex flex-col items-center text-center border-t-[#00e054]/50 shadow-[0_10px_40px_rgba(0,224,84,0.1)]">
                     
-                    <div class="w-24 h-24 rounded-full border-2 border-[#00e054] bg-[#0f1115] mb-6 flex items-center justify-center shadow-[0_0_20px_rgba(0,224,84,0.3)] shrink-0 overflow-hidden relative">
-                        <svg id="profile-avatar-fallback" class="w-10 h-10 text-[#2c3440] absolute" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-                        <div id="profile-avatar" class="w-full h-full absolute inset-0 z-10"></div>
+                    <div class="w-28 h-40 rounded-xl border-2 border-[#00e054] bg-[#0f1115] mb-3 flex items-center justify-center shadow-[0_0_20px_rgba(0,224,84,0.3)] shrink-0 overflow-hidden relative">
+                        <svg id="profile-avatar-fallback" class="w-10 h-10 text-[#2c3440] absolute" fill="currentColor" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm16-6H4v2h16v-2zM4 9v2h16V9H4zm0-4v2h16V5H4z"/></svg>
+                        <div id="profile-avatar" class="w-full h-full absolute inset-0 z-10 transition-opacity duration-500"></div>
                     </div>
+                    
+                    <div id="char-info-display" class="hidden text-center mb-6 flex flex-col items-center"></div>
                     
                     <h2 class="text-2xl md:text-3xl font-black text-white tracking-tighter mb-4 leading-tight" id="roast-title">
                         Analisando gosto... <svg class="animate-spin w-5 h-5 ml-2 text-[#00e054] inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
@@ -531,7 +533,7 @@
             if (!res.ok) throw new Error("Upload falhou");
             statsData = (await res.json()).stats;
             iniciarAppReal();
-            iniciarFluxoWatchlist(); // CHAMA INSTANTANEAMENTE SEM CASCATA
+            iniciarFluxoWatchlist(); 
         } catch(e) {
             mostrarErro("Erro ao ler o ZIP. Tente de novo.");
             btn.innerHTML = `<span id="btn-text-real">Iniciar Análise</span>`;
@@ -664,17 +666,28 @@
                 document.getElementById('roast-title').innerHTML = data.titulo;
                 document.getElementById('roast-desc').innerHTML = data.descricao.replace(/\n/g, '<br><br>');
                 
+                const charInfo = document.getElementById('char-info-display');
+                if(charInfo) {
+                    charInfo.innerHTML = `
+                        <span class="text-[#00e054] text-[9px] font-black uppercase tracking-widest block mb-0.5">Sua Vibe</span>
+                        <span class="text-white font-bold text-sm block leading-none mb-1 drop-shadow-md">${data.personagem_referencia}</span>
+                        <span class="text-[#8c9bab] text-[10px] block font-bold uppercase tracking-widest">DE ${data.filme_referencia}</span>
+                    `;
+                    charInfo.classList.remove('hidden');
+                }
+
                 const av = document.getElementById('profile-avatar');
                 const fb = document.getElementById('profile-avatar-fallback');
                 
-                try {
-                    let imgRes = await fetch(`/api/tmdb/character_image?movie=${encodeURIComponent(data.filme_referencia)}&character=${encodeURIComponent(data.personagem_referencia)}`);
-                    let imgD = await imgRes.json();
-                    if(imgD.url) {
+                // Mágica: Bate no TMDB e carrega o pôster do filme na hora
+                fetch(`/api/tmdb/search?query=${encodeURIComponent(data.filme_referencia)}`)
+                .then(r => r.json())
+                .then(imgD => {
+                    if(imgD.results && imgD.results.length > 0 && imgD.results[0].poster_path) {
                         fb.classList.add('hidden');
-                        av.innerHTML = `<img src="${imgD.url}" class="w-full h-full object-cover absolute inset-0 rounded-full" style="object-position: center 20%;">`;
+                        av.innerHTML = `<img src="https://image.tmdb.org/t/p/w500${imgD.results[0].poster_path}" class="w-full h-full object-cover absolute inset-0">`;
                     }
-                } catch(e) {}
+                }).catch(e => {});
             } else {
                 throw new Error("Limites");
             }
