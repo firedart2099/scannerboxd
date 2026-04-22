@@ -35,7 +35,6 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* O GLASSMORPHISM PREMIUM */
         .fluent-glass {
             background: rgba(24, 28, 33, 0.55) !important; 
             backdrop-filter: blur(24px) saturate(150%) !important; 
@@ -204,7 +203,7 @@
 </div>
 
 <div id="global-loading-phrase" class="fixed top-10 left-1/2 -translate-x-1/2 z-[60] opacity-0 transition-opacity duration-500 pointer-events-none hidden">
-    <p class="text-white text-[9px] font-bold uppercase tracking-widest text-center whitespace-nowrap drop-shadow-lg bg-[#0f1115]/50 px-4 py-1.5 rounded-full border border-white/10" id="phrase-text">Invocando o Oráculo...</p>
+    <p class="text-white text-[9px] font-bold uppercase tracking-widest text-center whitespace-nowrap drop-shadow-lg bg-[#0f1115]/50 px-4 py-1.5 rounded-full border border-white/10" id="funny-text">Invocando o Oráculo...</p>
 </div>
 
 <div id="app-view" class="fixed inset-0 w-full h-full z-30 opacity-0 transition-opacity duration-700 hidden">
@@ -212,23 +211,26 @@
     <div id="carousel-wrapper" class="flex w-[300vw] h-full transition-transform duration-500 ease-in-out pointer-events-auto">
         
         <div class="w-[100vw] h-full overflow-y-auto pb-32 pt-28 px-4 sm:px-8 flex flex-col items-center">
-            <div class="max-w-2xl w-full space-y-6">
-                <div class="fluent-glass p-8 relative flex flex-col items-center text-center border-t-[#00e054]/50 shadow-[0_10px_40px_rgba(0,224,84,0.1)]">
+            <div class="max-w-3xl w-full space-y-6">
+                <div class="fluent-glass relative overflow-hidden shadow-xl p-5 md:p-8 flex flex-col md:flex-row items-center md:items-start border-t-[#00e054]/50 shadow-[0_10px_40px_rgba(0,224,84,0.1)]">
                     
-                    <div class="w-28 h-40 rounded-xl border-2 border-[#00e054] bg-[#0f1115] mb-3 flex items-center justify-center shadow-[0_0_20px_rgba(0,224,84,0.3)] shrink-0 overflow-hidden relative">
-                        <svg id="profile-avatar-fallback" class="w-10 h-10 text-[#2c3440] absolute" fill="currentColor" viewBox="0 0 24 24"><path d="M4 19h16v-2H4v2zm16-6H4v2h16v-2zM4 9v2h16V9H4zm0-4v2h16V5H4z"/></svg>
-                        <div id="profile-avatar" class="w-full h-full absolute inset-0 z-10 transition-opacity duration-500"></div>
+                    <div class="flex flex-col items-center shrink-0 mx-auto md:mx-0">
+                        <p class="text-[#8c9bab] text-[8px] font-bold uppercase tracking-widest mb-2">Sua Vibe</p>
+                        <div class="w-28 h-40 rounded-xl border-2 border-[#00e054] bg-[#0f1115] relative overflow-hidden shadow-[0_0_20px_rgba(0,224,84,0.3)] flex items-center justify-center">
+                            <div id="profile-pulse-loader" class="w-full h-full bg-[#1c2228] animate-pulse absolute inset-0"></div>
+                            <img id="profile-img-element" src="" loading="lazy" class="w-full h-full object-cover hidden transition-opacity duration-500 relative z-10">
+                        </div>
+                        <h4 id="char-name" class="text-white font-black text-[12px] uppercase tracking-tighter mt-3 drop-shadow-md text-center max-w-[140px] truncate">...</h4>
+                        <p class="text-[#00e054] text-[9px] font-bold uppercase tracking-widest mt-0.5 text-center">DE <span id="char-movie" class="text-white">...</span></p>
                     </div>
                     
-                    <div id="char-info-display" class="hidden text-center mb-6 flex flex-col items-center"></div>
-                    
-                    <h2 class="text-2xl md:text-3xl font-black text-white tracking-tighter mb-4 leading-tight" id="roast-title">
-                        Analisando gosto... <svg class="animate-spin w-5 h-5 ml-2 text-[#00e054] inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                    </h2>
-                    
-                    <p class="text-gray-300 text-[12px] md:text-[13px] leading-relaxed px-2 md:px-6 font-light" id="roast-desc">
-                        Aguarde. O Oráculo está lendo sua alma cinematográfica.
-                    </p>
+                    <div class="flex-1 space-y-3 min-w-0 mt-6 md:mt-0 md:ml-8 flex flex-col justify-center">
+                        <h3 id="roast-title" class="text-2xl md:text-3xl font-black text-white tracking-tighter leading-tight text-center md:text-left">
+                            Analisando o gosto... 
+                            <svg class="animate-spin w-5 h-5 text-[#00e054] inline-block ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                        </h3>
+                        <p id="roast-desc" class="text-gray-300 text-[12px] md:text-[13px] leading-loose font-light text-center md:text-left">Processando avaliações...</p>
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
@@ -249,6 +251,13 @@
                 <div class="text-center mb-8">
                     <h2 class="text-3xl font-black text-white uppercase tracking-tighter">O Oráculo</h2>
                     <p class="text-[#40bcf4] text-[10px] font-bold tracking-widest uppercase">Escondidos no catálogo</p>
+                </div>
+
+                <div id="oracle-terror-panel" class="hidden mb-8 fluent-glass border-t-[#ff8000]/50 p-6 rounded-xl text-center mx-2 shadow-[0_10px_30px_rgba(255,128,0,0.15)] relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-t from-[#ff8000]/10 to-transparent"></div>
+                    <div class="text-4xl mb-3 relative z-10">🏆</div>
+                    <h4 class="text-[#ff8000] font-black text-sm md:text-base uppercase tracking-widest mb-2 relative z-10">Você Zerou o Cinema</h4>
+                    <p class="text-gray-300 text-[11px] md:text-xs leading-relaxed max-w-2xl mx-auto relative z-10">A Inteligência Artificial vasculhou o fundo da internet para recomendar obras inéditas, mas <strong class="text-white">você já assistiu a todas elas</strong>. Ela suou sangue, mas esgotou o repertório. Você venceu a máquina.</p>
                 </div>
 
                 <div id="oracle-loading" class="flex flex-col items-center justify-center mt-20">
@@ -353,15 +362,57 @@
     let fraseTimerInterval;
     let isCarouselBlocked = false;
 
-    const frasesAleatorias = [
-        "O Oráculo está assistindo a versão do diretor...",
-        "Hackeando o banco de dados do Quentin Tarantino...",
-        "O Neo demorou meses pra desviar daquelas balas, espere 5 segundos.",
-        "Descobrindo filmes que nem o seu professor de cinema viu...",
-        "Aguarde, o Letterboxd deitou o servidor.",
-        "Passando um café com o David Lynch...",
-        "Buscando as maiores pedradas cinematográficas..."
-    ];
+    let frasesAleatorias = [];
+    let frasesDisponiveis = [];
+
+    fetch('/frases')
+        .then(res => res.json())
+        .then(data => { 
+            if(data.length > 0) {
+                frasesAleatorias = data; 
+                frasesDisponiveis = [...frasesAleatorias].sort(() => Math.random() - 0.5);
+            }
+        })
+        .catch(e => {});
+
+    function obterProximaFrase() {
+        if (frasesAleatorias.length === 0) return "Invocando o Oráculo...";
+        if (frasesDisponiveis.length === 0) {
+            frasesDisponiveis = [...frasesAleatorias].sort(() => Math.random() - 0.5);
+        }
+        return frasesDisponiveis.pop();
+    }
+
+    function iniciarCicloDeFrases() {
+        const t = document.getElementById('funny-text');
+        const container = document.getElementById('global-loading-phrase');
+        if(!t || !container) return;
+        
+        container.classList.remove('hidden');
+        setTimeout(() => container.classList.remove('opacity-0'), 100);
+        
+        t.innerText = obterProximaFrase();
+        
+        if(fraseTimerInterval) clearInterval(fraseTimerInterval);
+        fraseTimerInterval = setInterval(() => {
+            if(frasesAleatorias.length > 0) {
+                t.style.opacity = '0';
+                setTimeout(() => { 
+                    t.innerText = obterProximaFrase(); 
+                    t.style.opacity = '1'; 
+                }, 500);
+            }
+        }, 5000);
+    }
+
+    function pararCicloDeFrases() {
+        if(fraseTimerInterval) clearInterval(fraseTimerInterval);
+        const container = document.getElementById('global-loading-phrase');
+        if(container) {
+            container.classList.add('opacity-0');
+            setTimeout(() => container.classList.add('hidden'), 500);
+        }
+    }
 
     const cinephileReleases = [
         { Name: "Project Hail Mary", Year: 2026 },
@@ -437,35 +488,6 @@
     
     document.addEventListener('DOMContentLoaded', startInitialSlideshow);
 
-    function iniciarCicloDeFrases() {
-        const t = document.getElementById('phrase-text');
-        const container = document.getElementById('global-loading-phrase');
-        if(!t || !container) return;
-        
-        container.classList.remove('hidden');
-        setTimeout(() => container.classList.remove('opacity-0'), 100);
-        
-        t.innerText = frasesAleatorias[Math.floor(Math.random() * frasesAleatorias.length)];
-        
-        if(fraseTimerInterval) clearInterval(fraseTimerInterval);
-        fraseTimerInterval = setInterval(() => {
-            t.style.opacity = '0';
-            setTimeout(() => {
-                t.innerText = frasesAleatorias[Math.floor(Math.random() * frasesAleatorias.length)];
-                t.style.opacity = '1';
-            }, 500);
-        }, 5000);
-    }
-
-    function pararCicloDeFrases() {
-        if(fraseTimerInterval) clearInterval(fraseTimerInterval);
-        const container = document.getElementById('global-loading-phrase');
-        if(container) {
-            container.classList.add('opacity-0');
-            setTimeout(() => container.classList.add('hidden'), 500);
-        }
-    }
-
     function mostrarErro(mensagem) {
         const toast = document.getElementById('custom-toast');
         const msgEl = document.getElementById('custom-toast-msg');
@@ -533,7 +555,7 @@
             if (!res.ok) throw new Error("Upload falhou");
             statsData = (await res.json()).stats;
             iniciarAppReal();
-            iniciarFluxoWatchlist(); 
+            iniciarFluxoWatchlist();
         } catch(e) {
             mostrarErro("Erro ao ler o ZIP. Tente de novo.");
             btn.innerHTML = `<span id="btn-text-real">Iniciar Análise</span>`;
@@ -666,34 +688,31 @@
                 document.getElementById('roast-title').innerHTML = data.titulo;
                 document.getElementById('roast-desc').innerHTML = data.descricao.replace(/\n/g, '<br><br>');
                 
-                const charInfo = document.getElementById('char-info-display');
-                if(charInfo) {
-                    charInfo.innerHTML = `
-                        <span class="text-[#00e054] text-[9px] font-black uppercase tracking-widest block mb-0.5">Sua Vibe</span>
-                        <span class="text-white font-bold text-sm block leading-none mb-1 drop-shadow-md">${data.personagem_referencia}</span>
-                        <span class="text-[#8c9bab] text-[10px] block font-bold uppercase tracking-widest">DE ${data.filme_referencia}</span>
-                    `;
-                    charInfo.classList.remove('hidden');
-                }
-
                 const av = document.getElementById('profile-avatar');
                 const fb = document.getElementById('profile-avatar-fallback');
                 
-                // Mágica: Bate no TMDB e carrega o pôster do filme na hora
-                fetch(`/api/tmdb/search?query=${encodeURIComponent(data.filme_referencia)}`)
-                .then(r => r.json())
-                .then(imgD => {
-                    if(imgD.results && imgD.results.length > 0 && imgD.results[0].poster_path) {
-                        fb.classList.add('hidden');
-                        av.innerHTML = `<img src="https://image.tmdb.org/t/p/w500${imgD.results[0].poster_path}" class="w-full h-full object-cover absolute inset-0">`;
+                try {
+                    let imgRes = await fetch(`/api/tmdb/character_image?movie=${encodeURIComponent(data.filme_referencia)}&character=${encodeURIComponent(data.personagem_referencia)}`);
+                    let imgD = await imgRes.json();
+                    if(imgD.url) {
+                        document.getElementById('char-name').innerText = data.personagem_referencia;
+                        document.getElementById('char-movie').innerText = data.filme_referencia;
+                        const imgEl = document.getElementById('profile-img-element');
+                        imgEl.src = imgD.url;
+                        imgEl.onload = () => {
+                            document.getElementById('profile-pulse-loader').classList.add('hidden');
+                            imgEl.classList.remove('hidden');
+                        }
                     }
-                }).catch(e => {});
+                } catch(e) {}
             } else {
                 throw new Error("Limites");
             }
         } catch(e) {
             document.getElementById('roast-title').innerHTML = "O Explorador Silencioso 🧘‍♂️";
-            document.getElementById('roast-desc').innerHTML = "Opa, desculpa pae! A Inteligência Artificial fritou os circuitos com tanta informação.\n\nMas ó, deslize pra aba do lado e aproveite pra ver onde assistir sua Watchlist ali na última aba! 🍿";
+            document.getElementById('roast-desc').innerHTML = "Opa, desculpa pae! As IAs do servidor derreteram com tanto acesso hoje e não conseguiram decifrar seu gosto peculiar.<br><br>Mas ó, deslize pra aba do lado e aproveite pra ver onde assistir sua Watchlist ali na última aba! 🍿";
+            document.getElementById('char-name').innerText = "Driver";
+            document.getElementById('char-movie').innerText = "Drive";
         }
     }
 
@@ -706,7 +725,7 @@
             
             document.getElementById('oracle-loading').classList.add('hidden');
             
-            if(data.erro === "RATE_LIMIT" || data.erro === "Falha" || (!data.recomendacoes && !data.terror_mode)) {
+            if(data.erro === "RATE_LIMIT") {
                 document.getElementById('oracle-grid').innerHTML = `
                     <div class="col-span-full text-center p-8 fluent-glass border border-[#40bcf4]/30 rounded-xl shadow-lg mt-4 w-full">
                         <div class="w-12 h-12 bg-[#40bcf4]/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-[#40bcf4]/30">
@@ -714,7 +733,7 @@
                         </div>
                         <h4 class="text-white font-black text-sm uppercase tracking-widest mb-3">Servidores Sobrecarregados</h4>
                         <p class="text-[#8c9bab] text-xs leading-relaxed">
-                            Opa, desculpa pae! A IA gaguejou com o limite de acesso ou o JSON quebrou. 💀<br><br>
+                            Opa, desculpa pae! As IAs fritaram com o tanto de gente acessando. 💀<br><br>
                             Mas não perde a viagem: <strong class="text-[#40bcf4]">deslize a tela pro lado e aproveite para ver onde assistir a sua Watchlist!</strong> 🍿
                         </p>
                     </div>
@@ -729,8 +748,8 @@
             document.getElementById('oracle-actions').classList.add('flex');
 
             if(data.terror_mode) {
+                document.getElementById('oracle-terror-panel').classList.remove('hidden');
                 document.getElementById('btn-descobrir-mais').classList.add('hidden');
-                document.getElementById('btn-export-desktop').classList.add('hidden');
             }
 
             if(data.recomendacoes && data.recomendacoes.length > 0) {
@@ -762,8 +781,8 @@
             });
             const data = await res.json();
             
-            if(data.erro === "RATE_LIMIT" || data.erro === "Falha") {
-                mostrarErro("O Oráculo falhou ou atingiu o limite. Tente de novo em instantes!");
+            if(data.erro === "RATE_LIMIT") {
+                mostrarErro("As APIs estão superlotadas. Aguarde 1 minuto e tente novamente!");
             } else if(data.recomendacoes && data.recomendacoes.length > 0) {
                 data.recomendacoes.forEach(novo_rec => {
                     const tituloLimpo = novo_rec.rec.toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -829,38 +848,37 @@
     }
 
     function renderizarOraculoCards(recs, startIdx) {
-        const g = document.getElementById('oracle-grid');
-        recs.forEach((r,i) => {
-            const idx = startIdx+i, id=`oracle-card-${idx}`;
+        const grid = document.getElementById('oracle-grid');
+        recs.forEach((r, i) => {
+            const idx = startIdx + i;
+            const id = `oracle-card-${idx}`;
             const isTerror = r.rec_original === "O Terror do Letterboxd" || r.base === "O REAL TERROR";
             
             const clickAction = isTerror ? "" : `onclick="toggleSelecao(${idx}, '${r.rec.replace(/'/g, "\\'")}', ${r.ano})"`;
             const pointerClass = isTerror ? "cursor-default border-[#ff8000]" : "cursor-pointer border-transparent hover:scale-[1.02] hover:border-[#40bcf4]";
-            const checkIcon = isTerror ? "" : `<div id="check-${idx}" class="absolute top-2 right-2 z-40 bg-[#40bcf4] text-[#14181c] rounded-full p-1 transition-all scale-0 shadow-lg"><svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg></div>`;
-            const selectText = isTerror ? "" : `<span class="text-[7px] sm:text-[9px] text-[#40bcf4] font-black uppercase tracking-widest mt-auto shrink-0">CLIQUE P/ SELECIONAR</span>`;
+            const checkIcon = isTerror ? "" : `<div id="check-${idx}" class="absolute top-2 right-2 z-50 bg-[#40bcf4] text-[#14181c] rounded-full p-1 transition-all scale-0 shadow-[0_4px_10px_rgba(0,0,0,0.8)]"><svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg></div>`;
+            const selectText = isTerror ? "" : `<span class="text-[8px] text-[#40bcf4] font-black mt-auto drop-shadow-md">CLIQUE P/ SELECIONAR</span>`;
 
-            g.insertAdjacentHTML('beforeend', `
-                <div id="${id}" class="fluent-glass movie-card group opacity-0 translate-y-4 transition-all duration-700 border-2 aspect-[2/3] ${pointerClass}" ${clickAction}>
+            grid.insertAdjacentHTML('beforeend', `
+                <div id="${id}" class="fluent-glass movie-card group relative overflow-hidden transition-all duration-300 border-2 ${pointerClass}" ${clickAction}>
                     ${checkIcon}
-                    <img class="fav-poster absolute inset-0 w-full h-full object-cover z-10" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="Poster">
+                    <img class="fav-poster absolute inset-0 w-full h-full object-cover z-10 opacity-0 transition-opacity duration-700" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="Poster">
                     
-                    <div class="card-info z-20 pb-2 px-2 sm:pb-3 sm:px-3 text-center absolute bottom-0 left-0 w-full bg-gradient-to-t from-[#0f1115] via-[#0f1115]/80 to-transparent">
-                        <span class="text-[#40bcf4] text-[7px] sm:text-[8px] font-black uppercase bg-[#14181c]/90 px-1 py-0.5 rounded inline-block truncate max-w-full mb-1 border border-[#40bcf4]/30">${r.base}</span>
-                        <h5 class="text-white font-bold text-[10px] sm:text-xs line-clamp-2 leading-tight drop-shadow-md">${r.rec}</h5>
+                    <div class="absolute bottom-0 left-0 w-full p-4 z-20 text-center bg-gradient-to-t from-[#0f1115] via-[#0f1115]/80 to-transparent pointer-events-none">
+                        <span class="text-[#40bcf4] text-[8px] font-black uppercase border border-[#40bcf4]/30 px-1.5 py-0.5 rounded bg-[#14181c]/90 drop-shadow">${r.base}</span>
+                        <h5 class="text-white font-bold text-[11px] sm:text-xs line-clamp-2 mt-1.5 drop-shadow-lg leading-tight">${r.rec}</h5>
                     </div>
 
-                    <div class="absolute inset-0 bg-[#14181c]/95 z-30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col p-3 sm:p-4 text-center justify-center items-center"> 
-                        <svg class="w-6 h-6 sm:w-8 sm:h-8 mb-1.5 sm:mb-2 text-[#40bcf4] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                        <div class="w-full flex-1 overflow-y-auto no-scrollbar flex flex-col justify-center items-center mb-1">
-                            <p class="text-[9px] sm:text-[11px] text-gray-300 leading-snug sm:leading-relaxed line-clamp-6">"${r.desc}"</p>
-                        </div>
+                    <div class="absolute inset-0 bg-[#14181c]/95 z-30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col p-5 text-center justify-center items-center pointer-events-none"> 
+                        <p class="text-[10px] sm:text-[11px] text-gray-300 line-clamp-6 leading-relaxed font-light">"${r.desc}"</p>
                         ${selectText}
                     </div>
                 </div>
             `);
             
-            buscarPosterInteligente(r.rec, r.ano, id);
-            setTimeout(()=>document.getElementById(id)?.classList.remove('opacity-0','translate-y-4'), 100+(i*150));
+            if(!isTerror) {
+                buscarPosterInteligente(r.rec, r.ano, id);
+            }
         });
     }
 
@@ -917,27 +935,34 @@
                 method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({session_id: sessionId})
             });
 
-            const iv = setInterval(async () => {
-                const res = await fetch(`/progress?session_id=${sessionId}`);
-                const p = await res.json();
-                
-                if(p.total > 0) {
-                    const pct = Math.floor((p.atual / p.total) * 100);
-                    document.getElementById('load-percent').innerText = pct + '%';
+            const checkProgress = async () => {
+                try {
+                    const res = await fetch(`/progress?session_id=${sessionId}`);
+                    const p = await res.json();
                     
-                    if(p.finalizado) {
-                        clearInterval(iv);
-                        pararCicloDeFrases();
-                        document.getElementById('watchlist-loading').classList.add('hidden');
-                        document.getElementById('watchlist-content').classList.remove('hidden');
+                    if(p.total > 0) {
+                        const pct = Math.floor((p.atual / p.total) * 100);
+                        document.getElementById('load-percent').innerText = pct + '%';
+                        
+                        if(p.finalizado) {
+                            pararCicloDeFrases();
+                            document.getElementById('watchlist-loading').classList.add('hidden');
+                            document.getElementById('watchlist-content').classList.remove('hidden');
 
-                        const finalRes = await fetch(`/dados?session_id=${sessionId}`);
-                        const finalData = await finalRes.json();
-                        rawDatabase = finalData.watchlist;
-                        gerarFiltrosEWatchlist(rawDatabase);
+                            const finalRes = await fetch(`/dados?session_id=${sessionId}`);
+                            const finalData = await finalRes.json();
+                            rawDatabase = finalData.watchlist;
+                            gerarFiltrosEWatchlist(rawDatabase);
+                            return; 
+                        }
                     }
-                }
-            }, 1000); 
+                } catch(e) {}
+                
+                setTimeout(checkProgress, 1000);
+            };
+            
+            setTimeout(checkProgress, 1000);
+            
         } catch(e) {}
     }
 
